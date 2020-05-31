@@ -1,0 +1,26 @@
+body {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.slide {
+    height: 100vh;
+    width: 100vw;
+}
+
+#slide-1 { background-color: dodgerblue; }
+#slide-2 { background-color: palevioletred; }
+#slide-3 { background-color: darkgoldenrod; }
+
+.slide h1 {
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 300%;
+    font-weight: bold;
+    padding: 20px 0px 0px 20px;
+}
+
+#slide-1 h1 {
+    padding-top: 20px;
+}

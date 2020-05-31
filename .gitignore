@@ -1,0 +1,10 @@
+.vscode/
+__pycache__/
+stats/
+venv/
+.idea/
+backup/
+autoreload
+autoreload.py
+insert.log
+config.py
