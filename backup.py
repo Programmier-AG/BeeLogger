@@ -29,7 +29,7 @@ os.popen("mysqldump -h %s -u %s -p%s %s > %sdb_backup.sql" % (MySql.host, MySql.
 
 print("copying files")
 copyfile("insert.log", dest + "insert.log")
-copytree("stats", dest + "stats/")
+# copytree("stats", dest + "stats/")
 
 print("packing files")
 make_archive(dest, "zip", dest)
