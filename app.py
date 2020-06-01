@@ -62,7 +62,7 @@ def contactPost():
     msg.attach(MIMEText(name + " schrieb uns über das Kontaktformular:\n\n"+message+"\n\nEnde der Nachricht. Falls du antworten möchtest, hier die E-Mail Adresse: "+emailaddr))
 
     msg["Subject"] = "Nachricht von " + name
-    msg["From"] = "BeeLogger <beelogger@itechnious.com>"
+    msg["From"] = "BeeLogger <%s>" % config.Mail.user + "@" + config.Mail.host
     msg["To"] = "fabian@itechnious.com, sonke@itechnious.com"
 
     if "file" in request.form.keys():
@@ -78,12 +78,12 @@ def contactPost():
         part['Content-Disposition'] = 'attachment; filename="%s"' % f.filename
         msg.attach(part)
 
-    server = smtplib.SMTP("itechnious.com")
-    server.connect("itechnious.com", 587)
+    server = smtplib.SMTP(config.Mail.host)
+    server.connect(config.Mail.host, config.Mail.port)
     server.ehlo()
     server.starttls()
     server.ehlo()
-    server.login("beelogger@itechnious.com", "erheablu16")
+    server.login(config.Mail.user + "@" + config.Mail.host, config.Mail.password)
     server.send_message(msg)
     server.quit()
 
