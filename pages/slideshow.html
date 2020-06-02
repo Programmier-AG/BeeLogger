@@ -14,16 +14,23 @@
             <div class="row" style="margin-top: 20px;">
                 <div class="box col-sm-5">
                     <h3>Aktuelles Wetter</h3>
+                    <span id="Wiesmoor_z704" style="font-size:36px"></span>
                     <a style="margin-bottom: 20px;" class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER" data-label_2="WEATHER" data-icons="Climacons Animated" data-theme="original" >LEER WEATHER</a>
                     <script>
                     !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
                     </script>
+                    <script src="//widget.time.is/de.js"></script>
+                    <script>
+                    time_is_widget.init({Wiesmoor_z704:{template:"TIME<br><p id='date'>DATE</p>", date_format:"dayname, dnum. monthname year, week"}});
+                    </script>
+                    <p id="weather-time-sources"><a href="https://time.is/Wiesmoor" id="time_is_link" rel="nofollow">time.is</a>, <a href="https://weatherwidget.io/">weatherwidget.io</a></p>
+                    
                 </div>
                 <div id="beelogger" class="box col-sm-5">
                     <h3>Bienen-Daten (BeeLogger)</h3>
                     <div class="row" style="margin-top: 30px;">
                         <div class="col-sm-4"><img class="icon" src="https://img.icons8.com/windows/64/000000/temperature.png"/><p class="beelogger-data-field" id="beelogger-temperature">Loading...</p></div>
-                        <div class="col-sm-4"><img class="icon" src="https://img.icons8.com/windows/64/000000/weight-1.png"/><p class="beelogger-data-field" id="beelogger-weight">Loading...</p></div>
+                        <div class="col-sm-4"><img class="icon" src="https://img.icons8.com/windows/64/000000/weight-1.png"/><p class="beelogger-data-field" id="beelogger-weight">Loading...</p><p class="beelogger-data-field" id="beelogger-weight-change">Loading...</p></div>
                         <div class="col-sm-4"><img class="icon" src="https://img.icons8.com/windows/64/000000/humidity.png"/><p class="beelogger-data-field" id="beelogger-humidity">Loading...</p></div>
                     </div>
                     <p id="beelogger-meta"></p>
