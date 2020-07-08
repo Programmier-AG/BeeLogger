@@ -42,16 +42,6 @@ def display():
 def simulate():
     return render_template("simulate.html")
 
-@app.route("/theme")
-def darkMainPage():
-    if "darkmode" in request.cookies.keys():
-        response = make_response(redirect("/"))
-        response.set_cookie("darkmode", "", expires=0)
-    else:
-        response = make_response(redirect("/"))
-        response.set_cookie("darkmode", "on")
-    return response
-
 @app.route("/post_contact", methods=["POST"])
 def contactPost():
     message = request.form["message"]

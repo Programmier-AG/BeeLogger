@@ -12,9 +12,19 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="/js/globals.js"></script>
+    <script src="/js/compare.js"></script>
     <script src="/js/app.js"></script>
     <script>
-        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+        ! function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (!d.getElementById(id)) {
+                js = d.createElement(s);
+                js.id = id;
+                js.src = 'https://weatherwidget.io/js/widget.min.js';
+                fjs.parentNode.insertBefore(js, fjs);
+            }
+        }(document, 'script', 'weatherwidget-io-js');
     </script>
 </head>
 
@@ -23,45 +33,164 @@
         <nav>
             <div class="nav-wrapper blue accent-3">
                 <a href="#!" class="brand-logo">BeeLogger</a>
+                <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i
+                        class="material-icons">menu</i></a>
                 <ul class="right">
-                    <li><a href="/theme" title="Theme ändern"><i class="material-icons">highlight</i></a>
-                    </li>
                     <li><a href="/" title="Aktualisieren"><i class="material-icons">refresh</i></a></li>
                 </ul>
             </div>
         </nav>
     </header>
-    <main>
-        <div id="loading-wrapper">
-            <div class="card blue-grey darken-1" id="loading" style="margin-top: 40px;">
-                <div class="card-content white-text">
-                    <span class="card-title">Daten werden geladen...</span>
-                    <div class="progress">
-                        <div class="indeterminate"></div>
+    
+    <div id="loading-wrapper">
+        <div class="card blue-grey darken-1" id="loading" style="margin-top: 40px;">
+            <div class="card-content white-text">
+                <span class="card-title">Daten werden geladen...</span>
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+                <p>Die Daten werden aus unserer Datenbank abgerufen. Dies kann einen Moment dauern.</p>
+            </div>
+        </div>
+    </div>
+
+    <main class="hide">
+        <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
+            data-label_2="WETTER" data-theme="original">LEER WETTER</a>
+
+        <ul id="slide-out" class="sidenav">
+            <li>
+                <h3 class="center">BeeLogger</h3>
+            </li>
+            <li>
+                <div class="divider"></div>
+            </li>
+            <li><a class="subheader">Gesamt</a></li>
+            <li><a class="waves-effect" href="#summary">Aktuell</a></li>
+            <li><a class="waves-effect" href="#compare">Vergleichsansicht</a></li>
+            <li>
+                <div class="divider"></div>
+            </li>
+            <li><a class="subheader">Andere Ansichten</a></li>
+            <li><a class="waves-effect" href="#weight_chart">Gewicht</a></li>
+            <li><a class="waves-effect" href="#temperature_chart">Temperatur</a></li>
+            <li><a class="waves-effect" href="#hum_chart">Luftfeuchtigkeit</a></li>
+            <br>
+            <li>
+                <div class="divider"></div>
+            </li>
+            <div class="container center">
+                <p>&copy; 2020</p>
+                <a onclick="getStatistics();" href="#aboutModal" style="margin-right: 10px;"
+                    class="modal-trigger">About</a>
+                <a href="#contactModal" class="modal-trigger">Kontakt</a>
+            </div>
+        </ul>
+
+
+        <div id="aboutModal" class="modal">
+            <div class="modal-content">
+                <h4>About BeeLogger</h4>
+                <p>BeeLogger ist ein Projekt der Programmier-AG des Teletta-Groß-Gymnasiums.</p>
+
+                <h5>Daten</h5>
+                <p>BeeLogger misst und sammelt die Daten der Imker-AG. Diese werden auf dieser Seite zur
+                    Verfügung gestellt.</p>
+                <p>Es werden alle 60 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
+                    Seite zur Verfügung stehen.</p>
+
+                <h5>Stats</h5>
+                <p>Gesammelte Datensätze: <b id="inserted-count">fetching...</b></p>
+                <p>Daten-Abfragen: <b id="requested-count">fetching...</b></p>
+                <p>Website-Aufrufe: <b id="website-count">fetching...</b></p>
+                <p>Statistik-Abfragen: <b id="stats-count">fetching...</b></p>
+                <p>Derzeit arbeiten wir noch an einer gesonderten Statistik-Seite, auf der alle Statistiken, die wir
+                    erfassen, genau einsehbar sind.</p>
+
+                <h5>Credits</h5>
+                <p><b>Daten-API:</b> Fabian Reinders</p>
+                <p><b>Website&Design:</b> Fabian Reinders</p>
+                <p><b>Flask-Webserver: </b>Sönke Klock</p>
+                <p><b>Messstationen-Software:</b> Sönke Klock</p>
+                <p><b>Statistiken:</b> Fabian Reinders</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+            </div>
+        </div>
+
+        <div id="contactModal" class="modal">
+            <div class="modal-content">
+                <h4>Kontakt</h4>
+                <p>Mit folgendem Formular kannst du uns kontaktieren:</p>
+
+                <form action="/post_contact" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">account_circle</i>
+                            <input id="icon_prefix" type="text" name="name" class="validate">
+                            <label for="icon_prefix">Dein Name</label>
+                        </div>
                     </div>
-                    <p>Die Daten werden aus unserer Datenbank abgerufen. Dies kann einen Moment dauern.</p>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">email</i>
+                            <input id="email" name="email" type="email" class="validate">
+                            <label for="email">Deine E-Mail Adresse</label>
+                            <span class="helper-text"
+                                data-error="Wir brauchen deine gültige E-Mail Adresse, um dir antworten zu können."
+                                data-success="Okay!"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">mode_edit</i>
+                            <textarea id="icon_prefix3" name="message" class="materialize-textarea"></textarea>
+                            <label for="icon_prefix3">Deine Nachricht</label>
+                        </div>
+                    </div>
+
+                    <p>Du kannst auch eine Datei (wie einen Screenshot oder Ähnliches) anhängen [optional]:</p>
+                    <div class="container center" style="width: 50%; margin-bottom: 40px;">
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Datei anhängen</span>
+                                <input type="file" name="file">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="submit" value="Absenden" class="waves-effect waves-light btn">
+                </form>
+
+                <div class="modal-footer">
+                    <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
                 </div>
             </div>
         </div>
 
-        <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER" data-label_2="WETTER" data-theme="original" >LEER WETTER</a>
-        
-        <div class="row hide" id="dataDisplay">
+        <div id="beelogger-current" class="row center">
+            <h3 id="summary" style="margin-left: 20px;">Aktuell</h3>
+            <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/temperature.png"/><p id="temperature" style="font-size: 250%;">Loading...</p></div>
+            <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/weight-1.png"/><p id="weight" style="font-size: 250%;">Loading...</p></div>
+            <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/humidity.png"/><p id="humidity" style="font-size: 250%;">Loading...</p></div>
+        </div>
 
-            <div id="chartContainer" style="margin-top: 10px;" class="col s12 m12 l9">
-                <div id="chart"></div>
-            </div>
+        <h3 id="compare" style="margin-left: 20px;">Vergleichsansicht</h3>
+        <div id="chartContainer">
+            <div id="chart" style="width: 90%;"></div>
+        </div>
 
-            <div id="dataPicker" class="col s12 m12 l3 center">
-                <h4>Aktuell</h4>
-                <p style="display: inline; font-size: 20px;"><i class="material-icons" style="vertical-align: bottom; font-size: 150%;">update</i> Temperatur</p>
-                <p style="margin: 10px 0 10px 0 !important; padding: 0 !important;" id="temperature">fetching...</p>
-                <p style="display: inline; font-size: 20px;"><i class="material-icons" style="vertical-align: bottom; font-size: 150%;">swap_calls</i> Gewicht</p>
-                <p style="margin: 10px 0 10px 0 !important; padding: 0 !important;" id="weight">fetching...</p>
-                <p style="display: inline; font-size: 20px;"><i class="material-icons" style="vertical-align: bottom; font-size: 150%;">local_drink</i> Luftfeuchtigkeit</p>
-                <p style="margin: 10px 0 10px 0 !important; padding: 0 !important;" id="humidity">fetching...</p>
-
-                <div class="input-field col s12">
+        <div class="row">
+            <div class="col s4"></div>
+            <div class="col s4" style="padding: 0px 40px 0px 40px;">
+                <div class="input-field">
+                    <h4>Zeitraum ändern</h4>
                     <select id="dropSelect">
                         <option value="1">Heute</option>
                         <option value="2">Eine Woche</option>
@@ -69,104 +198,23 @@
                         <option value="4">Ein Jahr</option>
                         <option value="5">Gesamt</option>
                     </select>
-                    <label>Zeitraum</label>
-                </div>
-
-                <div class="container center">
-                    <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
-                    style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
-                </div>
-
-                <div class="container center">
-                    <a onclick="getStatistics();" href="#aboutModal" style="margin-right: 10px;" class="modal-trigger">About</a>
-                    <a href="#contactModal" class="modal-trigger">Kontakt</a>
-                </div>
-
-                <div id="aboutModal" class="modal">
-                    <div class="modal-content">
-                        <h4>About BeeLogger</h4>
-                        <p>BeeLogger ist ein Projekt der Programmier-AG des Teletta-Groß-Gymnasiums.</p>
-
-                        <h5>Daten</h5>
-                        <p>BeeLogger misst und sammelt die Daten der Imker-AG. Diese werden auf dieser Seite zur
-                            Verfügung gestellt.</p>
-                        <p>Es werden alle 60 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
-                            Seite zur Verfügung stehen.</p>
-
-                        <h5>Stats</h5>
-                        <p>Gesammelte Datensätze: <b id="inserted-count">fetching...</b></p>
-                        <p>Daten-Abfragen: <b id="requested-count">fetching...</b></p>
-                        <p>Website-Aufrufe: <b id="website-count">fetching...</b></p>
-                        <p>Statistik-Abfragen: <b id="stats-count">fetching...</b></p>
-                        <p>Derzeit arbeiten wir noch an einer gesonderten Statistik-Seite, auf der alle Statistiken, die wir erfassen, genau einsehbar sind.</p>
-                        <!-- <a href="#">Mehr</a> -->
-
-                        <h5>Credits</h5>
-                        <p><b>Daten-API:</b> Fabian Reinders</p>
-                        <p><b>Website&Design:</b> Fabian Reinders</p>
-                        <p><b>Flask-Webserver: </b>Sönke Klock</p>
-                        <p><b>Messstationen-Software:</b> Sönke Klock</p>
-                        <p><b>Statistiken:</b> Fabian Reinders</p>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+                    <div class="container center">
+                        <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
+                        style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
                     </div>
                 </div>
-
-                <div id="contactModal" class="modal">
-                    <div class="modal-content">
-                        <h4>Kontakt</h4>
-                        <p>Mit folgendem Formular kannst du uns kontaktieren:</p>
-
-                    <form action="/post_contact" method="post" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <i class="material-icons prefix">account_circle</i>
-                                <input id="icon_prefix" type="text" name="name" class="validate">
-                                <label for="icon_prefix">Dein Name</label>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="input-field col s12">
-                            <i class="material-icons prefix">email</i>
-                              <input id="email" name="email" type="email" class="validate">
-                              <label for="email">Deine E-Mail Adresse</label>
-                              <span class="helper-text" data-error="Wir brauchen deine gültige E-Mail Adresse, um dir antworten zu können." data-success="Okay!"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <i class="material-icons prefix">mode_edit</i>
-                                <textarea id="icon_prefix3" name="message" class="materialize-textarea"></textarea>
-                                <label for="icon_prefix3">Deine Nachricht</label>
-                            </div>
-                        </div>
-
-                        <p>Du kannst auch eine Datei (wie einen Screenshot oder Ähnliches) anhängen [optional]:</p>
-                        <div class="container center" style="width: 50%; margin-bottom: 40px;">
-                            <div class="file-field input-field">
-                                <div class="btn">
-                                <span>Datei anhängen</span>
-                                <input type="file" name="file">
-                                </div>
-                                <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text">
-                                </div>
-                            </div>
-                        </div>
-
-                        <input type="submit" value="Absenden" class="waves-effect waves-light btn">
-                    </form>
-                    
-                    <div class="modal-footer">
-                        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
-                    </div>
-                </div>
-
             </div>
+            <div class="col s4"></div>
         </div>
+
+        <h3 style="margin-left: 20px;">Gewicht</h3>
+        <div id="weight_chart" style="margin: 0px 0px 50px 0px;"></div>
+        
+        <h3 id="temperature_chart" style="margin-left: 20px;">Temperatur</h3>
+        <div id="temp_chart" style="margin: 0px 0px 50px 0px;"></div>
+
+        <h3 id="hum_chart" style="margin-left: 20px;">Luftfeuchtigkeit</h3>
+        <div id="humidity_chart" style="margin: 0px 0px 50px 0px;"></div>
     </main>
 </body>
 
