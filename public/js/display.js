@@ -23,6 +23,8 @@ async function about() {
     $("#requested-count").html(res["data_calls"]);
     $("#website-count").html(res["website"]);
 
+    $("body").css("backgroundImage", "url('/assets/slideshow/bee-background.jpg')");
+
 }
 
 var timeoutID;
