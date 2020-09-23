@@ -16,6 +16,7 @@ if not os.path.isfile("app.py"):
     exit()
 
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 print("################################")
 print("#     BeeLogger DataService    #")
@@ -36,21 +37,11 @@ def display():
     if request.args["token"] != config.display_token:
         return redirect("/")
         
-    return render_template("slideshow.html")
+    return render_template("display.html")
 
 @app.route("/simulate")
 def simulate():
     return render_template("simulate.html")
-
-@app.route("/theme")
-def darkMainPage():
-    if "darkmode" in request.cookies.keys():
-        response = make_response(redirect("/"))
-        response.set_cookie("darkmode", "", expires=0)
-    else:
-        response = make_response(redirect("/"))
-        response.set_cookie("darkmode", "on")
-    return response
 
 @app.route("/post_contact", methods=["POST"])
 def contactPost():

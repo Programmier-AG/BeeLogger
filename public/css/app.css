@@ -1,15 +1,5 @@
-main {
-    width: 98%;
-}
-
 a:hover {
     text-decoration: none;
-}
-
-.dark {
-    background: #212121 !important;
-    background-color: #212121 !important;
-    color: #fff !important;
 }
 
 img {
@@ -40,7 +30,7 @@ header a:hover {
     color: #fff;
 }
 
-main, #dataDisplay, #chart {
+main, #chart {
     height: 90vh !important;
 }
 
@@ -59,4 +49,9 @@ input[type="text"] {
     width: 40%;
     margin: 0 auto;
     margin-bottom: 40px;
+}
+
+img.icon {
+    width: 70px;
+    height: 70px;
 }
