@@ -29,6 +29,10 @@
             }
         }(document, 'script', 'weatherwidget-io-js');
     </script>
+    <script>
+        setupTimers();
+        window.setInterval(updateData, 600000)
+    </script>
 </head>
 
 <body id="main">
@@ -129,7 +133,7 @@
                         <option value="5">Gesamt</option>
                     </select>
                     <div class="container center">
-                        <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
+                        <button onclick="updateCharts()" class="waves-effect waves-light btn"
                         style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
                     </div>
                 </div>
