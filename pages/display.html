@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>BeeLogger</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/display.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="/js/globals.js"></script>
+    <script src="/js/display.js"></script>
+    <script src="/js/compare.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/compare.js"></script>
+    <script>
+        ! function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (!d.getElementById(id)) {
+                js = d.createElement(s);
+                js.id = id;
+                js.src = 'https://weatherwidget.io/js/widget.min.js';
+                fjs.parentNode.insertBefore(js, fjs);
+            }
+        }(document, 'script', 'weatherwidget-io-js');
+    </script>
+</head>
+
+<body id="main">
+    <header>
+        <nav>
+            <div class="nav-wrapper blue accent-3">
+                <a href="#!" class="brand-logo">BeeLogger</a>
+                <ul class="right">
+                    <li>
+                        <button onclick="charts()" class="waves-effect waves-light btn" style="margin-left: 10px; margin-bottom: 3%;">Diagramme</button>
+                    </li>
+                    <li>
+                        <button onclick="stundenplan()" class="waves-effect waves-light btn" style="margin-left: 10px; margin-bottom: 3%;">Stundenplan</button>
+                    </li>
+                    <li>
+                        <button onclick="home()" class="waves-effect waves-light btn" style="margin-left: 10px; margin-right: 20px; margin-bottom: 3%;">Startseite</button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main id="data-site">
+        <div id="aboutModal" class="modal">
+            <div class="modal-content">
+                <h4>About BeeLogger</h4>
+                <p>BeeLogger ist ein Projekt der Programmier-AG des Teletta-Groß-Gymnasiums.</p>
+
+                <h5>Daten</h5>
+                <p>BeeLogger misst und sammelt die Daten der Imker-AG. Diese werden auf dieser Seite zur
+                    Verfügung gestellt.</p>
+                <p>Es werden alle 60 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
+                    Seite zur Verfügung stehen.</p>
+
+                <h5>Stats</h5>
+                <p>Gesammelte Datensätze: <b id="inserted-count">Lädt...</b></p>
+                <p>Daten-Abfragen: <b id="requested-count">Lädt...</b></p>
+                <p>Website-Aufrufe: <b id="website-count">Lädt...</b></p>
+                <p>Statistik-Abfragen: <b id="stats-count">Lädt...</b></p>
+                <p>Derzeit arbeiten wir noch an einer gesonderten Statistik-Seite, auf der alle Statistiken, die wir
+                    erfassen, genau einsehbar sind.</p>
+
+                <h5>Credits</h5>
+                <p><b>Daten-API:</b> Fabian Reinders</p>
+                <p><b>Website&Design:</b> Fabian Reinders</p>
+                <p><b>Flask-Webserver: </b>Sönke Klock</p>
+                <p><b>Messstationen-Software:</b> Sönke Klock</p>
+                <p><b>Netzwerk-Einrichtung:</b> Sönke Klock</p>
+                <p><b>Statistiken:</b> Fabian Reinders</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+            </div>
+        </div>
+
+        <div id="background-box">
+            <div id="current-weather">
+                <h1>Wetter & Aktuelle Daten</h1>
+                <span id="Wiesmoor_z704" style="font-size:36px"></span>
+                <a style="margin-bottom: 20px;" class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER" data-label_2="WEATHER" data-icons="Climacons Animated" data-theme="original" >LEER WEATHER</a>
+                <script>
+                !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+                </script>
+                <script src="//widget.time.is/de.js"></script>
+                <script>
+                time_is_widget.init({Wiesmoor_z704:{template:"TIME<br><p id='date'>DATE</p>", date_format:"dayname, dnum. monthname year, week"}});
+                </script>
+                <p id="weather-time-sources"><a href="https://time.is/Wiesmoor" id="time_is_link" rel="nofollow">time.is</a>, <a href="https://weatherwidget.io/">weatherwidget.io</a></p>
+            </div>
+
+            <div id="beelogger-current" class="row center">
+                <h3 id="summary" style="margin-left: 20px;">BeeLogger - Aktuell</h3>
+                <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/temperature.png"/><p id="temperature" style="font-size: 250%;">Lädt...</p></div>
+                <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/weight-1.png"/><p id="weight" style="font-size: 250%;">Lädt...</p></div>
+                <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/humidity.png"/><p id="humidity" style="font-size: 250%;">Lädt...</p></div>
+            </div>
+        </div>
+    </main>
+    <main id="tgg-frame" style="display: none;">
+        <iframe id="plan-frame" src="http://tgg-leer.de/stundenplaene/stundenplaene.html" frameborder="0"></iframe>
+    </main>
+    <main id="charts" style="display: none;">
+        <h1 style="margin-left: 20px;">Daten im Überblick</h1>
+        <h3 id="compare" style="margin-left: 20px;">Vergleichsansicht</h3>
+        <div id="chartContainer">
+            <div id="chart" style="width: 90%;"></div>
+        </div>
+
+        <div class="row">
+            <div class="col s4"></div>
+            <div class="col s4" style="padding: 0px 40px 0px 40px;">
+                <div class="input-field">
+                    <h4>Zeitraum ändern</h4>
+                    <select id="dropSelect">
+                        <option value="1">Heute</option>
+                        <option value="2">Eine Woche</option>
+                        <option value="3">Ein Monat</option>
+                        <option value="4">Ein Jahr</option>
+                        <option value="5">Gesamt</option>
+                    </select>
+                    <div class="container center">
+                        <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
+                        style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col s4"></div>
+        </div>
+
+        <h3 style="margin-left: 20px;">Gewicht</h3>
+        <div id="weight_chart" style="margin: 0px 0px 50px 0px;"></div>
+        
+        <h3 id="temperature_chart" style="margin-left: 20px;">Temperatur</h3>
+        <div id="temp_chart" style="margin: 0px 0px 50px 0px;"></div>
+
+        <h3 id="hum_chart" style="margin-left: 20px;">Luftfeuchtigkeit</h3>
+        <div id="humidity_chart" style="margin: 0px 0px 50px 0px;"></div>
+    </main>
+
+</body>
+</html>
