@@ -28,6 +28,10 @@
             }
         }(document, 'script', 'weatherwidget-io-js');
     </script>
+    <script>
+        setupTimers();
+        window.setInterval(updateData, 600000)
+    </script>
 </head>
 
 <body id="main">
