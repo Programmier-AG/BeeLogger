@@ -16,6 +16,7 @@ if not os.path.isfile("app.py"):
     exit()
 
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 print("################################")
 print("#     BeeLogger DataService    #")
@@ -36,7 +37,7 @@ def display():
     if request.args["token"] != config.display_token:
         return redirect("/")
         
-    return render_template("slideshow.html")
+    return render_template("display.html")
 
 @app.route("/simulate")
 def simulate():
