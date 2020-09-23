@@ -15,11 +15,28 @@ function stundenplan() {
     $("body").css("backgroundImage", "none");
 }
 
+async function about() {
+    let req = await fetch("http://" + api_adress + "/api/stats");
+    let res = await req.json();
+
+    $("#inserted-count").html(res["insert_calls"]);
+    $("#requested-count").html(res["data_calls"]);
+    $("#website-count").html(res["website"]);
+
+}
+
 var timeoutID;
 
 function startTimer() {
     timeoutID = window.setTimeout(doInactive, 60000);
 }
+
+
+function resetTimer() { 
+    window.clearTimeout(timeoutID)
+    startTimer();
+}
+
 function setupTimers () {
     document.addEventListener("mousemove", resetTimer, false);
     document.addEventListener("mousedown", resetTimer, false);
@@ -28,12 +45,9 @@ function setupTimers () {
      
     startTimer();
 }
+
 function doInactive() {
     home();
-}
-function resetTimer() { 
-    window.clearTimeout(timeoutID)
-    startTimer();
 }
 
 $(document).ready(() => {
