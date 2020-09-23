@@ -1,49 +1,95 @@
-main {
-    
-
-    color: white;
-    min-height: 100%;
-}
-#background-box {
-    background-color: white;
-    
-}
-#data-site {
+body {
     background-image: url("/assets/slideshow/bee-background.jpg");
     background-size: 100%;
     background-position-x: 0;
     background-position-y: 0;
+    color: #fff;
 }
-#beelogger-current {
-    width: 50%;
-    min-width: 320px;
-    float: right;
+
+ul.tabs {
     margin: 0;
+    padding: 0;
 }
-#current-weather {
-    width: 50%;
-    min-width: 320px;
-    text-align: center;
-    float: left;
-    margin: 0;
+
+h1#Wiesmoor_z704 p#date {
+    font-size: 50%;
+}
+
+#background-box {
+    background-color: white;
+}
+
+
+iframe#plan-frame {
+    width: 100vw;
+    height: 100vh;
 }
 
 #tgg-frame {
-    position: relative;
-    height: 0; 
-    overflow: hidden; 
     width: 100%;
-    max-height: 100%;
+    height: 100%;
 }
-#tgg-frame iframe {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background-color: white;
-}
+
 #charts {
     color: black;
     width: 100%;
+}
+
+.beelogger-current-box img {
+    width: 100px;
+    height: 100px;
+}
+
+a.weatherwidget-io {
+    width: 75% !important;
+    margin: 0 auto;
+}
+
+.tabs .tab a:focus, .tabs .tab a:focus.active {
+    background-color: black !important;
+}
+
+.indicator {
+    background-color: #1f567c;
+}
+
+#chart, #weight_chart, #humidity_chart, #temp_chart {
+    height: 50vh;
+}
+
+#about {
+    padding-left: 20px;
+    color: #fff;
+}
+#about div {
+    width: 100%;
+    max-width: 4000px;
+    height: 40%;
+}
+#about div div {
+    vertical-align: middle;
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    text-align: center;
+
+    /* border-left: 5px solid gray; */
+}
+
+#about div div h5 {
+    font-size: 250%;
+}
+
+#about div div p {
+    font-size: 150%;
+}
+
+@media screen and (max-width: 800px) {
+    #about div div { 
+        display: block;
+        height: auto;
+        width: 100%; 
+        border: none;
+        margin-bottom: 70px;
+    }
 }

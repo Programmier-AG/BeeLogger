@@ -41,7 +41,7 @@ async function updateData() {
     $("main").removeClass("hide");
     $("#temperature").html(Math.round(response[Object.keys(response).length - 1].temperature) + " °C");
     $("#weight").html(Math.round(response[Object.keys(response).length - 1].weight) + " kg");
-    $("#humidity").html(Math.round(response[Object.keys(response).length - 1].humidity) + " hPa");
+    $("#humidity").html(Math.round(response[Object.keys(response).length - 1].humidity) + " %");
     $("#updated").html(Math.round(response[Object.keys(response).length - 1].measured));
     $('#loading').addClass('hide');
 }
