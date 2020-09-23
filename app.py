@@ -16,6 +16,7 @@ if not os.path.isfile("app.py"):
     exit()
 
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 print("################################")
 print("#     BeeLogger DataService    #")
@@ -36,21 +37,11 @@ def display():
     if request.args["token"] != config.display_token:
         return redirect("/")
         
-    return render_template("slideshow.html")
+    return render_template("display.html")
 
 @app.route("/simulate")
 def simulate():
     return render_template("simulate.html")
-
-@app.route("/theme")
-def darkMainPage():
-    if "darkmode" in request.cookies.keys():
-        response = make_response(redirect("/"))
-        response.set_cookie("darkmode", "", expires=0)
-    else:
-        response = make_response(redirect("/"))
-        response.set_cookie("darkmode", "on")
-    return response
 
 @app.route("/post_contact", methods=["POST"])
 def contactPost():
@@ -62,7 +53,7 @@ def contactPost():
     msg.attach(MIMEText(name + " schrieb uns über das Kontaktformular:\n\n"+message+"\n\nEnde der Nachricht. Falls du antworten möchtest, hier die E-Mail Adresse: "+emailaddr))
 
     msg["Subject"] = "Nachricht von " + name
-    msg["From"] = "BeeLogger <beelogger@itechnious.com>"
+    msg["From"] = "BeeLogger <%s>" % config.Mail.user + "@" + config.Mail.host
     msg["To"] = "fabian@itechnious.com, sonke@itechnious.com"
 
     if "file" in request.form.keys():
@@ -78,12 +69,12 @@ def contactPost():
         part['Content-Disposition'] = 'attachment; filename="%s"' % f.filename
         msg.attach(part)
 
-    server = smtplib.SMTP("itechnious.com")
-    server.connect("itechnious.com", 587)
+    server = smtplib.SMTP(config.Mail.host)
+    server.connect(config.Mail.host, config.Mail.port)
     server.ehlo()
     server.starttls()
     server.ehlo()
-    server.login("beelogger@itechnious.com", "erheablu16")
+    server.login(config.Mail.user + "@" + config.Mail.host, config.Mail.password)
     server.send_message(msg)
     server.quit()
 
