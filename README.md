@@ -3,14 +3,22 @@
 * The Arduino and the API must be able to communicate via LAN or the internet
 * You can set up a hotspot: https://www.raspberrypi.org/documentation/configuration/wireless/access-point-routed.md
 
-## Setting up WSGI
+### Installing packages
+These packages are needed
+`sudo apt install git python3 python3-pip python3-dev`
+
+### Cloning BeeLogger
+`cd /var/www`
+`git clone https://github.com/Programmier-AG/BeeLogger`
+
+### Setting up WSGI
 I this case we will use Apache2 in combination with Python3.7 and mod_wsgi (pip)
 
 So let's install the things
 
-`sudo apt install apache2 apache2-dev`
+`sudo apt install apache2 apache2-dev libapache2-mod-wsgi-py3`
 
-`python3.7 -m pip install mod_wsgi pymysql`
+`python3 -m pip install mod_wsgi pymysql`
 
 Now modify your apache2.conf with `sudo nano /etc/apache2/apache2.conf`
 
@@ -19,7 +27,7 @@ Add this at the bottom:
 LoadModule wsgi_module /usr/local/lib/python3.7/dist-packages/mod_wsgi/server/mod_wsgi-py37.cpython-37m-arm-linux-gnueabihf.so
 WSGIPythonHome "/usr"
 ```
-If you use a different Python version change the Path accordingly.
+If you use a different Python version, change the Path accordingly.
 
 Now configure your virtual host:
 `sudo nano /etc/apache2/sites-available/000-default.conf`
@@ -27,10 +35,10 @@ Now configure your virtual host:
 And change it to this:
 ```
 <VirtualHost *:80>
-    WSGIDaemonProcess beelogger threads=5 lang='de_DE.UTF-8' locale='de_DE.UTF-8' 
-    WSGIScriptAlias / /var/www/beelogger/wsgi/beelogger.wsgi
+    WSGIDaemonProcess beelogger threads=5 lang='de_DE.UTF-8' locale='de_DE.UTF-8'
+    WSGIScriptAlias / /var/www/BeeLogger/wsgi/beelogger.wsgi
 
-    <Directory /var/www/beelogger>
+    <Directory /var/www/BeeLogger>
         WSGIProcessGroup beelogger
         WSGIApplicationGroup %{GLOBAL}
         Order deny,allow
@@ -42,10 +50,13 @@ Now clone the repository into `/var/www` rename it to beelogger and set the perm
 
 Dont forget to rename the example_config to `config` and fill in the data!
 
+Finally restart Apache:
+`sudo service apache2 restart`
+
 ## Setting up database
 Install MySql server and client.
 
-`sudo apt install mysql-server mysql-client`
+`sudo apt install mariadb-server mariadb-client`
 
 Launch the admin panel of your choice or do the following in the console:
 
