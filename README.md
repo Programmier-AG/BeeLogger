@@ -74,6 +74,20 @@ The table should look like this:
 |humidity    |double|Yes          |None | NULL          |   -    |
 |measured    |datetime|Yes        |None | NULL          |   -    |
 
+Also create a table for statistics:
+| Field name | Type | Allow nulls | Key | Default Value | Extras |
+| -----------|:----:|:-----------:|:---:|:-------------:|-------:|
+|id          |tinyint|No          |primary|NULL         |auto_increment|
+|data_calls  |int   |Yes          |None | NULL          |   -    |
+|insert_calls|double|Yes          |None | NULL          |   -    |
+|website     |double|Yes          |None | NULL          |   -    |
+
 You can also create the database with the included sql file.
 
-You are ready to go!
+**You are ready to go!**
+
+# Optional Chrome extension
+If you want to secure the kiosk so that it stays on the BeeLogger page, just use the basic plugin for Chrome.
+Open the background.js file and customize your kiosk URL. Then open the extension-manager and enable developer mode. Then select "load unpacked extension" and open the "Chrome Domain lock" folder, and off you go.
+
+Note that this plugin makes the browser otherwise unusable since it forces to only have a single tab with the set website. It may also be difficult to remove the extension.
