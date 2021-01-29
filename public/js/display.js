@@ -16,15 +16,14 @@ function stundenplan() {
 }
 
 async function about() {
+    $("body").css("backgroundImage", "url('/assets/slideshow/bee-background.jpg')");
+
     let req = await fetch("http://" + api_adress + "/api/stats");
     let res = await req.json();
 
     $("#inserted-count").html(res["insert_calls"]);
     $("#requested-count").html(res["data_calls"]);
     $("#website-count").html(res["website"]);
-
-    $("body").css("backgroundImage", "url('/assets/slideshow/bee-background.jpg')");
-
 }
 
 var timeoutID;
