@@ -122,6 +122,15 @@ async function getStatistics() {
     $("#website-count").html(res["website"]);
 }
 
+detailChartOptions = {
+    height: "100%",
+    width: "100%",
+    legend: {
+        position: 'bottom'
+    },
+    vAxis: {minValue: 0}
+}
+
 async function drawTempChart() {
     var tempData = [['Gemessen', 'Temperatur (°C)']];
     let response = await fetchData();
@@ -133,7 +142,7 @@ async function drawTempChart() {
 
     var data_temp = google.visualization.arrayToDataTable(tempData);
     var temp_chart = new google.visualization.LineChart(document.getElementById('temp_chart'));
-    temp_chart.draw(data_temp, {});
+    temp_chart.draw(data_temp, detailChartOptions);
 }
 
 async function drawWeightChart() {
@@ -147,7 +156,7 @@ async function drawWeightChart() {
 
     var data_weight = google.visualization.arrayToDataTable(weightData);
     var temp_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
-    temp_chart.draw(data_weight, {});
+    temp_chart.draw(data_weight, detailChartOptions);
 }
 
 async function drawHumidityChart() {
@@ -161,5 +170,5 @@ async function drawHumidityChart() {
 
     var data_humidity = google.visualization.arrayToDataTable(humidityData);
     var humidity_chart = new google.visualization.LineChart(document.getElementById('humidity_chart'));
-    humidity_chart.draw(data_humidity, {});
+    humidity_chart.draw(data_humidity, detailChartOptions);
 }
