@@ -7,10 +7,6 @@
 These packages are needed
 `sudo apt install git python3 python3-pip python3-dev`
 
-### Cloning BeeLogger
-`cd /var/www`
-`git clone https://github.com/Programmier-AG/BeeLogger`
-
 ### Setting up WSGI
 I this case we will use Apache2 in combination with Python3.7 and mod_wsgi (pip)
 
@@ -46,9 +42,13 @@ And change it to this:
     </Directory>
 </VirtualHost>
 ```
-Now clone the repository into `/var/www` rename it to beelogger and set the permissions.
 
-Dont forget to rename the example_config to `config` and fill in the data!
+### Cloning BeeLogger
+`cd /var/www`
+`git clone https://github.com/Programmier-AG/BeeLogger`
+
+Don't forget to set the permissions!
+Don't forget to rename the example_config to `config` and fill in the data!
 
 Finally restart Apache:
 `sudo service apache2 restart`

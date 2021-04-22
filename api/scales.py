@@ -27,8 +27,8 @@ def scales(r_data):
         cursor.execute("SELECT * FROM data ORDER BY number DESC LIMIT 1")
         res = cursor.fetchone()
         if not r_data["n"] in res.keys():
-            return "No collumn in database for this scale"
-        if res[r_data["n"]] is None:
+            return "No collumn in database for this scale", 304
+        if res is not None and res[r_data["n"]] is None:
             sql = "UPDATE data SET `%s` = '%s' WHERE number = '%s'" % (r_data['n'], weight, res['number'])
         else:
             sql = "INSERT INTO `data` (`%s`, `measured`) VALUES (%s, '%s')" % (r_data['n'], weight, date)

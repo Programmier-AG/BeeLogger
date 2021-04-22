@@ -24,7 +24,7 @@ def insert_data(r_data):
         cursor.execute("SELECT * FROM data ORDER BY number DESC LIMIT 1")
         res = cursor.fetchone()
 
-        if res["weight"] is None:
+        if res is not None and res["weight"] is None:
             sql = "UPDATE data SET `temperature` = '%s', `weight` = '%s', `humidity` = '%s' WHERE number = '%s'" % (float(r_data["t"]), float(r_data["w"]) * config.correction[0] - config.real_tare[0], float(r_data["h"]), res["number"])
         else:
             sql = "INSERT INTO `data` (`number`, `temperature`, `weight`, `humidity`, `measured`) VALUES (0, %s, %s, %s, '%s')" % (float(r_data["t"]), float(r_data["w"]) * config.correction[0] - config.real_tare[0], float(r_data["h"]), date)
