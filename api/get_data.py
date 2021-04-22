@@ -15,23 +15,33 @@ def get_data(r_data):
         cursorclass=pymysql.cursors.DictCursor
     )
 
-    try:
-        if "compressed" in r_data:
-            cursor = connection.cursor()
-            cursor.execute("SELECT MIN(number) as number, temperature, weight, humidity, DATE_FORMAT(`measured`, '%%Y-%%m-%%d %%H:%%i:%%S') as measured FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s' GROUP BY CAST(`measured` as DATE)" % (r_data["from"], r_data["to"]))
-            result = cursor.fetchall()
 
-        else:
-            cursor = connection.cursor()
-            cursor.execute("SELECT number, temperature, weight, humidity, DATE_FORMAT(`measured`, '%%Y-%%m-%%d %%H:%%i:%%S') as measured FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s'" % (r_data["from"], r_data["to"]))
-            result = cursor.fetchall()
+    if "compressed" in r_data:
+        cursor = connection.cursor()
+        cursor.execute("SELECT MIN(number) as number, temperature, weight, humidity, DATE_FORMAT(`measured`, '%%Y-%%m-%%d %%H:%%i:%%S') as measured FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s' GROUP BY CAST(`measured` as DATE)" % (r_data["from"], r_data["to"]))
+        result = cursor.fetchall()
 
-        fetched_data = {}
-        row_count = 0
-        for row in result:
-            fetched_data[row_count] = row
-            row_count += 1
-        
-        return jsonify(fetched_data)
-    except Exception as e:
-        return str(e)
+    else:
+        cursor = connection.cursor()
+        # cursor.execute("SELECT number, temperature, weight, humidity, DATE_FORMAT(`measured`, '%%Y-%%m-%%d %%H:%%i:%%S') as measured FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s'" % (r_data["from"], r_data["to"]))
+        cursor.execute("SELECT * FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s'" % (r_data["from"], r_data["to"]))
+
+        result = cursor.fetchall()
+
+    fetched_data = {}
+    row_count = 0
+    for row in result:
+        row["weight"] = row["weight"] - config.tare[0]
+
+        for i in range(1, len(row.keys())):
+            if str(i) in row.keys() and row[str(i)] is not None:
+                if i in config.tare.keys():
+                    row[str(i)] = row[str(i)] - config.tare[i]
+                else:
+                    row[str(i)] = row[str(i)] - config.tare[0]
+
+        fetched_data[row_count] = row
+
+        row_count += 1
+
+    return jsonify(fetched_data)
