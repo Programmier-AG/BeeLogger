@@ -55,3 +55,21 @@ img.icon {
     width: 70px;
     height: 70px;
 }
+
+h3.chart-title {
+    text-align: center;
+    margin-left: 20px;
+}
+
+.detail-chart {
+    height: 70vh;
+}
+
+.beelogger-current-box .card {
+    padding: 10px;
+    height: 100% !important;
+}
+
+.beelogger-current-box span {
+    font-size: 300%;
+}
