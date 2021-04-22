@@ -106,10 +106,10 @@ async function updateData() {
     }
 
     $("main").removeClass("hide");
-    $("#temperature").html(Math.round(response[Object.keys(response).length - 1].temperature) + " °C");
-    $("#weight").html(Math.round(response[Object.keys(response).length - 1].weight) + " kg");
-    $("#humidity").html(Math.round(response[Object.keys(response).length - 1].humidity) + " %");
-    $("#updated").html(Math.round(response[Object.keys(response).length - 1].measured));
+    $("#temperature").html(response[Object.keys(response).length - 1].temperature + " °C");
+    $("#weight").html(response[Object.keys(response).length - 1].weight + " kg");
+    $("#humidity").html(response[Object.keys(response).length - 1].humidity + " %");
+    $("#updated").html(response[Object.keys(response).length - 1].measured);
     $('#loading').addClass('hide');
 }
 
@@ -120,6 +120,15 @@ async function getStatistics() {
     $("#inserted-count").html(res["insert_calls"]);
     $("#requested-count").html(res["data_calls"]);
     $("#website-count").html(res["website"]);
+}
+
+detailChartOptions = {
+    height: "100%",
+    width: "100%",
+    legend: {
+        position: 'bottom'
+    },
+    vAxis: {minValue: 0}
 }
 
 async function drawTempChart() {
@@ -133,7 +142,7 @@ async function drawTempChart() {
 
     var data_temp = google.visualization.arrayToDataTable(tempData);
     var temp_chart = new google.visualization.LineChart(document.getElementById('temp_chart'));
-    temp_chart.draw(data_temp, {});
+    temp_chart.draw(data_temp, detailChartOptions);
 }
 
 async function drawWeightChart() {
@@ -147,7 +156,7 @@ async function drawWeightChart() {
 
     var data_weight = google.visualization.arrayToDataTable(weightData);
     var temp_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
-    temp_chart.draw(data_weight, {});
+    temp_chart.draw(data_weight, detailChartOptions);
 }
 
 async function drawHumidityChart() {
@@ -161,5 +170,5 @@ async function drawHumidityChart() {
 
     var data_humidity = google.visualization.arrayToDataTable(humidityData);
     var humidity_chart = new google.visualization.LineChart(document.getElementById('humidity_chart'));
-    humidity_chart.draw(data_humidity, {});
+    humidity_chart.draw(data_humidity, detailChartOptions);
 }
