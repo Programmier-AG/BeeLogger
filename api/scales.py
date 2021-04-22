@@ -30,7 +30,7 @@ def scales(r_data):
         fields = cursor.fetchall()
         fields = [str(x["Field"]) for x in fields]
         if not r_data["n"] in fields:
-            return "No collumn in database for this scale"
+            return "No column in database for this scale"
         if res is not None and res[r_data["n"]] is None:
             sql = "UPDATE data SET `%s` = '%s' WHERE number = '%s'" % (r_data['n'], weight, res['number'])
         else:
