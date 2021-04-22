@@ -41,7 +41,7 @@
             </div>
         </nav>
     </header>
-    
+
     <div id="loading-wrapper">
         <div class="card blue-grey darken-1" id="loading" style="margin-top: 40px;">
             <div class="card-content white-text">
@@ -55,6 +55,13 @@
     </div>
 
     <main class="hide">
+
+        <div class="fixed-action-btn">
+            <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
+                <i class="large material-icons">edit_calendar</i>
+            </a>
+        </div>
+        
         <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
             data-label_2="WETTER" data-theme="original">LEER WETTER</a>
 
@@ -87,6 +94,27 @@
             </div>
         </ul>
 
+        <div id="dateRangeModal" class="modal">
+            <div class="modal-content">
+                <div class="input-field">
+                    <h4>Zeitraum ändern</h4>
+                    <select id="dropSelect">
+                        <option value="1">Heute</option>
+                        <option value="2">Eine Woche</option>
+                        <option value="3">Ein Monat</option>
+                        <option value="4">Ein Jahr</option>
+                        <option value="5">Gesamt</option>
+                    </select>
+                    <div class="container center">
+                        <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
+                            style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+            </div>
+        </div>
 
         <div id="aboutModal" class="modal">
             <div class="modal-content">
@@ -176,45 +204,52 @@
 
         <div id="beelogger-current" class="row center">
             <h3 id="summary" style="margin-left: 20px;">Aktuell</h3>
-            <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/temperature.png"/><p id="temperature" style="font-size: 250%;">Loading...</p></div>
-            <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/weight-1.png"/><p id="weight" style="font-size: 250%;">Loading...</p></div>
-            <div class="beelogger-current-box col s4"><img class="icon" src="https://img.icons8.com/windows/64/000000/humidity.png"/><p id="humidity" style="font-size: 250%;">Loading...</p></div>
-        </div>
 
-        <h3 id="compare" style="margin-left: 20px;">Vergleichsansicht</h3>
-        <div id="chartContainer">
-            <div id="chart" style="width: 90%;"></div>
-        </div>
+            <div class="row">
+                <div class="beelogger-current-box col s4">
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="material-icons">thermostat</span>
+                            <span class="card-title">Temperatur</span>
+                            <p id="temperature" style="font-size: 250%;">Loading...</p>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="row">
-            <div class="col s4"></div>
-            <div class="col s4" style="padding: 0px 40px 0px 40px;">
-                <div class="input-field">
-                    <h4>Zeitraum ändern</h4>
-                    <select id="dropSelect">
-                        <option value="1">Heute</option>
-                        <option value="2">Eine Woche</option>
-                        <option value="3">Ein Monat</option>
-                        <option value="4">Ein Jahr</option>
-                        <option value="5">Gesamt</option>
-                    </select>
-                    <div class="container center">
-                        <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
-                        style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
+                <div class="beelogger-current-box col s4">
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="material-icons">monitor_weight</span>
+                            <span class="card-title">Gewicht</span>
+                            <p id="weight" style="font-size: 250%;">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="beelogger-current-box col s4">
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="material-icons">water</span>
+                            <span class="card-title">Luftfeuchtigkeit</span>
+                            <p id="humidity" style="font-size: 250%;">Loading...</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col s4"></div>
-        </div>
 
-        <h3 style="margin-left: 20px;">Gewicht</h3>
-        <div id="weight_chart" style="margin: 0px 0px 50px 0px;"></div>
-        
-        <h3 id="temperature_chart" style="margin-left: 20px;">Temperatur</h3>
-        <div id="temp_chart" style="margin: 0px 0px 50px 0px;"></div>
+            <h3 id="compare" class="chart-title">Vergleichsansicht</h3>
+            <div id="chartContainer">
+                <div id="chart" style="width: 90%;"></div>
+            </div>
 
-        <h3 id="hum_chart" style="margin-left: 20px;">Luftfeuchtigkeit</h3>
-        <div id="humidity_chart" style="margin: 0px 0px 50px 0px;"></div>
+            <h3 class="chart-title">Gewicht</h3>
+            <div id="weight_chart" class="detail-chart"></div>
+
+            <h3 id="temperature_chart" class="chart-title">Temperatur</h3>
+            <div id="temp_chart" class="detail-chart"></div>
+
+            <h3 id="hum_chart" class="chart-title">Luftfeuchtigkeit</h3>
+            <div id="humidity_chart" class="detail-chart"></div>
     </main>
 </body>
 
