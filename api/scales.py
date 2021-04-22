@@ -26,8 +26,11 @@ def scales(r_data):
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM data ORDER BY number DESC LIMIT 1")
         res = cursor.fetchone()
-        if not r_data["n"] in res.keys():
-            return "No collumn in database for this scale", 304
+        cursor.execute("DESCRIBE data")
+        fields = cursor.fetchall()
+        fields = [str(x["Field"]) for x in fields]
+        if not r_data["n"] in fields:
+            return "No collumn in database for this scale"
         if res is not None and res[r_data["n"]] is None:
             sql = "UPDATE data SET `%s` = '%s' WHERE number = '%s'" % (r_data['n'], weight, res['number'])
         else:
