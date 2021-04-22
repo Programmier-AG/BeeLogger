@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from flask import Flask, make_response, redirect, render_template, request
 
 import config
-from api import get_data, get_statistics, insert_data
+from api import get_data, get_statistics, insert_data, scales
 from crossdomain import crossdomain
 
 if not os.path.isfile("app.py"):
@@ -92,10 +92,17 @@ def insertData():
     statistics.update("insert_calls")
     return insert_data.insert_data(request.args)
 
+@app.route("/api/data/scales", methods=["GET"])
+@crossdomain(origin="*", current_app=app)
+def insertDataScales():
+    statistics.update("insert_calls")
+    return scales.scales(request.args)
+
 @app.route("/api/stats", methods=["GET"])
 @crossdomain(origin="*", current_app=app)
 def getStatistics():
     return get_statistics.get_statistics()
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.web_port)

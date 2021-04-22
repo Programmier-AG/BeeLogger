@@ -18,19 +18,23 @@ def insert_data(r_data):
             cursorclass=pymysql.cursors.DictCursor
         )
 
-        try:
-            date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            cursor = connection.cursor()
-            sql = "INSERT INTO `data` (`number`, `temperature`, `weight`, `humidity`, `measured`) VALUES (0, %s, %s, %s, '%s')" % (float(r_data["t"]), float(r_data["w"]), float(r_data["h"]), date)
+        date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        cursor = connection.cursor()
 
-            log = open("insert.log", mode="a")
-            log.write("\n[%s] - %s" % (time.asctime(), sql))
-            log.close()
+        cursor.execute("SELECT * FROM data ORDER BY number DESC LIMIT 1")
+        res = cursor.fetchone()
 
-            cursor.execute(sql)
-            connection.commit()
-            return "data inserted"
-        except Exception as error:
-            return "error: %s" % error
+        if res is not None and res["weight"] is None:
+            sql = "UPDATE data SET `temperature` = '%s', `weight` = '%s', `humidity` = '%s' WHERE number = '%s'" % (float(r_data["t"]), float(r_data["w"]) * config.correction[0] - config.real_tare[0], float(r_data["h"]), res["number"])
+        else:
+            sql = "INSERT INTO `data` (`number`, `temperature`, `weight`, `humidity`, `measured`) VALUES (0, %s, %s, %s, '%s')" % (float(r_data["t"]), float(r_data["w"]) * config.correction[0] - config.real_tare[0], float(r_data["h"]), date)
+
+        log = open("insert.log", mode="a")
+        log.write("\n[%s] - %s" % (time.asctime(), sql))
+        log.close()
+
+        cursor.execute(sql)
+        connection.commit()
+        return "data inserted"
 
     return "invalid arguments"
