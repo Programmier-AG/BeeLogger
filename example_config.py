@@ -2,6 +2,10 @@ web_port = 80
 insert_token = ""
 display_token = ""
 
+correction = {0: 1}  # Gets multiplied by the weight before insertion
+tare = {0: 0}  # tare value after selection from database
+real_tare = {0: 0}  # tare value before insertion into database
+
 class MySql:
     host = ""
     port = 3306
