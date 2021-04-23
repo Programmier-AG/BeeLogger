@@ -63,7 +63,7 @@ async function fetchData() {
                 from = dateTwo;
                 to = date;
                 view = "month";
-                response = await fetch("http://" + api_adress + "/api/data/get?from=" + dateTwo + "&to=" + date + "&compressed");
+                response = await fetch("http://" + api_adress + "/api/data/get?from=" + dateTwo + "&to=" + date);
                 break;
                 // Year
             case "4":
@@ -71,14 +71,14 @@ async function fetchData() {
                 from = year;
                 to = year;
                 view = year;
-                response = await fetch("http://" + api_adress + "/api/data/get?from=" + year + "-01-01&to=" + year + "-12-31&compressed");
+                response = await fetch("http://" + api_adress + "/api/data/get?from=" + year + "-01-01&to=" + year + "-12-31");
                 break;
                 // All
             case "5":
                 from = "2020";
                 to = "-";
                 view = "all";
-                response = await fetch("http://" + api_adress + "/api/data/get?from=2000-01-01&to=2099-12-31&compressed");
+                response = await fetch("http://" + api_adress + "/api/data/get?from=2000-01-01&to=2099-12-31");
                 break;
         }
     } else {

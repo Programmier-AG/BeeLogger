@@ -15,18 +15,9 @@ def get_data(r_data):
         cursorclass=pymysql.cursors.DictCursor
     )
 
-
-    if "compressed" in r_data:
-        cursor = connection.cursor()
-        cursor.execute("SELECT MIN(number) as number, temperature, weight, humidity, DATE_FORMAT(`measured`, '%%Y-%%m-%%d %%H:%%i:%%S') as measured FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s' GROUP BY CAST(`measured` as DATE)" % (r_data["from"], r_data["to"]))
-        result = cursor.fetchall()
-
-    else:
-        cursor = connection.cursor()
-        # cursor.execute("SELECT number, temperature, weight, humidity, DATE_FORMAT(`measured`, '%%Y-%%m-%%d %%H:%%i:%%S') as measured FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s'" % (r_data["from"], r_data["to"]))
-        cursor.execute("SELECT * FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s'" % (r_data["from"], r_data["to"]))
-
-        result = cursor.fetchall()
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s'" % (r_data["from"], r_data["to"]))
+    result = cursor.fetchall()
 
     fetched_data = {}
     row_count = 0
