@@ -4,6 +4,8 @@ body {
     background-position-x: 0;
     background-position-y: 0;
     color: #fff;
+    margin: 0;
+    padding: 0;
 }
 
 ul.tabs {
@@ -19,13 +21,23 @@ h1#Wiesmoor_z704 p#date {
     background-color: white;
 }
 
-
-iframe#plan-frame {
-    width: 100vw;
+.iframe iframe {
+    display: block;
+    border: none;
     height: 100vh;
+    width: 100vw;
 }
 
-#tgg-frame {
+.iframe {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#gallery-tab, #stundenplan-tab {
+    margin: 0 !important;
+    padding: 0 !important;
     width: 100%;
     height: 100%;
 }
