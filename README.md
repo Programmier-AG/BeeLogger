@@ -90,4 +90,4 @@ You can also create the database with the included sql file.
 If you want to secure the kiosk so that it stays on the BeeLogger page, just use the basic plugin for Chrome.
 Open the background.js file and customize your kiosk URL. Then open the extension-manager and enable developer mode. Then select "load unpacked extension" and open the "Chrome Domain lock" folder, and off you go.
 
-Note that this plugin makes the browser otherwise unusable since it forces to only have a single tab with the set website. It may also be difficult to remove the extension.
+Note that this plugin makes the browser otherwise unusable since it forces to only have a single tab with the set website. It may also be difficult to remove the extension.test
