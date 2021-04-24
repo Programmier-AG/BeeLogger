@@ -11,6 +11,10 @@ function home() {
     $("body").css("backgroundImage", "url('/assets/slideshow/bee-background.jpg')");
 }
 
+function gallery() {
+    $("body").css("backgroundImage", "none");
+}
+
 function stundenplan() {
     $("body").css("backgroundImage", "none");
 }
