@@ -22,7 +22,7 @@ function stundenplan() {
 async function about() {
     $("body").css("backgroundImage", "url('/assets/slideshow/bee-background.jpg')");
 
-    let req = await fetch("http://" + api_adress + "/api/stats");
+    let req = await fetch("/api/stats");
     let res = await req.json();
 
     $("#inserted-count").html(res["insert_calls"]);
