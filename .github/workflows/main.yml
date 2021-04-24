@@ -1,0 +1,15 @@
+
+name: Automatic Deployment
+
+on:
+   push:
+     branches:
+       - master
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - name: Update repository
+      uses: actions/checkout@v2
