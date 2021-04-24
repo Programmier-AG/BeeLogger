@@ -31,7 +31,7 @@ async function fetchData() {
         switch (compareValue.options[compareValue.selectedIndex].value) {
             // Today
             case "1":
-                response = await fetch("http://" + api_adress + "/api/data/get?from=" + date + "&to=" + date);
+                response = await fetch("/api/data/get?from=" + date + "&to=" + date);
                 from = date;
                 to = date;
                 view = "today";
@@ -48,7 +48,7 @@ async function fetchData() {
                 from = dateTwo;
                 to = date;
                 view = "week";
-                response = await fetch("http://" + api_adress + "/api/data/get?from=" + dateTwo + "&to=" + date);
+                response = await fetch("/api/data/get?from=" + dateTwo + "&to=" + date);
                 break;
                 // Month
             case "3":
@@ -63,7 +63,7 @@ async function fetchData() {
                 from = dateTwo;
                 to = date;
                 view = "month";
-                response = await fetch("http://" + api_adress + "/api/data/get?from=" + dateTwo + "&to=" + date);
+                response = await fetch("/api/data/get?from=" + dateTwo + "&to=" + date);
                 break;
                 // Year
             case "4":
@@ -71,18 +71,18 @@ async function fetchData() {
                 from = year;
                 to = year;
                 view = year;
-                response = await fetch("http://" + api_adress + "/api/data/get?from=" + year + "-01-01&to=" + year + "-12-31");
+                response = await fetch("/api/data/get?from=" + year + "-01-01&to=" + year + "-12-31");
                 break;
                 // All
             case "5":
                 from = "2020";
                 to = "-";
                 view = "all";
-                response = await fetch("http://" + api_adress + "/api/data/get?from=2000-01-01&to=2099-12-31");
+                response = await fetch("/api/data/get?from=2000-01-01&to=2099-12-31");
                 break;
         }
     } else {
-        response = await fetch("http://" + api_adress + "/api/data/get?from=" + date + "&to=" + date);
+        response = await fetch("/api/data/get?from=" + date + "&to=" + date);
         from = date;
         to = date;
         view = "today";
@@ -91,7 +91,7 @@ async function fetchData() {
     return await response.json();
 
 /*
-    let response = await fetch("http://" + api_adress + "/api/data/get?from=" + date + "&to=" + date);
+    let response = await fetch("/api/data/get?from=" + date + "&to=" + date);
     return await response.json();
 */
 }
@@ -114,7 +114,7 @@ async function updateData() {
 }
 
 async function getStatistics() {
-    let req = await fetch("http://" + api_adress + "/api/stats");
+    let req = await fetch("/api/stats");
     let res = await req.json();
 
     $("#inserted-count").html(res["insert_calls"]);
