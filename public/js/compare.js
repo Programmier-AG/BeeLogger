@@ -75,7 +75,7 @@ async function drawCompareChart() {
     ];
 
     for (row in c) {
-        var measured = new Date(c[row].measured.replace("-", "/").replace("-", "/"));
+        var measured = new Date(c[row].measured);
         compareData.push([measured, c[row].temperature, c[row].weight, c[row].humidity]);
     }
 
