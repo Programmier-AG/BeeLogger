@@ -6,6 +6,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from flask import Flask, make_response, redirect, render_template, request
+from flask.json import JSONEncoder
+from datetime import date
 
 import config
 from api import get_data, get_statistics, insert_data, scales
@@ -15,8 +17,22 @@ if not os.path.isfile("app.py"):
     print("You need to start this script from the directory it's contained in. Please cd into that folder.")
     exit()
 
+# Custom json encoder for returning date in ISO format
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):  # pylint: disable=E0202
+        try:
+            if isinstance(obj, date):
+                return obj.isoformat()
+            iterable = iter(obj)
+        except TypeError:
+            pass
+        else:
+            return list(iterable)
+        return JSONEncoder.default(self, obj)
+
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.json_encoder = CustomJSONEncoder
 
 print("################################")
 print("#     BeeLogger DataService    #")

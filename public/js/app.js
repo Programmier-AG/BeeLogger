@@ -1,8 +1,19 @@
-$(document).ready(function () {
-    $('select').formSelect();
-    $('.dropdown-trigger').dropdown();
-    $('.modal').modal();
-    $('.sidenav').sidenav();
+/*
+                    BeeLogger
+
+        JS for dashboard and display page
+    
+    Copyright (c) 2020-2021 Fabian R., Sönke K.
+*/
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initializing used Materialize components
+    M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
+    M.Modal.init(document.querySelectorAll('.modal'), {});
+    M.FormSelect.init(document.querySelectorAll('select'), {});
+    M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
+
+    // Setting up background tasks for automatic data refresh
     setTimeout(() => {
         updateData();
         drawCompareChart();
@@ -20,69 +31,105 @@ google.charts.load('current', {
 var date = luxon.DateTime.now().toISODate();
 
 async function fetchData() {
-    var compareValue = document.getElementById("dropSelect");
+    var compareValue = document.getElementById('dropSelect');
 
     if (compareValue) {
         switch (compareValue.options[compareValue.selectedIndex].value) {
             // Today
-            case "1":
-                response = await fetch("/api/data/get?from=" + date + "&to=" + date);
+            case '1':
+                response = await fetch('/api/data/get?from=' + date + '&to=' + date);
                 break;
             
             // Week
-            case "2":
+            case '2':
                 var dateTwo = luxon.DateTime.now().minus({ weeks: 1 }).toISODate();
-                response = await fetch("/api/data/get?from=" + dateTwo + "&to=" + date);
+                response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
                 break;
             
             // Month
-            case "3":
+            case '3':
                 var dateTwo = luxon.DateTime.now().minus({ months: 1 }).toISODate();
-                response = await fetch("/api/data/get?from=" + date + "&to=" + date);
+                response = await fetch('/api/data/get?from=' + date + '&to=' + date);
                 break;
 
             // Year
-            case "4":
+            case '4':
                 var dateTwo = luxon.DateTime.now().minus({ years: 1 }).toISODate();
-                response = await fetch("/api/data/get?from=" + dateTwo + "&to=" + date);
+                response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
                 break;
         }
     
     // If no view is selected, fetch current data
-    } else response = await fetch("/api/data/get?from=" + date + "&to=" + date);
+    } else response = await fetch('/api/data/get?from=' + date + '&to=' + date);
 
     return await response.json();
 }
 
+// Function for updating the 'current data' section
 async function updateData() {
     let response = await fetchData();
 
-    if(jQuery.isEmptyObject(response)) {
+    if(Object.keys(response).length <= 0) {
         let card = '<div class="row"><div class="col m3"></div><div class="col m5"><div class="card blue-grey darken-1"><div class="card-image"><img src="../assets/bee.png"><span class="card-title">Keine Daten erhalten!</span></div><div class="card-content white-text"><p>Der Server hat für den ausgewählten Zeitraum keine Daten zurückgegeben. Diese wurden aufgrund eines temporären technischen Fehlers entweder nicht gemessen oder es gibt Verbindungsprobleme mit der Datenbank.</p></div></div></div><div class="col m3"></div></div>';
-        $('#loading-wrapper').html(card);
+        document.querySelector('#loading-wrapper').innerHTML = card;
         return
     }
 
-    $("main").removeClass("hide");
-    $("#temperature").html(response[Object.keys(response).length - 1].temperature + " °C");
-    $("#weight").html(response[Object.keys(response).length - 1].weight + " kg");
-    $("#humidity").html(response[Object.keys(response).length - 1].humidity + " %");
-    $("#updated").html(response[Object.keys(response).length - 1].measured);
-    $('#loading').addClass('hide');
+    document.querySelector('main').classList.remove('hide');
+    document.querySelector('#temperature').innerHTML = response[Object.keys(response).length - 1].temperature + ' °C';
+    document.querySelector('#weight').innerHTML = response[Object.keys(response).length - 1].weight + ' kg';
+    document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
+    document.querySelector('#updated').innerHTML = response[Object.keys(response).length - 1].measured;
+    document.querySelector('#loading').className = 'hide';
 }
 
 async function getStatistics() {
-    let req = await fetch("/api/stats");
+    let req = await fetch('/api/stats');
     let res = await req.json();
 
-    $("#inserted-count").html(res["insert_calls"]);
-    $("#requested-count").html(res["data_calls"]);
-    $("#website-count").html(res["website"]);
+    document.querySelector('#inserted-count').innerHTML = res['insert_calls'];
+    document.querySelector('#requested-count').innerHTML = res['data_calls'];
+    document.querySelector('#website-count').innerHTML = res['website'];
+}
+
+async function drawCompareChart() {
+    var c = await fetchData();
+    var compareData = [
+        ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
+    ];
+
+    for (row in c) {
+        var measured = new Date(c[row].measured);
+        compareData.push([measured, c[row].temperature, c[row].weight, c[row].humidity]);
+    }
+
+    var from = luxon.DateTime.fromJSDate(compareData[1][0]).toISODate();
+    var to = luxon.DateTime.fromJSDate(compareData[compareData.length - 1][0]).toISODate();
+
+    var data = google.visualization.arrayToDataTable(compareData);
+    var options = {
+        title: `Daten von ${from} bis ${to}`,
+        curveType: 'function',
+        legend: {
+            position: 'bottom'
+        },
+        width: '100%',
+        height: '70%',
+        chartArea: {
+            left: '8%',
+            top: '8%',
+            width: '100%',
+            height: '70%'
+        },
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('chart'));
+    await chart.draw(data, options);
 }
 
 detailChartOptions = {
-    height: "100%",
-    width: "100%",
+    height: '100%',
+    width: '100%',
     legend: {
         position: 'bottom'
     },
@@ -94,7 +141,7 @@ async function drawTempChart() {
     let response = await fetchData();
 
     for (row in response) {
-        var measured = new Date(response[row].measured.replace("-", "/").replace("-", "/"));
+        var measured = new Date(response[row].measured);
         tempData.push([measured, response[row].temperature]);
     }
 
@@ -108,15 +155,15 @@ async function drawWeightChart() {
     let response = await fetchData();
 
     for (row in response) {
-        var measured = new Date(response[row].measured.replace("-", "/").replace("-", "/"));
+        var measured = new Date(response[row].measured);
         weightData.push([measured, response[row].weight]);
     }
 
     var data_weight = google.visualization.arrayToDataTable(weightData);
     var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
     weight_chart.draw(data_weight, {
-        height: "100%",
-        width: "100%",
+        height: '100%',
+        width: '100%',
         legend: {
             position: 'bottom'
         },
@@ -130,11 +177,11 @@ async function drawWeightChart() {
 }
 
 async function drawHumidityChart() {
-    var humidityData = [['Gemessen', 'Luftfeuchtigkeit (hPa)']];
+    var humidityData = [['Gemessen', 'Luftfeuchtigkeit (%)']];
     let response = await fetchData();
 
     for (row in response) {
-        var measured = new Date(response[row].measured.replace("-", "/").replace("-", "/"));
+        var measured = new Date(response[row].measured);
         humidityData.push([measured, response[row].humidity]);
     }
 
