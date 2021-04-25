@@ -16,13 +16,8 @@ google.charts.load('current', {
     'packages': ['corechart']
 });
 
-var date = new Date();
-var year = date.getFullYear();
-var month = date.getMonth() + 1;
-month = (month < 10 ? "0" : "") + month;
-var day = date.getDate();
-day = (day < 10 ? "0" : "") + day;
-date = year + "-" + month + "-" + day;
+// ISO date format => 2021-04-25
+var date = luxon.DateTime.now().toISODate();
 
 async function fetchData() {
     var compareValue = document.getElementById("dropSelect");
@@ -32,68 +27,31 @@ async function fetchData() {
             // Today
             case "1":
                 response = await fetch("/api/data/get?from=" + date + "&to=" + date);
-                from = date;
-                to = date;
-                view = "today";
                 break;
-                // Week
+            
+            // Week
             case "2":
-                var dateTwo = new Date(Date.now() - 604800000);
-                var yearTwo = dateTwo.getFullYear();
-                var monthTwo = dateTwo.getMonth() + 1;
-                monthTwo = (monthTwo < 10 ? "0" : "") + monthTwo;
-                var dayTwo = dateTwo.getDate();
-                dayTwo = (dayTwo < 10 ? "0" : "") + dayTwo;
-                dateTwo = yearTwo + "-" + monthTwo + "-" + dayTwo;
-                from = dateTwo;
-                to = date;
-                view = "week";
+                var dateTwo = luxon.DateTime.now().minus({ weeks: 1 }).toISODate();
                 response = await fetch("/api/data/get?from=" + dateTwo + "&to=" + date);
                 break;
-                // Month
+            
+            // Month
             case "3":
-                var dateTwo = new Date(Date.now());
-                dateTwo.setMonth(dateTwo.getMonth());
-                var yearTwo = dateTwo.getFullYear();
-                var monthTwo = dateTwo.getMonth();
-                monthTwo = (monthTwo < 10 ? "0" : "") + monthTwo;
-                var dayTwo = dateTwo.getDate();
-                dayTwo = (dayTwo < 10 ? "0" : "") + dayTwo;
-                dateTwo = yearTwo + "-" + monthTwo + "-" + dayTwo;
-                from = dateTwo;
-                to = date;
-                view = "month";
-                response = await fetch("/api/data/get?from=" + dateTwo + "&to=" + date);
+                var dateTwo = luxon.DateTime.now().minus({ months: 1 }).toISODate();
+                response = await fetch("/api/data/get?from=" + date + "&to=" + date);
                 break;
-                // Year
+
+            // Year
             case "4":
-                var year = new Date(Date.now()).getFullYear();
-                from = year;
-                to = year;
-                view = year;
-                response = await fetch("/api/data/get?from=" + year + "-01-01&to=" + year + "-12-31");
-                break;
-                // All
-            case "5":
-                from = "2020";
-                to = "-";
-                view = "all";
-                response = await fetch("/api/data/get?from=2000-01-01&to=2099-12-31");
+                var dateTwo = luxon.DateTime.now().minus({ years: 1 }).toISODate();
+                response = await fetch("/api/data/get?from=" + dateTwo + "&to=" + date);
                 break;
         }
-    } else {
-        response = await fetch("/api/data/get?from=" + date + "&to=" + date);
-        from = date;
-        to = date;
-        view = "today";
-    }
+    
+    // If no view is selected, fetch current data
+    } else response = await fetch("/api/data/get?from=" + date + "&to=" + date);
 
     return await response.json();
-
-/*
-    let response = await fetch("/api/data/get?from=" + date + "&to=" + date);
-    return await response.json();
-*/
 }
 
 async function updateData() {
