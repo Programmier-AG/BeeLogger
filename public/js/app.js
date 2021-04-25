@@ -155,8 +155,20 @@ async function drawWeightChart() {
     }
 
     var data_weight = google.visualization.arrayToDataTable(weightData);
-    var temp_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
-    temp_chart.draw(data_weight, detailChartOptions);
+    var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
+    weight_chart.draw(data_weight, {
+        height: "100%",
+        width: "100%",
+        legend: {
+            position: 'bottom'
+        },
+        vAxis: {              
+            viewWindowMode:'explicit',
+            viewWindow:{
+                min: 15
+            }
+        }
+    });
 }
 
 async function drawHumidityChart() {
