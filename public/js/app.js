@@ -125,6 +125,7 @@ async function drawCompareChart() {
         legend: {
             position: 'bottom'
         },
+        lineWidth: 3,
         width: '100%',
         height: '70%',
         chartArea: {
@@ -139,15 +140,6 @@ async function drawCompareChart() {
     await chart.draw(data, options);
 }
 
-detailChartOptions = {
-    height: '100%',
-    width: '100%',
-    legend: {
-        position: 'bottom'
-    },
-    vAxis: {minValue: 0}
-}
-
 async function drawTempChart() {
     var tempData = [['Gemessen', 'Temperatur (°C)']];
     let response = await fetchData();
@@ -159,7 +151,16 @@ async function drawTempChart() {
 
     var data_temp = google.visualization.arrayToDataTable(tempData);
     var temp_chart = new google.visualization.LineChart(document.getElementById('temp_chart'));
-    temp_chart.draw(data_temp, detailChartOptions);
+    temp_chart.draw(data_temp, {
+        height: '100%',
+        width: '100%',
+        lineWidth: 3,
+        colors: ['#ff3333'],
+        legend: {
+            position: 'bottom'
+        },
+        vAxis: {minValue: 0}
+    });
 }
 
 async function drawWeightChart() {
@@ -175,16 +176,10 @@ async function drawWeightChart() {
     var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
     weight_chart.draw(data_weight, {
         height: '100%',
-        width: '100%',
+        lineWidth: 3,
         legend: {
             position: 'bottom'
         },
-        vAxis: {              
-            viewWindowMode:'explicit',
-            viewWindow:{
-                min: 20
-            }
-        }
     });
 }
 
@@ -199,5 +194,14 @@ async function drawHumidityChart() {
 
     var data_humidity = google.visualization.arrayToDataTable(humidityData);
     var humidity_chart = new google.visualization.LineChart(document.getElementById('humidity_chart'));
-    humidity_chart.draw(data_humidity, detailChartOptions);
+    humidity_chart.draw(data_humidity, {
+        height: '100%',
+        width: '100%',
+        lineWidth: 3,
+        colors: ['ffd21b'],
+        legend: {
+            position: 'bottom'
+        },
+        vAxis: {minValue: 0}
+    });
 }

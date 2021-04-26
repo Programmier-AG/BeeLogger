@@ -1,0 +1,116 @@
+<div id="aboutModal" class="modal">
+    <div class="modal-content">
+        <h4>Über BeeLogger</h4>
+        <p>BeeLogger ist ein Projekt, welches von 2 Schülern des Teletta-Groß-Gymnasiums entwickelt wird.</p>
+
+        <br>
+
+        <h5>Daten</h5>
+        <p>BeeLogger misst und sammelt die Daten der Bienenvölker (wie Gewicht, Temperatur, Luftfeuchtigkeit, etc.).
+        <p>Diese werden auf diesem Dashboard zur Verfügung gestellt.</p>
+        <p>Es werden alle 30 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
+            Seite zur Verfügung stehen.</p>
+
+        <br>
+
+        <h5>Statistiken</h5>
+        <p>Gesammelte Datensätze: <b id="inserted-count">fetching...</b></p>
+        <p>Daten-Abfragen: <b id="requested-count">fetching...</b></p>
+        <p>Website-Aufrufe: <b id="website-count">fetching...</b></p>
+        
+        <p>Derzeit arbeiten wir noch an einer gesonderten Statistik-Seite, auf der alle Statistiken, die wir
+            erfassen, genau einsehbar sind.</p>
+
+        <br>
+
+        <h5>Credits</h5>
+        <p>Dieses Dashboard und die dazugehörige Daten- und Statistiken-API (Schnittstelle) wurden von <b>Fabian Reinders und Sönke Klock</b> entwickelt.</p>
+        <p>Zur Entwicklung dieser Dinge wurden verschiedene open-source Libraries verwendet.</p>
+        <p>Die Arduino-Software der Messsation(en) ist von Sönke Klock programmiert worden</p>
+        <p>und dieses Dashboard und die Display-Software von Fabian Reinders.</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+    </div>
+</div>
+
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+        <h4>Kontakt</h4>
+        <p>Mit folgendem Formular kannst du uns kontaktieren:</p>
+
+        <form action="/post_contact" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input id="icon_prefix" type="text" name="name" class="validate">
+                    <label for="icon_prefix">Dein Name</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">email</i>
+                    <input id="email" name="email" type="email" class="validate">
+                    <label for="email">Deine E-Mail Adresse</label>
+                    <span class="helper-text"
+                        data-error="Wir brauchen deine gültige E-Mail Adresse, um dir antworten zu können."
+                        data-success="Okay!"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">mode_edit</i>
+                    <textarea id="icon_prefix3" name="message" class="materialize-textarea"></textarea>
+                    <label for="icon_prefix3">Deine Nachricht</label>
+                </div>
+            </div>
+
+            <p>Du kannst auch eine Datei (wie einen Screenshot oder Ähnliches) anhängen [optional]:</p>
+            <div class="container center" style="width: 50%; margin-bottom: 40px;">
+                <div class="file-field input-field">
+                    <div class="btn blue accent-3">
+                        <span>Datei anhängen</span>
+                        <input type="file" name="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+            
+            <br>
+
+            <div class="center">
+                <button type="submit" class="waves-effect waves-light btn-large blue accent-3">Absenden</button>
+            </div>
+        </form>
+
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+        </div>
+    </div>
+</div>
+
+<div id="dateRangeModal" class="modal">
+    <div class="modal-content">
+        <div class="input-field">
+            <h4>Zeitraum ändern <span class="badge red white-text">Experimentelle Funktion</span></h4>
+            <select id="dropSelect">
+                <option value="1">Heute</option>
+                <option value="2">Eine Woche</option>
+                <option value="3">Ein Monat</option>
+                <option value="4">Ein Jahr</option>
+                <option value="5">Gesamt</option>
+            </select>
+            <div class="container center">
+                <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
+                    style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>
+    </div>
+</div>
