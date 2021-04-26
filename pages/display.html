@@ -6,17 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>BeeLogger</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/lib/materialize/css/materialize.min.css">
     <link rel="stylesheet" href="/css/display.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script src="/js/globals.js"></script>
+    <script src="/lib/materialize/js/materialize.min.js"></script>
+    <script src="/lib/luxon.min.js"></script>
     <script src="/js/display.js"></script>
-    <script src="/js/compare.js"></script>
     <script src="/js/app.js"></script>
-    <script src="/js/compare.js"></script>
     <script>
         ! function (d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];
@@ -93,6 +90,8 @@
                             src="/assets/water.png" />
                         <p id="humidity" style="font-size: 250%;">Lädt...</p>
                     </div>
+                    
+                    <p><b>Gemessen: <i id="updated"></i></b></p>
                 </div>
             </div>
 
