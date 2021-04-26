@@ -17,12 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
 
     // Fetching data and rendering charts with a little timeout
-    setTimeout(() => {
-        updateData();
-        drawCompareChart();
-        drawTempChart();
-        drawWeightChart();
-        drawHumidityChart();
+    setTimeout(async () => {
+        await updateData();
+        await drawCompareChart();
+        await drawTempChart();
+        await drawWeightChart();
+        await drawHumidityChart();
     }, 500);
 
     // Setting up background tasks for keeping the 'last updated' date up-to-date
@@ -182,7 +182,7 @@ async function drawWeightChart() {
         vAxis: {              
             viewWindowMode:'explicit',
             viewWindow:{
-                min: 15
+                min: 20
             }
         }
     });
