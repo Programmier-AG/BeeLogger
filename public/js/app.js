@@ -8,6 +8,7 @@
 
 // Global variables
 var last_measured;
+var response;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initializing used Materialize components
@@ -18,11 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetching data and rendering charts with a little timeout
     setTimeout(async () => {
-        await updateData();
-        await drawCompareChart();
-        await drawTempChart();
-        await drawWeightChart();
-        await drawHumidityChart();
+        response = await fetchData();
+        await updateCharts();
     }, 500);
 
     // Setting up background tasks for keeping the 'last updated' date up-to-date
@@ -58,7 +56,7 @@ async function fetchData() {
             // Month
             case '3':
                 var dateTwo = luxon.DateTime.now().minus({ months: 1 }).toISODate();
-                response = await fetch('/api/data/get?from=' + date + '&to=' + date);
+                response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
                 break;
 
             // Year
@@ -76,7 +74,7 @@ async function fetchData() {
 
 // Function for updating the 'current data' section
 async function updateData() {
-    let response = await fetchData();
+    response = await fetchData();
 
     if(Object.keys(response).length <= 0) {
         let card = '<div class="row"><div class="col m3"></div><div class="col m5"><div class="card blue-grey darken-1"><div class="card-image"><img src="../assets/bee.png"><span class="card-title">Keine Daten erhalten!</span></div><div class="card-content white-text"><p>Der Server hat für den ausgewählten Zeitraum keine Daten zurückgegeben. Diese wurden aufgrund eines temporären technischen Fehlers entweder nicht gemessen oder es gibt Verbindungsprobleme mit der Datenbank.</p></div></div></div><div class="col m3"></div></div>';
@@ -104,15 +102,26 @@ async function getStatistics() {
     document.querySelector('#website-count').innerHTML = res['website'];
 }
 
+async function updateCharts() {
+    await updateData();
+    await drawCharts();
+}
+
+async function drawCharts() {
+    await drawCompareChart();
+    await drawTempChart();
+    await drawWeightChart();
+    await drawHumidityChart();
+}
+
 async function drawCompareChart() {
-    var c = await fetchData();
     var compareData = [
         ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
     ];
 
-    for (row in c) {
-        var measured = new Date(c[row].measured);
-        compareData.push([measured, c[row].temperature, c[row].weight, c[row].humidity]);
+    for (row in response) {
+        var measured = new Date(response[row].measured);
+        compareData.push([measured, response[row].temperature, response[row].weight, response[row].humidity]);
     }
 
     var from = luxon.DateTime.fromJSDate(compareData[1][0]).toISODate();
@@ -142,7 +151,6 @@ async function drawCompareChart() {
 
 async function drawTempChart() {
     var tempData = [['Gemessen', 'Temperatur (°C)']];
-    let response = await fetchData();
 
     for (row in response) {
         var measured = new Date(response[row].measured);
@@ -165,7 +173,6 @@ async function drawTempChart() {
 
 async function drawWeightChart() {
     var weightData = [['Gemessen', 'Gewicht (kg)']];
-    let response = await fetchData();
 
     for (row in response) {
         var measured = new Date(response[row].measured);
@@ -185,7 +192,6 @@ async function drawWeightChart() {
 
 async function drawHumidityChart() {
     var humidityData = [['Gemessen', 'Luftfeuchtigkeit (%)']];
-    let response = await fetchData();
 
     for (row in response) {
         var measured = new Date(response[row].measured);
