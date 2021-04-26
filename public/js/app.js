@@ -6,6 +6,9 @@
     Copyright (c) 2020-2021 Fabian R., Sönke K.
 */
 
+// Global variables
+var last_measured;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -13,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
 
-    // Setting up background tasks for automatic data refresh
+    // Fetching data and rendering charts with a little timeout
     setTimeout(() => {
         updateData();
         drawCompareChart();
@@ -21,6 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
         drawWeightChart();
         drawHumidityChart();
     }, 500);
+
+    // Setting up background tasks for keeping the 'last updated' date up-to-date
+    setInterval(() => {
+        var measured = luxon.DateTime.fromISO(last_measured).toRelative({ locale: 'de' });
+        document.querySelector('#updated').innerHTML = measured;
+    }, 15000);
 });
 
 google.charts.load('current', {
@@ -71,15 +80,18 @@ async function updateData() {
 
     if(Object.keys(response).length <= 0) {
         let card = '<div class="row"><div class="col m3"></div><div class="col m5"><div class="card blue-grey darken-1"><div class="card-image"><img src="../assets/bee.png"><span class="card-title">Keine Daten erhalten!</span></div><div class="card-content white-text"><p>Der Server hat für den ausgewählten Zeitraum keine Daten zurückgegeben. Diese wurden aufgrund eines temporären technischen Fehlers entweder nicht gemessen oder es gibt Verbindungsprobleme mit der Datenbank.</p></div></div></div><div class="col m3"></div></div>';
-        document.querySelector('#loading-wrapper').innerHTML = card;
+        document.querySelector('#loading').innerHTML = card;
         return
     }
+
+    last_measured = response[Object.keys(response).length - 1].measured;
+    var measured = luxon.DateTime.fromISO(last_measured).toRelative({ locale: 'de' });
 
     document.querySelector('main').classList.remove('hide');
     document.querySelector('#temperature').innerHTML = response[Object.keys(response).length - 1].temperature + ' °C';
     document.querySelector('#weight').innerHTML = response[Object.keys(response).length - 1].weight + ' kg';
     document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
-    document.querySelector('#updated').innerHTML = response[Object.keys(response).length - 1].measured;
+    document.querySelector('#updated').innerHTML = measured;
     document.querySelector('#loading').className = 'hide';
 }
 

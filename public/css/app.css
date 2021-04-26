@@ -45,12 +45,6 @@ input[type="text"] {
     line-height: 40px;
 }
 
-#loading { 
-    width: 40%;
-    margin: 0 auto;
-    margin-bottom: 40px;
-}
-
 img.icon {
     width: 70px;
     height: 70px;
