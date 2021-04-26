@@ -95,6 +95,5 @@ Note that this plugin makes the browser otherwise unusable since it forces to on
 # Third party dependencies
 ## Front-End
 * [Materialize](https://materializecss.com/)
-* [jQuery](https://jquery.com/)
 * [Material Icons](https://fonts.google.com/icons)
 * [Google Charts](https://developers.google.com/chart)
