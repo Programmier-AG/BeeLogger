@@ -97,16 +97,16 @@
     <div class="modal-content">
         <div class="input-field">
             <h4>Zeitraum ändern <span class="badge red white-text">Experimentelle Funktion</span></h4>
-            <select id="dropSelect">
+            <p>Dieses Feature ist experimentell und temporär deaktiviert, da es sich in der Überarbeitung befindet.</p>
+            <select id="dropSelect" disabled>
                 <option value="1">Heute</option>
                 <option value="2">Eine Woche</option>
                 <option value="3">Ein Monat</option>
                 <option value="4">Ein Jahr</option>
-                <option value="5">Gesamt</option>
             </select>
             <div class="container center">
-                <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
-                    style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
+                <button onclick="updateCharts();" class="waves-effect waves-light btn"
+                    style="margin-left: 10px; margin-bottom: 3%;" disabled>Ansicht ändern</button>
             </div>
         </div>
     </div>

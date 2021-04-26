@@ -27,7 +27,7 @@ while month != 13:
                 if len(str(hour)) == 1: hhour = "0" + str(hour)
                 final_date = "2021-" + str(mmonth) + "-" + str(dday) + " " + str(hhour) + ":13:06"
                 final_date = datetime.datetime.strptime(final_date, "%Y-%m-%d %H:%M:%S")
-                cursor.execute("INSERT INTO `data` (`number`, `temperature`, `weight`, `humidity`, `measured`) VALUES (0, %s, %s, %s, '%s')" % (round(random.uniform(20.0, 30.0), 2), round(random.uniform(50.0, 70.0), 2), round(random.uniform(90.0, 120.0), 2), final_date))
+                cursor.execute("INSERT INTO `data` (`number`, `temperature`, `weight`, `humidity`, `measured`) VALUES (0, %s, %s, %s, '%s')" % (round(random.uniform(20.0, 30.0), 2), round(random.uniform(20.0, 30.0), 2), round(random.uniform(40.0, 90.0), 2), final_date))
                 connection.commit()
                 print("Generated data for ", final_date, ".")
                 hour += 1
