@@ -67,3 +67,17 @@ h3.chart-title {
 .beelogger-current-box span {
     font-size: 300%;
 }
+
+footer {
+    margin-top: 100px !important;
+}
+
+.modal {
+    width: 80% !important;
+}
+
+.badge {
+    padding: 0 20px !important;
+    border-radius: 10px;
+    font-weight: bold;
+}
