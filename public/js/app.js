@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetching data and rendering charts with a little timeout
     setTimeout(async () => {
-        response = await fetchData();
         await updateCharts();
         window.onresize = async () => {
             await drawCharts();
