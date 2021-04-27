@@ -4,6 +4,7 @@ stats/
 venv/
 .idea/
 backup/
+contact/
 autoreload
 autoreload.py
 insert.log
