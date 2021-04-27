@@ -39,7 +39,7 @@
         <h4>Kontakt</h4>
         <p>Mit folgendem Formular kannst du uns kontaktieren:</p>
 
-        <form action="/post_contact" method="post" enctype="multipart/form-data">
+        <form id="contact-form" action="/post_contact" method="post" enctype="multipart/form-data">
             <div class="row">
                 <div class="input-field col s12">
                     <i class="material-icons prefix">account_circle</i>
@@ -83,7 +83,9 @@
             <br>
 
             <div class="center">
-                <button type="submit" class="waves-effect waves-light btn-large blue accent-3">Absenden</button>
+                <button id="contact-submit-button" type="submit" class="waves-effect waves-light btn-large blue accent-3"
+                        onclick="document.getElementById('contact-submit-button').setAttribute('disabled', 'true'); 
+                        document.getElementById('contact-form').submit();">Absenden</button>
             </div>
         </form>
 
