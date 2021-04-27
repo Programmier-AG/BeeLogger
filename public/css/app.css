@@ -1,3 +1,7 @@
+body {
+    background-color: #fff;
+}
+
 a:hover {
     text-decoration: none;
 }
