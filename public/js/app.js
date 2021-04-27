@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(async () => {
         response = await fetchData();
         await updateCharts();
+        window.onresize = async () => {
+            await drawCharts();
+        };
     }, 500);
 
     // Setting up background tasks for keeping the 'last updated' date up-to-date
@@ -138,8 +141,9 @@ async function drawCompareChart() {
         width: '100%',
         height: '70%',
         chartArea: {
-            left: '8%',
-            top: '8%',
+            left: '10%',
+            top: '10%',
+            right: '10%',
             width: '100%',
             height: '70%'
         },
@@ -164,6 +168,13 @@ async function drawTempChart() {
         width: '100%',
         lineWidth: 3,
         colors: ['#ff3333'],
+        chartArea: {
+            left: '10%',
+            top: '10%',
+            right: '10%',
+            width: '100%',
+            height: '70%'
+        },
         legend: {
             position: 'bottom'
         },
@@ -184,6 +195,13 @@ async function drawWeightChart() {
     weight_chart.draw(data_weight, {
         height: '100%',
         lineWidth: 3,
+        chartArea: {
+            left: '10%',
+            top: '10%',
+            right: '10%',
+            width: '100%',
+            height: '70%'
+        },
         legend: {
             position: 'bottom'
         },
@@ -205,6 +223,13 @@ async function drawHumidityChart() {
         width: '100%',
         lineWidth: 3,
         colors: ['ffd21b'],
+        chartArea: {
+            left: '10%',
+            top: '10%',
+            right: '10%',
+            width: '100%',
+            height: '70%'
+        },
         legend: {
             position: 'bottom'
         },
