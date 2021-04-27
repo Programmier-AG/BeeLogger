@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(async () => {
         response = await fetchData();
         await updateCharts();
+        window.onresize = async () => {
+            await drawCharts();
+        };
     }, 500);
 
     // Setting up background tasks for keeping the 'last updated' date up-to-date
