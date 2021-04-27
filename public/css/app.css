@@ -16,12 +16,13 @@ img {
 }
 
 a.brand-logo {
-    margin-left: 30px;
+    position: static;
+    margin: 0;
 }
 
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 992px) {
     a.brand-logo {
-        margin-left: 0px;
+        position: absolute;
     }
 }
 
