@@ -10,31 +10,35 @@
 var last_measured;
 var response;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
     M.Modal.init(document.querySelectorAll('.modal'), {});
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
 
-    // Fetching data and rendering charts with a little timeout
-    setTimeout(async () => {
-        response = await fetchData();
-        await updateCharts();
-        window.onresize = async () => {
-            await drawCharts();
-        };
-    }, 500);
+    response = await fetchData();
 
-    // Setting up background tasks for keeping the 'last updated' date up-to-date
+    // Setting up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
         var measured = luxon.DateTime.fromISO(last_measured).toRelative({ locale: 'de' });
         document.querySelector('#updated').innerHTML = measured;
     }, 15000);
-});
 
-google.charts.load('current', {
-    'packages': ['corechart']
+    // Initializing google charts
+    await google.charts.load('current', {
+        'packages': ['corechart'],
+        // Callback to just draw charts and show data if charts lib is loaded
+        'callback': async () => {
+            await updateData();
+            await drawCharts();
+            // Event handler for automatically resizing charts on screen resize
+            window.onresize = async () => {
+                await drawCharts();
+            };
+        }
+    });
+
 });
 
 // ISO date format => 2021-04-25
@@ -42,35 +46,53 @@ var date = luxon.DateTime.now().toISODate();
 
 async function fetchData() {
     var compareValue = document.getElementById('dropSelect');
-
+    var url;
+    
+    // Handling date range dropdown and just fetching data for the corresponding time frame
     if (compareValue) {
         switch (compareValue.options[compareValue.selectedIndex].value) {
             // Today
             case '1':
-                response = await fetch('/api/data/get?from=' + date + '&to=' + date);
+                url = '/api/data/get?from=' + date + '&to=' + date;
                 break;
             
             // Week
             case '2':
                 var dateTwo = luxon.DateTime.now().minus({ weeks: 1 }).toISODate();
-                response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
+                url = '/api/data/get?from=' + dateTwo + '&to=' + date;
                 break;
             
             // Month
             case '3':
                 var dateTwo = luxon.DateTime.now().minus({ months: 1 }).toISODate();
-                response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
+                url = '/api/data/get?from=' + dateTwo + '&to=' + date
                 break;
 
             // Year
             case '4':
                 var dateTwo = luxon.DateTime.now().minus({ years: 1 }).toISODate();
-                response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
+                url = '/api/data/get?from=' + dateTwo + '&to=' + date;
                 break;
         }
+
+        response = await fetch(url);
     
     // If no view is selected, fetch current data
     } else response = await fetch('/api/data/get?from=' + date + '&to=' + date);
+
+    // Checking if valid data is returned and not some error
+    if(!response.ok) {
+        document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
+        document.getElementById('loading-text').innerHTML = `
+            <hr>
+            <b>Das Laden der Daten ist fehlgeschlagen!</b><br>
+            Dies kann daran liegen, dass unsere Datenschnittstelle gerade offline ist,
+            wir Wartungen vornehmen oder aufgrund eines Vorfalls keine aktuellen Daten
+            aufgezeichnet wurden.<hr>
+            <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
+        `;
+        document.getElementById('loading-progress').classList.remove('progress');
+    }
 
     return await response.json();
 }
@@ -78,13 +100,7 @@ async function fetchData() {
 // Function for updating the 'current data' section
 async function updateData() {
     response = await fetchData();
-
-    if(Object.keys(response).length <= 0) {
-        let card = '<div class="row"><div class="col m3"></div><div class="col m5"><div class="card blue-grey darken-1"><div class="card-image"><img src="../assets/bee.png"><span class="card-title">Keine Daten erhalten!</span></div><div class="card-content white-text"><p>Der Server hat für den ausgewählten Zeitraum keine Daten zurückgegeben. Diese wurden aufgrund eines temporären technischen Fehlers entweder nicht gemessen oder es gibt Verbindungsprobleme mit der Datenbank.</p></div></div></div><div class="col m3"></div></div>';
-        document.querySelector('#loading').innerHTML = card;
-        return
-    }
-
+    
     last_measured = response[Object.keys(response).length - 1].measured;
     var measured = luxon.DateTime.fromISO(last_measured).toRelative({ locale: 'de' });
 
@@ -103,11 +119,6 @@ async function getStatistics() {
     document.querySelector('#inserted-count').innerHTML = res['insert_calls'];
     document.querySelector('#requested-count').innerHTML = res['data_calls'];
     document.querySelector('#website-count').innerHTML = res['website'];
-}
-
-async function updateCharts() {
-    await updateData();
-    await drawCharts();
 }
 
 async function drawCharts() {
