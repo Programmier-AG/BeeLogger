@@ -21,10 +21,12 @@ function home() {
 
 function gallery() {
     document.querySelector('body').style.backgroundImage = 'none';
+    document.getElementById("gallery-frame").setAttribute("src", "http://localhost:8080")
 }
 
 function stundenplan() {
     document.querySelector('body').style.backgroundImage = 'none';
+    document.getElementById("plan-frame").setAttribute("src", "https://tgg-leer.de/stundenplaene/stundenplaene.html")
 }
 
 async function about() {
@@ -47,6 +49,7 @@ function startTimer() {
 
 function resetTimer() { 
     window.clearTimeout(timeoutID)
+    console.log("reset timer...")
     startTimer();
 }
 
@@ -55,12 +58,17 @@ function setupTimers () {
     document.addEventListener('mousedown', resetTimer, false);
     document.addEventListener('keypress', resetTimer, false);
     document.addEventListener('touchmove', resetTimer, false);
+    
+    document.getElementById("gallery-frame").addEventListener('mousemove', resetTimer, false);
+    document.getElementById("gallery-frame").addEventListener('mousedown', resetTimer, false);
+    document.getElementById("gallery-frame").addEventListener('keypress', resetTimer, false);
+    document.getElementById("gallery-frame").addEventListener('touchmove', resetTimer, false);
      
     startTimer();
 }
 
 function doInactive() {
-    home();
+    document.getElementById("home-button").click();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

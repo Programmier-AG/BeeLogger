@@ -36,7 +36,7 @@
         <div class="row">
             <div class="col s12 black">
                 <ul class="tabs tabs-transparent">
-                    <li class="tab col s3"><a href="#index-tab" onclick="home()">Dashboard</a></li>
+                    <li class="tab col s3"><a id="home-button"href="#index-tab" onclick="home()">Dashboard</a></li>
                     <li class="tab col s2"><a href="#charts-tab" onclick="charts()">Diagramme</a></li>
                     <li class="tab col s2"><a href="#gallery-tab" onclick="gallery()">Galerie</a></li>
                     <li class="tab col s2"><a href="#stundenplan-tab" onclick="stundenplan()">Stundenplan</a></li>
@@ -137,13 +137,13 @@
 
             <div id="gallery-tab" class="center col s12">
                 <div class="iframe">
-                    <iframe src="http://localhost:8080" frameborder="0"></iframe>
+                    <iframe id="gallery-frame" src="http://localhost:8080" frameborder="0"></iframe>
                 </div>
             </div>
 
             <div id="stundenplan-tab" class="col s12">
                 <div class="iframe">
-                    <iframe src="http://tgg-leer.de/stundenplaene/stundenplaene.html" frameborder="0"></iframe>
+                    <iframe id="plan-frame" src="https://tgg-leer.de/stundenplaene/stundenplaene.html" frameborder="0"></iframe>
                 </div>
             </div>
 

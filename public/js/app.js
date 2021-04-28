@@ -148,6 +148,7 @@ async function drawCompareChart() {
         legend: {
             position: 'bottom'
         },
+        colors: ['red', 'black', 'blue'],
         lineWidth: 3,
         width: '100%',
         height: '70%',
@@ -178,7 +179,7 @@ async function drawTempChart() {
         height: '100%',
         width: '100%',
         lineWidth: 3,
-        colors: ['#ff3333'],
+        colors: ['red'],
         chartArea: {
             left: '10%',
             top: '10%',
@@ -206,6 +207,7 @@ async function drawWeightChart() {
     weight_chart.draw(data_weight, {
         height: '100%',
         lineWidth: 3,
+        colors: ['black'],
         chartArea: {
             left: '10%',
             top: '10%',
@@ -233,7 +235,7 @@ async function drawHumidityChart() {
         height: '100%',
         width: '100%',
         lineWidth: 3,
-        colors: ['ffd21b'],
+        colors: ['blue'],
         chartArea: {
             left: '10%',
             top: '10%',
