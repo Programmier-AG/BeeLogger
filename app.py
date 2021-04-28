@@ -1,15 +1,15 @@
 import os
 import smtplib
-import statistics
+from datetime import date
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from flask import Flask, make_response, redirect, render_template, request
+from flask import Flask, redirect, render_template, request
 from flask.json import JSONEncoder
-from datetime import date
 
 import config
+import statistics
 from api import get_data, get_statistics, insert_data, scales
 from crossdomain import crossdomain
 
@@ -29,6 +29,7 @@ class CustomJSONEncoder(JSONEncoder):
         else:
             return list(iterable)
         return JSONEncoder.default(self, obj)
+
 
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -118,6 +119,20 @@ def insertDataScales():
 @crossdomain(origin="*", current_app=app)
 def getStatistics():
     return get_statistics.get_statistics()
+
+
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    Credit: https://stackoverflow.com/a/34067710
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
 
 
 if __name__ == "__main__":
