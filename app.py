@@ -1,9 +1,12 @@
 import os
+import secrets
 import smtplib
+import ssl
 from datetime import date
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate
 
 from flask import Flask, redirect, render_template, request
 from flask.json import JSONEncoder
@@ -71,31 +74,37 @@ def contactPost():
 
     msg["Subject"] = "Nachricht von " + name
     msg["From"] = "BeeLogger <%s>" % config.Mail.user + "@" + config.Mail.host
-    msg["To"] = "fabian@itechnious.com, sonke@itechnious.com"
+    msg["To"] = config.Mail.reciever
+    msg["Date"] = formatdate(localtime=True)
 
-    if "file" in request.form.keys():
+    print(request.form)
+
+    if 'file' in request.files:
         f = request.files["file"]
-        f.save("contact/"+f.filename)
+        if f.filename != "":
+            if not os.path.exists("contact/"):
+                os.mkdir("contact/")
+            saved = secrets.token_urlsafe(10)
+            print(saved)
 
-        with open("contact/"+f.filename, "rb") as fil:
-            part = MIMEApplication(
-                fil.read(),
-                Name=f.filename
-            )
-        
-        part['Content-Disposition'] = 'attachment; filename="%s"' % f.filename
-        msg.attach(part)
+            f.save("contact/"+saved)
 
-    server = smtplib.SMTP(config.Mail.host)
-    server.connect(config.Mail.host, config.Mail.port)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(config.Mail.user + "@" + config.Mail.host, config.Mail.password)
-    server.send_message(msg)
-    server.quit()
+            with open("contact/"+saved, "rb") as fil:
+                part = MIMEApplication(
+                    fil.read(),
+                    Name=f.filename
+                )
+
+            part['Content-Disposition'] = 'attachment; filename="%s"' % f.filename
+            msg.attach(part)
+
+    with smtplib.SMTP_SSL(config.Mail.host, config.Mail.port, context=ssl.create_default_context()) as server:
+        server.login(config.Mail.user, config.Mail.password)
+        server.sendmail(config.Mail.user, config.Mail.reciever, msg.as_string())
+        server.close()
 
     return "Deine Nachricht wurde gesendet. Wir werden dich demnächst kontaktieren.<br>Du wirst automatisch weitergeleitet...<meta http-equiv='refresh' content='3; URL=/'>"
+
 # API
 @app.route("/api/data/get")
 @crossdomain(origin="*", current_app=app)
