@@ -64,9 +64,18 @@ h3.chart-title {
     height: 70vh;
 }
 
+.beelogger-current-box {
+    height: 200px;
+    margin-bottom: 20px;
+}
+
 .beelogger-current-box .card {
     padding: 10px;
     height: 100% !important;
+}
+
+.beelogger-current-box .card-title {
+    font-size: 130%;
 }
 
 .beelogger-current-box span {
