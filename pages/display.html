@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>BeeLogger</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="/lib/materialize/css/materialize.min.css">
     <link rel="stylesheet" href="/css/display.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,6 +32,10 @@
 </head>
 
 <body id="main">
+    <div id="loading" class="progress">
+        <div class="indeterminate"></div>
+    </div>
+
     <main id="everything">
         <div class="row">
             <div class="col s12 black">
@@ -75,63 +79,13 @@
                         <a href="https://weatherwidget.io/">weatherwidget.io</a>
                     </p>
                 </div>
-
-                <div id="beelogger-current" class="row center">
-                    <h3 id="summary" style="margin-left: 20px;">Bienen-Daten</h3>
-                    <div class="beelogger-current-box col s4"><img class="icon"
-                            src="/assets/temperature.png" />
-                        <p id="temperature" style="font-size: 250%;">Lädt...</p>
-                    </div>
-                    <div class="beelogger-current-box col s4"><img class="icon"
-                            src="/assets/weight.png" />
-                        <p id="weight" style="font-size: 250%;">Lädt...</p>
-                    </div>
-                    <div class="beelogger-current-box col s4"><img class="icon"
-                            src="/assets/water.png" />
-                        <p id="humidity" style="font-size: 250%;">Lädt...</p>
-                    </div>
-                    
-                    <p><b>Gemessen: <i id="updated"></i></b></p>
-                </div>
+                
+                {% include './components/current-data.html' %}
             </div>
 
             <div id="charts-tab" class="center col s12">
                 <main id="charts">
-                    <h1 style="margin-left: 20px;">Daten im Überblick</h1>
-                    <h3 id="compare" style="margin-left: 20px;">Vergleichsansicht</h3>
-                    <div id="chartContainer">
-                        <div id="chart" style="width: 90%;"></div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col s4"></div>
-                        <div class="col s4" style="padding: 0px 40px 0px 40px;">
-                            <div class="input-field">
-                                <h4>Zeitraum ändern</h4>
-                                <select id="dropSelect">
-                                    <option value="1">Heute</option>
-                                    <option value="2">Eine Woche</option>
-                                    <option value="3">Ein Monat</option>
-                                    <option value="4">Ein Jahr</option>
-                                    <option value="5">Gesamt</option>
-                                </select>
-                                <div class="container center">
-                                    <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
-                                        style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col s4"></div>
-                    </div>
-
-                    <h3 style="margin-left: 20px;">Gewicht</h3>
-                    <div id="weight_chart" style="margin: 0px 0px 50px 0px;"></div>
-
-                    <h3 id="temperature_chart" style="margin-left: 20px;">Temperatur</h3>
-                    <div id="temp_chart" style="margin: 0px 0px 50px 0px;"></div>
-
-                    <h3 id="hum_chart" style="margin-left: 20px;">Luftfeuchtigkeit</h3>
-                    <div id="humidity_chart" style="margin: 0px 0px 50px 0px;"></div>
+                    {% include './components/charts.html' %}
                 </main>
             </div>
 
@@ -152,34 +106,28 @@
                     <h4>About BeeLogger</h4>
                     <p style="margin-bottom: 50px;">BeeLogger ist ein Projekt der Programmier-AG des Teletta-Groß-Gymnasiums.</p>
             
-                    <div>
-                        <div>
+                    <div class="row">
+                        <div class="about-box col s8 offset-s2">
                             <h5>Daten</h5>
-                            <p>
-                                BeeLogger misst und sammelt die Daten der Imker-AG. Diese werden auf dieser Seite zur
-                                Verfügung gestellt.
-                            </p>
-                            <p>
-                                Es werden alle 60 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
-                                Seite zur Verfügung stehen.
-                            </p>
+                            <p>BeeLogger misst und sammelt die Daten der Bienenvölker (wie Gewicht, Temperatur, Luftfeuchtigkeit, etc.).
+                                <p>Diese werden auf diesem Dashboard zur Verfügung gestellt.</p>
+                                <p>Es werden alle 30 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
+                                    Seite zur Verfügung stehen.</p>
                         </div>
                         
-                        <div>
+                        <div class="about-box col s8 offset-s2">
                             <h5>Stats</h5>
                             <p>Gesammelte Datensätze: <b id="inserted-count">Lädt...</b></p>
                             <p>Daten-Abfragen: <b id="requested-count">Lädt...</b></p>
                             <p>Website-Aufrufe: <b id="website-count">Lädt...</b></p>
                         </div>
                         
-                        <div>
+                        <div class="about-box col s8 offset-s2">
                             <h5>Credits</h5>
-                            <p><b>Daten-API:</b> Fabian Reinders</p>
-                            <p><b>Website&Design:</b> Fabian Reinders</p>
-                            <p><b>Flask-Webserver: </b>Sönke Klock</p>
-                            <p><b>Messstationen-Software:</b> Sönke Klock</p>
-                            <p><b>Netzwerk-Einrichtung:</b> Sönke Klock</p>
-                            <p><b>Statistiken:</b> Fabian Reinders</p>
+                            <p>Dieses Dashboard und die dazugehörige Daten- und Statistiken-API (Schnittstelle) wurden von <b>Fabian Reinders und Sönke Klock</b> entwickelt.</p>
+                            <p>Zur Entwicklung dieser Dinge wurden verschiedene open-source Libraries verwendet.</p>
+                            <p>Die Arduino-Software der Messstation(en) ist von Sönke Klock programmiert worden</p>
+                            <p>und das Dashboard und diese Display-Software von Fabian Reinders.</p>
                         </div>
                     </div>
                 </main>
