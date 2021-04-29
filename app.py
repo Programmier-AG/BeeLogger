@@ -58,10 +58,15 @@ def display():
         return redirect("/")
         
     return render_template("display.html")
+    
+@app.route("/gallery")
+def gallery():
+    return render_template("gallery.html")
 
-@app.route("/simulate")
-def simulate():
-    return render_template("simulate.html")
+# Shouldn't be active in production (since anyone could insert data)
+# @app.route("/simulate")
+# def simulate():
+#     return render_template("simulate.html")
 
 @app.route("/post_contact", methods=["POST"])
 def contactPost():
