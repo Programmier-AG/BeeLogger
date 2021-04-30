@@ -61,17 +61,26 @@ h1#Wiesmoor_z704 p#date {
     height: 75vh;
 }
 
+#beelogger-current {
+    margin-top: 4%;
+    padding: 0px 80px 0px 80px;
+}
+
 .beelogger-current-box {
-    padding: 0px 50px 0px 50px !important;
+    padding: 10px 20px 10px 20px !important;
 }
 
 .beelogger-current-box .card {
-    background-color: rgba(99, 106, 107, 0.5) !important;
+    background-color: rgba(99, 106, 107, 0.7) !important;
     border-radius: 10px;
 }
 
 .beelogger-current-box span {
     font-size: 300%;
+}
+
+.beelogger-current-box p {
+    font-size: 240% !important;
 }
 
 a.weatherwidget-io {
@@ -101,4 +110,8 @@ a.weatherwidget-io {
     margin-bottom: 50px;
     padding: 30px !important;
     background-color: rgba(99, 106, 107, 0.5); 
+}
+
+#timestamp {
+    font-size: 150%;
 }
