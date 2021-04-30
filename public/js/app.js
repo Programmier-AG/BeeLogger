@@ -93,7 +93,7 @@ async function updateData() {
     document.querySelector('#weight').innerHTML = response[Object.keys(response).length - 1].weight + ' kg';
     document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
     document.querySelector('#updated').innerHTML = measured;
-    document.querySelector('#loading').className = 'hide';
+    document.querySelector('#loading').classList.add('hide');
 }
 
 async function getStatistics() {

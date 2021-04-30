@@ -6,6 +6,13 @@ body {
     color: #fff;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+}
+
+#loading {
+    position: absolute;
+    top: 50px;
+    left: 0;
 }
 
 ul.tabs {
@@ -47,14 +54,39 @@ h1#Wiesmoor_z704 p#date {
     width: 100%;
 }
 
-.beelogger-current-box img {
-    width: 100px;
-    height: 100px;
+#chart,
+#temp_chart,
+#weight_chart,
+#humidity_chart {
+    height: 75vh;
+}
+
+#beelogger-current {
+    margin-top: 4%;
+    padding: 0px 80px 0px 80px;
+}
+
+.beelogger-current-box {
+    padding: 10px 20px 10px 20px !important;
+}
+
+.beelogger-current-box .card {
+    background-color: rgba(99, 106, 107, 0.7) !important;
+    border-radius: 10px;
+}
+
+.beelogger-current-box span {
+    font-size: 300%;
+}
+
+.beelogger-current-box p {
+    font-size: 240% !important;
 }
 
 a.weatherwidget-io {
     width: 75% !important;
     margin: 0 auto;
+    border-radius: 10px;
 }
 
 .tabs .tab a:focus, .tabs .tab a:focus.active {
@@ -65,43 +97,21 @@ a.weatherwidget-io {
     background-color: #1f567c;
 }
 
-#chart, #weight_chart, #humidity_chart, #temp_chart {
-    height: 50vh;
-}
-
-#about {
-    padding-left: 20px;
-    color: #fff;
-}
-#about div {
-    width: 100%;
-    max-width: 4000px;
-    height: 40%;
-}
-#about div div {
-    vertical-align: middle;
-    display: inline-block;
-    height: 100%;
-    width: 33%;
-    text-align: center;
-
-    /* border-left: 5px solid gray; */
-}
-
 #about div div h5 {
     font-size: 250%;
 }
 
 #about div div p {
-    font-size: 150%;
+    font-size: 120%;
 }
 
-@media screen and (max-width: 800px) {
-    #about div div { 
-        display: block;
-        height: auto;
-        width: 100%; 
-        border: none;
-        margin-bottom: 70px;
-    }
+.about-box {
+    border-radius: 10px;
+    margin-bottom: 50px;
+    padding: 30px !important;
+    background-color: rgba(99, 106, 107, 0.5); 
+}
+
+#timestamp {
+    font-size: 150%;
 }

@@ -6,17 +6,27 @@
     Copyright (c) 2020-2021 Fabian R., Sönke K.
 */
 
-function charts() {
-    drawCompareChart()
-    drawHumidityChart();
-    drawTempChart();
-    drawWeightChart();
+async function charts() {
+    document.getElementById('loading').classList.remove('hide');
+
+    // Timeout for the time it roughly takes to switch tabs
+    setTimeout(async () => {
+        response = await fetchData();
+        await drawCharts();
+        document.getElementById('loading').classList.add('hide');
+    }, 1000);
+
     document.querySelector('body').style.backgroundImage = 'none';
 }
 
-function home() {
-    // $('.tabs').tabs('select', 'index-tab');
+async function home() {
+    response = await fetchData();
+
     document.querySelector('body').style.backgroundImage = `url('/assets/slideshow/bee-background.jpg')`;
+    document.querySelector('#temperature').innerHTML = response[Object.keys(response).length - 1].temperature + ' °C';
+    document.querySelector('#weight').innerHTML = response[Object.keys(response).length - 1].weight + ' kg';
+    document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
+    document.querySelector('#updated').innerHTML = measured;
 }
 
 function gallery() {
@@ -31,13 +41,7 @@ function stundenplan() {
 
 async function about() {
     document.querySelector('body').style.backgroundImage = `url('/assets/slideshow/bee-background.jpg')`;
-
-    let req = await fetch('/api/stats');
-    let res = await req.json();
-
-    document.querySelector('#inserted-count').innerHTML = res['insert_calls'];
-    document.querySelector('#requested-count').innerHTML = res['data_calls'];
-    document.querySelector('#website-count').innerHTML = res['website'];
+    await getStatistics();
 }
 
 var timeoutID;
@@ -48,8 +52,7 @@ function startTimer() {
 
 
 function resetTimer() { 
-    window.clearTimeout(timeoutID)
-    console.log("reset timer...")
+    window.clearTimeout(timeoutID);
     startTimer();
 }
 
