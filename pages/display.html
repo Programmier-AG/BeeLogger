@@ -97,31 +97,19 @@
 
             <div id="charts-tab" class="center col s12">
                 <main id="charts">
+
+                    {% include './components/modals.html' %}
+
+                    <div class="fixed-action-btn">
+                        <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
+                            <i class="large material-icons">edit_calendar</i>
+                        </a>
+                    </div>
+
                     <h1 style="margin-left: 20px;">Daten im Überblick</h1>
                     <h3 id="compare" style="margin-left: 20px;">Vergleichsansicht</h3>
                     <div id="chartContainer">
                         <div id="chart" style="width: 90%;"></div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col s4"></div>
-                        <div class="col s4" style="padding: 0px 40px 0px 40px;">
-                            <div class="input-field">
-                                <h4>Zeitraum ändern</h4>
-                                <select id="dropSelect">
-                                    <option value="1">Heute</option>
-                                    <option value="2">Eine Woche</option>
-                                    <option value="3">Ein Monat</option>
-                                    <option value="4">Ein Jahr</option>
-                                    <option value="5">Gesamt</option>
-                                </select>
-                                <div class="container center">
-                                    <button onclick="drawCompareChart()" class="waves-effect waves-light btn"
-                                        style="margin-left: 10px; margin-bottom: 3%;">Ansicht ändern</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col s4"></div>
                     </div>
 
                     <h3 style="margin-left: 20px;">Gewicht</h3>

@@ -97,19 +97,19 @@
 
 <div id="dateRangeModal" class="modal">
     <div class="modal-content">
-        <div class="input-field">
-            <h4>Zeitraum ändern <span class="badge red white-text">Experimentelle Funktion</span></h4>
-            <p>Dieses Feature ist experimentell und temporär deaktiviert, da es sich in der Überarbeitung befindet.</p>
-            <select id="dropSelect" disabled>
-                <option value="1">Heute</option>
-                <option value="2">Eine Woche</option>
-                <option value="3">Ein Monat</option>
-                <option value="4">Ein Jahr</option>
-            </select>
-            <div class="container center">
-                <button onclick="updateCharts();" class="waves-effect waves-light btn"
-                    style="margin-left: 10px; margin-bottom: 3%;" disabled>Ansicht ändern</button>
-            </div>
+        <h4>Zeitraum ändern <span class="badge red white-text">Experimentelle Funktion</span></h4>
+        <p>Unten kannst du einen Zeitraum auswählen für den die Daten angezeigt werden sollen (in den Diagrammen).</p>
+
+        <br>
+
+        <b>Datum ab dem die angezeigten Daten starten sollen:</b>
+        <input id="from-date-input" type="text" class="datepicker" placeholder="Alle Daten von ...">
+        <b>Datum an dem die angezeigten Daten enden sollen:</b>
+        <input id="to-date-input" type="text" class="datepicker" placeholder="Alle Daten bis ...">
+
+        <p>Die Daten werden, besonders bei großen Datenmengen, dadurch reduziert, dass ein Durchschnittswert für jeden Tag gebildet wird, anstatt alle 48 gemessenen Datensätze für jeden Tag auszugeben.</p>
+        <div class="container center" style="margin-top: 30px;">
+            <button onclick="updateCharts();" class="modal-close waves-effect waves-light btn-large blue accent-3">Ansicht ändern</button>
         </div>
     </div>
     <div class="modal-footer">
