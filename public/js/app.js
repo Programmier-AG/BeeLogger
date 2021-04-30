@@ -10,12 +10,29 @@
 var last_measured;
 var response;
 
+// Initializing both date pickers as globals
+var datePickerFrom, datePickerTo;
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
     M.Modal.init(document.querySelectorAll('.modal'), {});
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
+
+    datePickerFrom = M.Datepicker.init(document.getElementById('from-date-input'), {
+        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        maxDate: luxon.DateTime.now().toJSDate(),
+        defaultDate: luxon.DateTime.now().minus({ days: 4 }).toJSDate(),
+        setDefaultDate: true
+    });
+
+    datePickerTo = M.Datepicker.init(document.getElementById('to-date-input'), {
+        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        maxDate: luxon.DateTime.now().toJSDate(),
+        defaultDate: luxon.DateTime.now().toJSDate(),
+        setDefaultDate: true
+    });
 
     response = await fetchData();
 
@@ -41,45 +58,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
-// ISO date format => 2021-04-25
-var date = luxon.DateTime.now().toISODate();
-
 async function fetchData() {
-    var compareValue = document.getElementById('dropSelect');
-    var url;
+    var date = luxon.DateTime.fromJSDate(datePickerTo.date).toISODate();
+    var dateTwo = luxon.DateTime.fromJSDate(datePickerFrom.date).toISODate();
     
-    // Handling date range dropdown and just fetching data for the corresponding time frame
-    if (compareValue) {
-        switch (compareValue.options[compareValue.selectedIndex].value) {
-            // Today
-            case '1':
-                url = '/api/data/get?from=' + date + '&to=' + date;
-                break;
-            
-            // Week
-            case '2':
-                var dateTwo = luxon.DateTime.now().minus({ weeks: 1 }).toISODate();
-                url = '/api/data/get?from=' + dateTwo + '&to=' + date;
-                break;
-            
-            // Month
-            case '3':
-                var dateTwo = luxon.DateTime.now().minus({ months: 1 }).toISODate();
-                url = '/api/data/get?from=' + dateTwo + '&to=' + date
-                break;
-
-            // Year
-            case '4':
-                var dateTwo = luxon.DateTime.now().minus({ years: 1 }).toISODate();
-                url = '/api/data/get?from=' + dateTwo + '&to=' + date;
-                break;
-        }
-
-        response = await fetch(url);
+    response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
     
-    // If no view is selected, fetch current data
-    } else response = await fetch('/api/data/get?from=' + date + '&to=' + date);
-
     // Checking if valid data is returned and not some error
     if(!response.ok) {
         document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
@@ -126,6 +110,11 @@ async function drawCharts() {
     await drawTempChart();
     await drawWeightChart();
     await drawHumidityChart();
+}
+
+async function updateCharts() {
+    response = await fetchData();
+    await drawCharts();
 }
 
 async function drawCompareChart() {
