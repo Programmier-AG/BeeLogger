@@ -59,11 +59,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function fetchData() {
-    var date = luxon.DateTime.fromJSDate(datePickerTo.date).toISODate();
-    var dateTwo = luxon.DateTime.fromJSDate(datePickerFrom.date).toISODate();
+    var date = luxon.DateTime.fromJSDate(datePickerTo.date);
+    var dateTwo = luxon.DateTime.fromJSDate(datePickerFrom.date);
     
-    response = await fetch('/api/data/get?from=' + dateTwo + '&to=' + date);
+    // Calculating difference between dates to determine whether or not 'compressed' should be used 
+    var diff = date.diff(dateTwo, 'days');
+    diff = diff.toObject().days;
+
+    date = date.toISODate();
+    dateTwo = dateTwo.toISODate();
+
+    var url = '/api/data/get?from=' + dateTwo + '&to=' + date;
     
+    // When more than or 10 days are requested add 'compressed'
+    if(diff > 10) url += '&compressed'
+    
+    response = await fetch(url);
+
     // Checking if valid data is returned and not some error
     if(!response.ok) {
         document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
@@ -138,7 +150,7 @@ async function drawCompareChart() {
             position: 'bottom'
         },
         colors: ['red', 'black', 'blue'],
-        lineWidth: 3,
+        lineWidth: 2,
         width: '100%',
         height: '70%',
         chartArea: {
@@ -167,7 +179,7 @@ async function drawTempChart() {
     temp_chart.draw(data_temp, {
         height: '100%',
         width: '100%',
-        lineWidth: 3,
+        lineWidth: 2,
         colors: ['red'],
         chartArea: {
             left: '10%',
@@ -195,7 +207,7 @@ async function drawWeightChart() {
     var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
     weight_chart.draw(data_weight, {
         height: '100%',
-        lineWidth: 3,
+        lineWidth: 2,
         colors: ['black'],
         chartArea: {
             left: '10%',
@@ -223,7 +235,7 @@ async function drawHumidityChart() {
     humidity_chart.draw(data_humidity, {
         height: '100%',
         width: '100%',
-        lineWidth: 3,
+        lineWidth: 2,
         colors: ['blue'],
         chartArea: {
             left: '10%',
