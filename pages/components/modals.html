@@ -98,16 +98,18 @@
 <div id="dateRangeModal" class="modal">
     <div class="modal-content">
         <h4>Zeitraum ändern <span class="badge red white-text">Experimentelle Funktion</span></h4>
-        <p>Unten kannst du einen Zeitraum auswählen für den die Daten angezeigt werden sollen (in den Diagrammen).</p>
+        <p>Unten kannst du einen Zeitraum auswählen, für den die Daten angezeigt werden sollen (in den Diagrammen).</p>
 
         <br>
 
-        <b>Datum ab dem die angezeigten Daten starten sollen:</b>
+        <b>Datum ab dem die angezeigten Daten beginnen sollen:</b>
         <input id="from-date-input" type="text" class="datepicker" placeholder="Alle Daten von ...">
         <b>Datum an dem die angezeigten Daten enden sollen:</b>
         <input id="to-date-input" type="text" class="datepicker" placeholder="Alle Daten bis ...">
 
-        <p>Die Daten werden, besonders bei großen Datenmengen, dadurch reduziert, dass ein Durchschnittswert für jeden Tag gebildet wird, anstatt alle 48 gemessenen Datensätze für jeden Tag auszugeben.</p>
+        <p><b>Warum sehen die Diagramme bei einem Zeitraum größer als 10 Tage anders aus?</b> Die Daten werden, besonders bei großen Datenmengen (über 10 Tage), dadurch reduziert, dass ein Durchschnittswert für jeden Tag gebildet wird. Da es insgesamt 48 gemessene Datensätze pro Tag gibt, wäre das Diagramm ansonsten schwer bis kaum ablesbar.
+            So sind auch bei großen Zeiträumen langfristige Tendenzen ablesbar. Die unreduzierten Daten sind per API abrufbar.
+        </p>
         <div class="container center" style="margin-top: 30px;">
             <button onclick="updateCharts();" class="modal-close waves-effect waves-light btn-large blue accent-3">Ansicht ändern</button>
         </div>
