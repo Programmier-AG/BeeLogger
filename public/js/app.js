@@ -137,7 +137,6 @@ async function drawCharts() {
 }
 
 async function drawCompareChart(seperate_weight) {
-    console.log(seperate_weight);
     var compareData = [
         ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
     ];
