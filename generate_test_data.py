@@ -10,8 +10,8 @@ connection = pymysql.connect(
     cursorclass=pymysql.cursors.DictCursor
 )
 
-month = 1
-day = 1
+month = 5
+day = 3
 hour = 0
 
 while month != 13:
