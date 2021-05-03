@@ -49,6 +49,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         'callback': async () => {
             await updateData();
             await drawCharts();
+            checkbox = document.getElementById("scale-switch");
+            checkbox.addEventListener("change", async function(e) {
+                element = document.getElementById("scale-switch");
+                if (element.checked) { await drawCompareChart(true); }
+                else {await drawCompareChart(false); }
+            });
+            checkbox.checked = false;
+
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
                 await drawCharts();
@@ -118,7 +126,7 @@ async function getStatistics() {
 }
 
 async function drawCharts() {
-    await drawCompareChart();
+    await drawCompareChart(false);
     await drawTempChart();
     await drawWeightChart();
     await drawHumidityChart();
@@ -129,7 +137,7 @@ async function updateCharts() {
     await drawCharts();
 }
 
-async function drawCompareChart() {
+async function drawCompareChart(seperate_weight) {
     var compareData = [
         ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
     ];
@@ -160,7 +168,21 @@ async function drawCompareChart() {
             width: '100%',
             height: '70%'
         },
+        series: {
+            0: {targetAxisIndex: 0},
+            1: {targetAxisIndex: 1},
+            2: {targetAxisIndex: 0},
+        },
+        vAxes: {
+            0: {title: "Temperatur und Lauftfeuchtigkeit"},
+            1: {title: "Gewicht"}
+        },
     };
+
+    if (seperate_weight == false) {
+        delete options["series"]
+        delete options["vAxes"]
+    }
 
     var chart = new google.visualization.LineChart(document.getElementById('chart'));
     await chart.draw(data, options);
@@ -250,3 +272,4 @@ async function drawHumidityChart() {
         vAxis: {minValue: 0}
     });
 }
+
