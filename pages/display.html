@@ -83,7 +83,17 @@
 
             <div id="charts-tab" class="center col s12">
                 <main id="charts">
+
+                    {% include './components/modals.html' %}
+
+                    <div class="fixed-action-btn">
+                        <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
+                            <i class="large material-icons">edit_calendar</i>
+                        </a>
+                    </div>
+
                     {% include './components/charts.html' %}
+                    
                 </main>
             </div>
 

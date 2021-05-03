@@ -10,12 +10,29 @@
 var last_measured;
 var response;
 
+// Initializing both date pickers as globals
+var datePickerFrom, datePickerTo;
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
     M.Modal.init(document.querySelectorAll('.modal'), {});
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
+
+    datePickerFrom = M.Datepicker.init(document.getElementById('from-date-input'), {
+        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        maxDate: luxon.DateTime.now().toJSDate(),
+        defaultDate: luxon.DateTime.now().minus({ days: 4 }).toJSDate(),
+        setDefaultDate: true
+    });
+
+    datePickerTo = M.Datepicker.init(document.getElementById('to-date-input'), {
+        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        maxDate: luxon.DateTime.now().toJSDate(),
+        defaultDate: luxon.DateTime.now().toJSDate(),
+        setDefaultDate: true
+    });
 
     response = await fetchData();
 
@@ -49,44 +66,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
-// ISO date format => 2021-04-25
-var date = luxon.DateTime.now().toISODate();
-
 async function fetchData() {
-    var compareValue = document.getElementById('dropSelect');
-    var url;
+    var date = luxon.DateTime.fromJSDate(datePickerTo.date);
+    var dateTwo = luxon.DateTime.fromJSDate(datePickerFrom.date);
     
-    // Handling date range dropdown and just fetching data for the corresponding time frame
-    if (compareValue) {
-        switch (compareValue.options[compareValue.selectedIndex].value) {
-            // Today
-            case '1':
-                url = '/api/data/get?from=' + date + '&to=' + date;
-                break;
-            
-            // Week
-            case '2':
-                var dateTwo = luxon.DateTime.now().minus({ weeks: 1 }).toISODate();
-                url = '/api/data/get?from=' + dateTwo + '&to=' + date;
-                break;
-            
-            // Month
-            case '3':
-                var dateTwo = luxon.DateTime.now().minus({ months: 1 }).toISODate();
-                url = '/api/data/get?from=' + dateTwo + '&to=' + date
-                break;
+    // Calculating difference between dates to determine whether or not 'compressed' should be used 
+    var diff = date.diff(dateTwo, 'days');
+    diff = diff.toObject().days;
 
-            // Year
-            case '4':
-                var dateTwo = luxon.DateTime.now().minus({ years: 1 }).toISODate();
-                url = '/api/data/get?from=' + dateTwo + '&to=' + date;
-                break;
-        }
+    date = date.toISODate();
+    dateTwo = dateTwo.toISODate();
 
-        response = await fetch(url);
+    var url = '/api/data/get?from=' + dateTwo + '&to=' + date;
     
-    // If no view is selected, fetch current data
-    } else response = await fetch('/api/data/get?from=' + date + '&to=' + date);
+    // When more than or 10 days are requested add 'compressed'
+    if(diff > 10) url += '&compressed'
+    
+    response = await fetch(url);
 
     // Checking if valid data is returned and not some error
     if(!response.ok) {
@@ -136,6 +132,11 @@ async function drawCharts() {
     await drawHumidityChart();
 }
 
+async function updateCharts() {
+    response = await fetchData();
+    await drawCharts();
+}
+
 async function drawCompareChart(seperate_weight) {
     var compareData = [
         ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
@@ -157,7 +158,7 @@ async function drawCompareChart(seperate_weight) {
             position: 'bottom'
         },
         colors: ['red', 'black', 'blue'],
-        lineWidth: 3,
+        lineWidth: 2,
         width: '100%',
         height: '70%',
         chartArea: {
@@ -200,7 +201,7 @@ async function drawTempChart() {
     temp_chart.draw(data_temp, {
         height: '100%',
         width: '100%',
-        lineWidth: 3,
+        lineWidth: 2,
         colors: ['red'],
         chartArea: {
             left: '10%',
@@ -228,7 +229,7 @@ async function drawWeightChart() {
     var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
     weight_chart.draw(data_weight, {
         height: '100%',
-        lineWidth: 3,
+        lineWidth: 2,
         colors: ['black'],
         chartArea: {
             left: '10%',
@@ -256,7 +257,7 @@ async function drawHumidityChart() {
     humidity_chart.draw(data_humidity, {
         height: '100%',
         width: '100%',
-        lineWidth: 3,
+        lineWidth: 2,
         colors: ['blue'],
         chartArea: {
             left: '10%',
