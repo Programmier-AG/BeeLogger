@@ -32,3 +32,8 @@ class Mail:
     port = 587
     user = ""
     password = ""
+
+# Pages that are 'mounted' at /<key> and embedded using an iframe
+embedded_pages = {
+    # "examplePage": "https://example.org"
+}
