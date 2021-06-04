@@ -48,7 +48,7 @@ print("################################")
 @app.route("/")
 def mainPage():
     statistics.update("website")
-    return render_template("index.html")
+    return render_template("index.html", sidenav_links=config.embedded_pages)
 
 @app.route("/display")
 def display():
@@ -58,15 +58,15 @@ def display():
         return redirect("/")
         
     return render_template("display.html")
-    
-@app.route("/gallery")
-def gallery():
-    return render_template("gallery.html")
 
-# Shouldn't be active in production (since anyone could insert data)
-# @app.route("/simulate")
-# def simulate():
-#     return render_template("simulate.html")
+@app.route("/<page>")
+def embeddedPage(page):
+    pages = config.embedded_pages
+
+    if not page in pages.keys():
+        return "this page doesn't exist"
+
+    return render_template("embed.html", page=pages[page])
 
 @app.route("/post_contact", methods=["POST"])
 def contactPost():

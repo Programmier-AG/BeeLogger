@@ -16,7 +16,9 @@
 
     <li><div class="divider"></div></li>
     <li><a class="subheader">Externe Seiten</a></li>
-    <li><a class="waves-effect" href="/gallery"><i class="material-icons-outlined">collections</i>Galerie</a></li>
+    {% for link in links.keys() %}
+        <li><a class="waves-effect" href="/{{ link }}"><i class="material-icons-outlined">link</i>{{ link }}</a></li>
+    {% endfor %}
 
     <li><div class="divider"></div></li>
     <br>

@@ -52,7 +52,9 @@
         <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
             data-label_2="WETTER" data-theme="original">LEER WETTER</a>
 
-        {% include './components/sidenav.html' %}
+        {% with links=sidenav_links %}
+            {% include './components/sidenav.html' %}
+        {% endwith %}
 
         {% include './components/modals.html' %}
 
