@@ -29,9 +29,10 @@ async function home() {
     document.querySelector('#updated').innerHTML = measured;
 }
 
-function gallery() {
+function pages(url) {
     document.querySelector('body').style.backgroundImage = 'none';
-    document.getElementById("gallery-frame").setAttribute("src", "http://localhost:8080")
+    console.log(url)
+    navigatePages(url)
 }
 
 function stundenplan() {
@@ -62,16 +63,21 @@ function setupTimers () {
     document.addEventListener('keypress', resetTimer, false);
     document.addEventListener('touchmove', resetTimer, false);
     
-    document.getElementById("gallery-frame").addEventListener('mousemove', resetTimer, false);
-    document.getElementById("gallery-frame").addEventListener('mousedown', resetTimer, false);
-    document.getElementById("gallery-frame").addEventListener('keypress', resetTimer, false);
-    document.getElementById("gallery-frame").addEventListener('touchmove', resetTimer, false);
+    document.getElementById("page-frame").addEventListener('mousemove', resetTimer, false);
+    document.getElementById("page-frame").addEventListener('mousedown', resetTimer, false);
+    document.getElementById("page-frame").addEventListener('keypress', resetTimer, false);
+    document.getElementById("page-frame").addEventListener('touchmove', resetTimer, false);
      
     startTimer();
 }
 
 function doInactive() {
     document.getElementById("home-button").click();
+}
+
+function navigatePages(url) {
+    document.getElementById("page-frame").setAttribute("src", url)
+    M.Sidenav.getInstance(document.querySelector('#slide-out')).close();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

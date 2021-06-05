@@ -40,9 +40,10 @@
         <div class="row">
             <div class="col s12 black">
                 <ul class="tabs tabs-transparent">
-                    <li class="tab col s3"><a id="home-button"href="#index-tab" onclick="home()">Dashboard</a></li>
+                    <li class="tab col s3"><a id="home-button" href="#index-tab" onclick="home()">Dashboard</a></li>
                     <li class="tab col s2"><a href="#charts-tab" onclick="charts()">Diagramme</a></li>
-                    <li class="tab col s2"><a href="#gallery-tab" onclick="gallery()">Galerie</a></li>
+                    {% set pageValues = pages.values()|list %}
+                    <li class="tab col s2"><a href="#pages-tab" onclick="pages('{{ pageValues[0] }}')">Seiten</a></li>
                     <li class="tab col s2"><a href="#stundenplan-tab" onclick="stundenplan()">Stundenplan</a></li>
                     <li class="tab col s3"><a href="#about-tab" onclick="about()">About</a></li>
                 </ul>
@@ -51,7 +52,9 @@
             <div id="index-tab" class="col s12">
                 <div id="current-weather" class="center">
                     <h1 id="Wiesmoor_z704"></h1>
-                    <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER" data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-theme="gray" data-basecolor="rgba(99, 106, 107, 0.5)" data-cloudfill="" >LEER WEATHER</a>
+                    <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
+                        data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-theme="gray"
+                        data-basecolor="rgba(99, 106, 107, 0.5)" data-cloudfill="">LEER WEATHER</a>
                     <script>
                         ! function (d, s, id) {
                             var js, fjs = d.getElementsByTagName(s)[0];
@@ -73,11 +76,11 @@
                         });
                     </script>
                     <p id="weather-time-sources" style="display: none;">
-                        <a href="https://time.is/Wiesmoor" id="time_is_link" rel="nofollow">time.is</a>, 
+                        <a href="https://time.is/Wiesmoor" id="time_is_link" rel="nofollow">time.is</a>,
                         <a href="https://weatherwidget.io/">weatherwidget.io</a>
                     </p>
                 </div>
-                
+
                 {% include './components/current-data.html' %}
             </div>
 
@@ -93,46 +96,60 @@
                     </div>
 
                     {% include './components/charts.html' %}
-                    
+
                 </main>
             </div>
 
-            <div id="gallery-tab" class="center col s12">
+            <div id="pages-tab" class="col s12">
+                <ul id="slide-out" class="center sidenav">
+                    <li><h4 style="color: black">Externe Seiten</h4></li><br>
+                    {% for page in pages %}
+                        <li class="collection-item left-align" onclick="navigatePages('{{ pages[page] }}')"><a style="cursor: pointer;"><i class="material-icons-outlined">link</i> {{ page }}</a></li>
+                    {% endfor %}
+                </ul>
+
+                <a href="#" data-target="slide-out" class="sidenav-trigger"><i style="font-size: 50px; padding: 20px;" class="material-icons">menu</i></a>
+
                 <div class="iframe">
-                    <iframe id="gallery-frame" src="http://localhost:8080" frameborder="0"></iframe>
+                    <iframe sandbox="allow-scripts allow-forms allow-modals allow-same-origin allow-popups allow-popups-to-escape-sandbox" id="page-frame" src="{{ pages[0] }}" frameborder="0"></iframe>
                 </div>
             </div>
 
             <div id="stundenplan-tab" class="col s12">
                 <div class="iframe">
-                    <iframe id="plan-frame" src="https://tgg-leer.de/stundenplaene/stundenplaene.html" frameborder="0"></iframe>
+                    <iframe id="plan-frame" src="https://tgg-leer.de/stundenplaene/stundenplaene.html"
+                        frameborder="0"></iframe>
                 </div>
             </div>
 
             <div id="about-tab" class="center col s12">
                 <main id="about">
                     <h4 style="margin-top: 50px;">Über dieses Display und BeeLogger</h4>
-                    <p style="margin-bottom: 50px;">BeeLogger ist ein Projekt von zwei Schülern des Teletta-Groß-Gymnasiums.</p>
-            
+                    <p style="margin-bottom: 50px;">BeeLogger ist ein Projekt von zwei Schülern des
+                        Teletta-Groß-Gymnasiums.</p>
+
                     <div class="row">
                         <div class="about-box col s8 offset-s2">
                             <h5>Daten</h5>
-                            <p>BeeLogger misst und sammelt die Daten der Bienenvölker (wie Gewicht, Temperatur, Luftfeuchtigkeit, etc.).
+                            <p>BeeLogger misst und sammelt die Daten der Bienenvölker (wie Gewicht, Temperatur,
+                                Luftfeuchtigkeit, etc.).
                                 <p>Diese werden auf diesem Dashboard zur Verfügung gestellt.</p>
-                                <p>Es werden alle 30 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
+                                <p>Es werden alle 30 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf
+                                    dieser
                                     Seite zur Verfügung stehen.</p>
                         </div>
-                        
+
                         <div class="about-box col s8 offset-s2">
                             <h5>Statistiken</h5>
                             <p>Gesammelte Datensätze: <b id="inserted-count">Lädt...</b></p>
                             <p>Daten-Abfragen: <b id="requested-count">Lädt...</b></p>
                             <p>Website-Aufrufe: <b id="website-count">Lädt...</b></p>
                         </div>
-                        
+
                         <div class="about-box col s8 offset-s2">
                             <h5>Credits</h5>
-                            <p>Dieses Display und die dazugehörige WebApp und Daten- und Statistiken-API (Schnittstelle) wurden von <b>Fabian Reinders und Sönke Klock</b> entwickelt.</p>
+                            <p>Dieses Display und die dazugehörige WebApp und Daten- und Statistiken-API (Schnittstelle)
+                                wurden von <b>Fabian Reinders und Sönke Klock</b> entwickelt.</p>
                             <p>Zur Entwicklung dieser Dinge wurden verschiedene open-source Libraries verwendet.</p>
                             <p>Die Arduino-Software der Messstation(en) ist von Sönke Klock programmiert worden</p>
                             <p>und das Dashboard und diese Display-Software von Fabian Reinders.</p>
@@ -143,4 +160,5 @@
         </div>
     </main>
 </body>
+
 </html>

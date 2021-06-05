@@ -57,7 +57,7 @@ def display():
     if request.args["token"] != config.display_token:
         return redirect("/")
         
-    return render_template("display.html")
+    return render_template("display.html", pages=config.embedded_pages)
 
 @app.route("/<page>")
 def embeddedPage(page):
