@@ -1,27 +1,18 @@
-import pymysql
+from database import Database
 import config
-import datetime
-from flask import jsonify
+import statistics
+from flask import jsonify, request
 
-def get_data(r_data):
-    if len(r_data["from"]) < 10 or len(r_data["to"]) < 10: return "date must have following format: 'yyyy-mm-dd'"
+def get_data():
+    if len(request.args["from"]) < 10 or len(request.args["to"]) < 10: return "date must have following format: 'yyyy-mm-dd'"
 
-    connection = pymysql.connect(
-        host=config.MySql.host,
-        port=config.MySql.port,
-        user=config.MySql.user,
-        password=config.MySql.password,
-        db=config.MySql.db,
-        charset='utf8mb4',
-        cursorclass=pymysql.cursors.DictCursor
-    )
+    statistics.update("data_calls")
 
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM `data` WHERE DATE(`measured`) BETWEEN '%s' AND '%s'" % (r_data["from"], r_data["to"]))
-    result = cursor.fetchall()
+    database = Database()
+    result = database.get_data(request.args["from"], request.args["to"])
 
     compressed = False
-    if "compressed" in r_data.keys():
+    if "compressed" in request.args.keys():
         compressed = True
 
     fetched_data = {}
