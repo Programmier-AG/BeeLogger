@@ -1,164 +1,97 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>BeeLogger</title>
-    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
-    <link rel="stylesheet" href="/lib/materialize/css/materialize.min.css">
-    <link rel="stylesheet" href="/css/display.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="/lib/materialize/js/materialize.min.js"></script>
-    <script src="/lib/luxon.min.js"></script>
-    <script src="/js/display.js"></script>
-    <script src="/js/app.js"></script>
-    <script>
-        ! function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (!d.getElementById(id)) {
-                js = d.createElement(s);
-                js.id = id;
-                js.src = 'https://weatherwidget.io/js/widget.min.js';
-                fjs.parentNode.insertBefore(js, fjs);
-            }
-        }(document, 'script', 'weatherwidget-io-js');
-    </script>
-    <script>
-        setupTimers();
-        window.setInterval(updateData, 600000)
-    </script>
-</head>
+{% block custom_header %}
+<script src="/js/display.js"></script>
+<link rel="stylesheet" href="/css/display.css">
+<script>
+    window.setInterval(updateData, 600000)
+</script>
+{% endblock %}
 
-<body id="main">
-    <div id="loading" class="progress">
-        <div class="indeterminate"></div>
-    </div>
+{% block content %}
+<div id="loading" class="progress">
+    <div class="indeterminate"></div>
+</div>
 
-    <main id="everything">
-        <div class="row">
-            <div class="col s12 black">
-                <ul class="tabs tabs-transparent">
-                    <li class="tab col s3"><a id="home-button" href="#index-tab" onclick="home()">Dashboard</a></li>
-                    <li class="tab col s2"><a href="#charts-tab" onclick="charts()">Diagramme</a></li>
-                    {% set pageValues = pages.values()|list %}
-                    <li class="tab col s2"><a href="#pages-tab" onclick="pages('{{ pageValues[0] }}')">Seiten</a></li>
-                    <li class="tab col s2"><a href="#stundenplan-tab" onclick="stundenplan()">Stundenplan</a></li>
-                    <li class="tab col s3"><a href="#about-tab" onclick="about()">About</a></li>
-                </ul>
+<main id="everything">
+    {% include './components/modals.html' %}
+
+    <div class="row">
+        <div class="col s12 black">
+            <ul class="tabs tabs-transparent">
+                <li class="tab col s3"><a id="home-button" href="#index-tab" onclick="home()">Dashboard</a></li>
+                <li class="tab col s2"><a href="#charts-tab" onclick="charts()">Diagramme</a></li>
+                {% set pageValues = pages.values()|list %}
+                <li class="tab col s2"><a href="#pages-tab" onclick="pages('{{ pageValues[0] }}')">Seiten</a></li>
+                <li class="tab col s2"><a href="#stundenplan-tab" onclick="stundenplan()">Stundenplan</a></li>
+                <li class="tab col s3"><a href="#about-tab" onclick="about()">About</a></li>
+            </ul>
+        </div>
+
+        <div id="index-tab" class="col s12">
+            <div id="current-weather" class="center">
+                <h1 id="Wiesmoor_z704"></h1>
+                <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
+                    data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-theme="gray"
+                    data-basecolor="rgba(99, 106, 107, 0.5)" data-cloudfill="">LEER WEATHER</a>
+                <script src="//widget.time.is/de.js"></script>
+                <script>
+                    time_is_widget.init({
+                        Wiesmoor_z704: {
+                            template: "TIME<br><p id='date'>DATE</p>",
+                            date_format: "dayname, dnum. monthname year, week"
+                        }
+                    });
+                </script>
+                <p id="weather-time-sources" style="display: none;">
+                    <a href="https://time.is/Wiesmoor" id="time_is_link" rel="nofollow">time.is</a>,
+                    <a href="https://weatherwidget.io/">weatherwidget.io</a>
+                </p>
             </div>
 
-            <div id="index-tab" class="col s12">
-                <div id="current-weather" class="center">
-                    <h1 id="Wiesmoor_z704"></h1>
-                    <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
-                        data-label_2="WEATHER" data-font="Roboto" data-icons="Climacons Animated" data-theme="gray"
-                        data-basecolor="rgba(99, 106, 107, 0.5)" data-cloudfill="">LEER WEATHER</a>
-                    <script>
-                        ! function (d, s, id) {
-                            var js, fjs = d.getElementsByTagName(s)[0];
-                            if (!d.getElementById(id)) {
-                                js = d.createElement(s);
-                                js.id = id;
-                                js.src = 'https://weatherwidget.io/js/widget.min.js';
-                                fjs.parentNode.insertBefore(js, fjs);
-                            }
-                        }(document, 'script', 'weatherwidget-io-js');
-                    </script>
-                    <script src="//widget.time.is/de.js"></script>
-                    <script>
-                        time_is_widget.init({
-                            Wiesmoor_z704: {
-                                template: "TIME<br><p id='date'>DATE</p>",
-                                date_format: "dayname, dnum. monthname year, week"
-                            }
-                        });
-                    </script>
-                    <p id="weather-time-sources" style="display: none;">
-                        <a href="https://time.is/Wiesmoor" id="time_is_link" rel="nofollow">time.is</a>,
-                        <a href="https://weatherwidget.io/">weatherwidget.io</a>
-                    </p>
+            {% include './components/current-data.html' %}
+        </div>
+
+        <div id="charts-tab" class="center col s12">
+            <main id="charts">
+                <div class="fixed-action-btn">
+                    <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
+                        <i class="large material-icons">edit_calendar</i>
+                    </a>
                 </div>
 
-                {% include './components/current-data.html' %}
-            </div>
+                {% include './components/charts.html' %}
 
-            <div id="charts-tab" class="center col s12">
-                <main id="charts">
+            </main>
+        </div>
 
-                    {% include './components/modals.html' %}
+        <div id="pages-tab" class="col s12">
+            <ul id="slide-out" class="center sidenav">
+                <li><h4 style="color: black">Externe Seiten</h4></li><br>
+                {% for page in pages %}
+                    <li class="collection-item left-align" onclick="navigatePages('{{ pages[page] }}')"><a style="cursor: pointer;"><i class="material-icons-outlined">link</i> {{ page }}</a></li>
+                {% endfor %}
+            </ul>
 
-                    <div class="fixed-action-btn">
-                        <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
-                            <i class="large material-icons">edit_calendar</i>
-                        </a>
-                    </div>
+            <a href="#" data-target="slide-out" class="sidenav-trigger"><i style="font-size: 50px; padding: 20px;" class="material-icons">menu</i></a>
 
-                    {% include './components/charts.html' %}
-
-                </main>
-            </div>
-
-            <div id="pages-tab" class="col s12">
-                <ul id="slide-out" class="center sidenav">
-                    <li><h4 style="color: black">Externe Seiten</h4></li><br>
-                    {% for page in pages %}
-                        <li class="collection-item left-align" onclick="navigatePages('{{ pages[page] }}')"><a style="cursor: pointer;"><i class="material-icons-outlined">link</i> {{ page }}</a></li>
-                    {% endfor %}
-                </ul>
-
-                <a href="#" data-target="slide-out" class="sidenav-trigger"><i style="font-size: 50px; padding: 20px;" class="material-icons">menu</i></a>
-
-                <div class="iframe">
-                    <iframe sandbox="allow-scripts allow-forms allow-modals allow-same-origin allow-popups allow-popups-to-escape-sandbox" id="page-frame" src="{{ pages[0] }}" frameborder="0"></iframe>
-                </div>
-            </div>
-
-            <div id="stundenplan-tab" class="col s12">
-                <div class="iframe">
-                    <iframe id="plan-frame" src="https://tgg-leer.de/stundenplaene/stundenplaene.html"
-                        frameborder="0"></iframe>
-                </div>
-            </div>
-
-            <div id="about-tab" class="center col s12">
-                <main id="about">
-                    <h4 style="margin-top: 50px;">Über dieses Display und BeeLogger</h4>
-                    <p style="margin-bottom: 50px;">BeeLogger ist ein Projekt von zwei Schülern des
-                        Teletta-Groß-Gymnasiums.</p>
-
-                    <div class="row">
-                        <div class="about-box col s8 offset-s2">
-                            <h5>Daten</h5>
-                            <p>BeeLogger misst und sammelt die Daten der Bienenvölker (wie Gewicht, Temperatur,
-                                Luftfeuchtigkeit, etc.).
-                                <p>Diese werden auf diesem Dashboard zur Verfügung gestellt.</p>
-                                <p>Es werden alle 30 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf
-                                    dieser
-                                    Seite zur Verfügung stehen.</p>
-                        </div>
-
-                        <div class="about-box col s8 offset-s2">
-                            <h5>Statistiken</h5>
-                            <p>Gesammelte Datensätze: <b id="inserted-count">Lädt...</b></p>
-                            <p>Daten-Abfragen: <b id="requested-count">Lädt...</b></p>
-                            <p>Website-Aufrufe: <b id="website-count">Lädt...</b></p>
-                        </div>
-
-                        <div class="about-box col s8 offset-s2">
-                            <h5>Credits</h5>
-                            <p>Dieses Display und die dazugehörige WebApp und Daten- und Statistiken-API (Schnittstelle)
-                                wurden von <b>Fabian Reinders und Sönke Klock</b> entwickelt.</p>
-                            <p>Zur Entwicklung dieser Dinge wurden verschiedene open-source Libraries verwendet.</p>
-                            <p>Die Arduino-Software der Messstation(en) ist von Sönke Klock programmiert worden</p>
-                            <p>und das Dashboard und diese Display-Software von Fabian Reinders.</p>
-                        </div>
-                    </div>
-                </main>
+            <div class="iframe">
+                <iframe sandbox="allow-scripts allow-forms allow-modals allow-same-origin allow-popups allow-popups-to-escape-sandbox" id="page-frame" src="{{ pages[0] }}" frameborder="0"></iframe>
             </div>
         </div>
-    </main>
-</body>
 
-</html>
+        <div id="stundenplan-tab" class="col s12">
+            <div class="iframe">
+                <iframe id="plan-frame" src="https://tgg-leer.de/stundenplaene/stundenplaene.html"
+                    frameborder="0"></iframe>
+            </div>
+        </div>
+
+        <div id="about-tab" class="center col s12">
+            <main id="about">
+                {% include './content/about.html' %}
+            </main>
+        </div>
+    </div>
+</main>
+{% endblock %}
