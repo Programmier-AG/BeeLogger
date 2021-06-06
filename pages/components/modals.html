@@ -1,33 +1,6 @@
 <div id="aboutModal" class="modal">
     <div class="modal-content">
-        <h4>Über BeeLogger</h4>
-        <p>BeeLogger ist ein Projekt, welches von 2 Schülern des Teletta-Groß-Gymnasiums entwickelt wird.</p>
-
-        <br>
-
-        <h5>Daten</h5>
-        <p>BeeLogger misst und sammelt die Daten der Bienenvölker (wie Gewicht, Temperatur, Luftfeuchtigkeit, etc.).
-        <p>Diese werden auf diesem Dashboard zur Verfügung gestellt.</p>
-        <p>Es werden alle 30 Minuten neue Daten gemessen, welche dann innerhalb von Sekunden auf dieser
-            Seite zur Verfügung stehen.</p>
-
-        <br>
-
-        <h5>Statistiken</h5>
-        <p>Gesammelte Datensätze: <b id="inserted-count">fetching...</b></p>
-        <p>Daten-Abfragen: <b id="requested-count">fetching...</b></p>
-        <p>Website-Aufrufe: <b id="website-count">fetching...</b></p>
-        
-        <p>Derzeit arbeiten wir noch an einer gesonderten Statistik-Seite, auf der alle Statistiken, die wir
-            erfassen, genau einsehbar sind.</p>
-
-        <br>
-
-        <h5>Credits</h5>
-        <p>Dieses Dashboard und die dazugehörige Daten- und Statistiken-API (Schnittstelle) wurden von <b>Fabian Reinders und Sönke Klock</b> entwickelt.</p>
-        <p>Zur Entwicklung dieser Dinge wurden verschiedene open-source Libraries verwendet.</p>
-        <p>Die Arduino-Software der Messstation(en) ist von Sönke Klock programmiert worden</p>
-        <p>und dieses Dashboard und die Display-Software von Fabian Reinders.</p>
+        {% include './content/about.html' %}
     </div>
     <div class="modal-footer">
         <a href="#!" class="modal-close waves-effect waves-green btn-flat">Schließen</a>

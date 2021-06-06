@@ -20,7 +20,7 @@ ul.tabs {
     padding: 0;
 }
 
-h1#Wiesmoor_z704 p#date {
+h1 p#date {
     font-size: 50%;
 }
 
@@ -97,6 +97,18 @@ a.weatherwidget-io {
     background-color: #1f567c;
 }
 
+#about-content > p {
+    font-size: 130%;
+}
+
+#about, #about-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 #about div div h5 {
     font-size: 250%;
 }
@@ -105,7 +117,8 @@ a.weatherwidget-io {
     font-size: 120%;
 }
 
-.about-box {
+.about-block {
+    width: 80%;
     border-radius: 10px;
     margin-bottom: 50px;
     padding: 30px !important;
@@ -114,4 +127,9 @@ a.weatherwidget-io {
 
 #timestamp {
     font-size: 150%;
+}
+
+.modal {
+    color: black !important;
+    background-color: #fff !important;
 }
