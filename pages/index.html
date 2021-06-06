@@ -1,69 +1,44 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>BeeLogger</title>
-    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
-    <link rel="stylesheet" href="/lib/materialize/css/materialize.min.css">
-    <link rel="stylesheet" href="/css/app.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="/lib/materialize/js/materialize.min.js"></script>
-    <script src="/lib/luxon.min.js"></script>
-    <script src="/js/app.js"></script>
-    <script>
-        ! function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (!d.getElementById(id)) {
-                js = d.createElement(s);
-                js.id = id;
-                js.src = 'https://weatherwidget.io/js/widget.min.js';
-                fjs.parentNode.insertBefore(js, fjs);
-            }
-        }(document, 'script', 'weatherwidget-io-js');
-    </script>
-</head>
+{% block custom_header %}
+<link rel="stylesheet" href="/css/app.css">
+{% endblock %}
 
-<body id="main">
-
-    {% include './components/header.html' %}
-
-    <div class="row center" id="loading">
-        <div class="card col s10 m6 offset-s1 offset-m3 blue-grey darken-1" style="margin-top: 40px;">
-            <div class="card-content white-text">
-                <span id="loading-title" class="card-title">Daten werden geladen...</span>
-                <div id="loading-progress" class="progress">
-                    <div class="indeterminate"></div>
-                </div>
-                <p id="loading-text">Die Daten werden aus unserer Datenbank abgerufen. Dies kann einen Moment dauern.</p>
+{% block content %}
+<div class="row center" id="loading">
+    <div class="card col s10 m6 offset-s1 offset-m3 blue-grey darken-1" style="margin-top: 40px;">
+        <div class="card-content white-text">
+            <span id="loading-title" class="card-title">Daten werden geladen...</span>
+            <div id="loading-progress" class="progress">
+                <div class="indeterminate"></div>
             </div>
+            <p id="loading-text">Die Daten werden aus unserer Datenbank abgerufen. Dies kann einen Moment dauern.</p>
         </div>
     </div>
+</div>
 
-    <main class="hide">
-        <div class="fixed-action-btn">
-            <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
-                <i class="large material-icons">edit_calendar</i>
-            </a>
-        </div>
+<main class="hide">
+    {% include './components/header.html' %}
+    
+    {% with links=pages %}
+        {% include './components/sidenav.html' %}
+    {% endwith %}
 
-        <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
-            data-label_2="WETTER" data-theme="original">LEER WETTER</a>
+    {% include './components/modals.html' %}
 
-        {% with links=sidenav_links %}
-            {% include './components/sidenav.html' %}
-        {% endwith %}
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
+            <i class="large material-icons">edit_calendar</i>
+        </a>
+    </div>
 
-        {% include './components/modals.html' %}
+    <a class="weatherwidget-io" href="https://forecast7.com/de/53d247d47/leer/" data-label_1="LEER"
+        data-label_2="WETTER" data-theme="original">LEER WETTER</a>
+    
+    {% include './components/current-data.html' %}
 
-        {% include './components/current-data.html' %}
+    {% include './components/charts.html' %}
 
-        {% include './components/charts.html' %}
-
-        {% include './components/footer.html' %}
-    </main>
-</body>
-
-</html>
+    {% include './components/footer.html' %}
+</main>
+{% endblock %}
