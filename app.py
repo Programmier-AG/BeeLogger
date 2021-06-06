@@ -12,13 +12,11 @@ if not os.path.isfile("app.py"):
     print("You need to start this script from the directory it's contained in. Please cd into that folder.")
     exit()
 
-
 print("################################")
 print("#           BeeLogger          #")
 print("#    -----------------------   #")
 print("#    by Fabian R., Soenke K.   #")
 print("################################")
-
 
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
