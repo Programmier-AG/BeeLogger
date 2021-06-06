@@ -18,7 +18,7 @@ views = Blueprint("views", __name__)
 @views.route("/")
 def dashboard():
     statistics.update("website")
-    return render_template("index.html", sidenav_links=config.embedded_pages)
+    return render_template("index.html", pages=config.embedded_pages)
 
 # /display
 @views.route("/display")
@@ -38,7 +38,7 @@ def embeddedPage(page):
     if not page in pages.keys():
         return "this page doesn't exist"
 
-    return render_template("embed.html", page=pages[page])
+    return render_template("embedded.html", page=pages[page])
 
 # /post_contact
 @views.route("/post_contact", methods=["POST"])
