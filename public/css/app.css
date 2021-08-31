@@ -65,7 +65,7 @@ h3.chart-title {
 }
 
 .beelogger-current-box {
-    height: 200px;
+    height: 240px;
     margin-bottom: 20px;
 }
 
@@ -94,4 +94,8 @@ footer {
     padding: 0 20px !important;
     border-radius: 10px;
     font-weight: bold;
+}
+
+.beelogger-current-box #weight-delta {
+    margin-top: 5px;
 }
