@@ -42,7 +42,6 @@ function stundenplan() {
 
 async function about() {
     document.querySelector('body').style.backgroundImage = `url('/assets/slideshow/bee-background.jpg')`;
-    await getStatistics();
 }
 
 var timeoutID;

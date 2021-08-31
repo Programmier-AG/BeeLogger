@@ -7,7 +7,6 @@ import secrets
 import smtplib
 import ssl
 from flask import Blueprint
-import statistics
 from flask import render_template, request, redirect
 import config
 
@@ -17,7 +16,6 @@ views = Blueprint("views", __name__)
 # /
 @views.route("/")
 def dashboard():
-    statistics.update("website")
     return render_template("index.html", pages=config.embedded_pages)
 
 # /display

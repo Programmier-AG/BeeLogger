@@ -42,36 +42,6 @@ LOCK TABLES `data` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `statistics`
---
-
-DROP TABLE IF EXISTS `statistics`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `statistics` (
-  `id` tinyint(4) NOT NULL AUTO_INCREMENT,
-  `data_calls` int(11) DEFAULT NULL,
-  `insert_calls` int(11) DEFAULT NULL,
-  `website` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `statistics`
---
-
-LOCK TABLES `statistics` WRITE;
-/*!40000 ALTER TABLE `statistics` DISABLE KEYS */;
-INSERT INTO `statistics` VALUES (1,0,0,0);
-/*!40000 ALTER TABLE `statistics` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Dumping events for database 'beelogger'
---
-
---
 -- Dumping routines for database 'beelogger'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

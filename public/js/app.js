@@ -89,7 +89,9 @@ async function fetchData() {
         document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
         document.getElementById('loading-text').innerHTML = `
             <hr>
-            <b>Das Laden der Daten ist fehlgeschlagen!</b><br>
+            <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b>
+            <br>
+            <hr>
             Dies kann daran liegen, dass unsere Datenschnittstelle gerade offline ist,
             wir Wartungen vornehmen oder aufgrund eines Vorfalls keine aktuellen Daten
             aufgezeichnet wurden.<hr>
@@ -114,15 +116,6 @@ async function updateData() {
     document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
     document.querySelector('#updated').innerHTML = measured;
     document.querySelector('#loading').classList.add('hide');
-}
-
-async function getStatistics() {
-    let req = await fetch('/api/stats');
-    let res = await req.json();
-
-    document.querySelector('#inserted-count').innerHTML = res['insert_calls'];
-    document.querySelector('#requested-count').innerHTML = res['data_calls'];
-    document.querySelector('#website-count').innerHTML = res['website'];
 }
 
 async function drawCharts() {
