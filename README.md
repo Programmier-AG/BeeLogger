@@ -74,14 +74,6 @@ The table should look like this:
 |humidity    |double|Yes          |None | NULL          |   -    |
 |measured    |datetime|Yes        |None | NULL          |   -    |
 
-Also create a table for statistics:
-| Field name | Type | Allow nulls | Key | Default Value | Extras |
-| -----------|:----:|:-----------:|:---:|:-------------:|-------:|
-|id          |tinyint|No          |primary|NULL         |auto_increment|
-|data_calls  |int   |Yes          |None | NULL          |   -    |
-|insert_calls|double|Yes          |None | NULL          |   -    |
-|website     |double|Yes          |None | NULL          |   -    |
-
 You can also create the database with the included sql file.
 
 **You are ready to go!**
