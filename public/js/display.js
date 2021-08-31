@@ -21,12 +21,8 @@ async function charts() {
 
 async function home() {
     response = await fetchData();
-
     document.querySelector('body').style.backgroundImage = `url('/assets/slideshow/bee-background.jpg')`;
-    document.querySelector('#temperature').innerHTML = response[Object.keys(response).length - 1].temperature + ' °C';
-    document.querySelector('#weight').innerHTML = response[Object.keys(response).length - 1].weight + ' kg';
-    document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
-    document.querySelector('#updated').innerHTML = measured;
+    await updateData();
 }
 
 function pages(url) {

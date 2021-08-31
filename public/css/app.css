@@ -82,6 +82,11 @@ h3.chart-title {
     font-size: 300%;
 }
 
+.beelogger-current-box p#weight-delta {
+    font-size: 170%;
+    margin-top: 5px;
+}
+
 footer {
     margin-top: 100px !important;
 }
@@ -94,8 +99,4 @@ footer {
     padding: 0 20px !important;
     border-radius: 10px;
     font-weight: bold;
-}
-
-.beelogger-current-box #weight-delta {
-    margin-top: 5px;
 }
