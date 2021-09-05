@@ -65,7 +65,7 @@ h3.chart-title {
 }
 
 .beelogger-current-box {
-    height: 200px;
+    height: 240px;
     margin-bottom: 20px;
 }
 
@@ -80,6 +80,11 @@ h3.chart-title {
 
 .beelogger-current-box span {
     font-size: 300%;
+}
+
+.beelogger-current-box p#weight-delta {
+    font-size: 170%;
+    margin-top: 5px;
 }
 
 footer {

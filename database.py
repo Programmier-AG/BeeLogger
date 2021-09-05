@@ -69,12 +69,4 @@ class Database:
         log = open("insert.log", mode="a")
         log.write("\n[%s] - %s" % (time.asctime(), sql))
         log.close()
-
         return
-
-    def get_statistics(self):
-        connection = pymysql.connect(**self.mysql_args)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM `statistics`")
-        result = cursor.fetchall()
-        return result

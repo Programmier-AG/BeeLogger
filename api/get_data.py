@@ -1,12 +1,9 @@
 from database import Database
 import config
-import statistics
 from flask import jsonify, request
 
 def get_data():
     if len(request.args["from"]) < 10 or len(request.args["to"]) < 10: return "date must have following format: 'yyyy-mm-dd'"
-
-    statistics.update("data_calls")
 
     database = Database()
     result = database.get_data(request.args["from"], request.args["to"])

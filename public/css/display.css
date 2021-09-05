@@ -63,7 +63,7 @@ h1 p#date {
 
 #beelogger-current {
     margin-top: 4%;
-    padding: 0px 80px 0px 80px;
+    padding: 0px 10% 0px 10%;
 }
 
 .beelogger-current-box {
@@ -71,6 +71,7 @@ h1 p#date {
 }
 
 .beelogger-current-box .card {
+    height: 220px;
     background-color: rgba(99, 106, 107, 0.7) !important;
     border-radius: 10px;
 }
@@ -81,6 +82,10 @@ h1 p#date {
 
 .beelogger-current-box p {
     font-size: 240% !important;
+}
+
+.beelogger-current-box p#weight-delta {
+    font-size: 10px !important;
 }
 
 a.weatherwidget-io {
