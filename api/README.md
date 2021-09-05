@@ -19,20 +19,3 @@ This route allows the hardware to post the data to the server so that it can sav
 * ```t```: The temperature
 * ```w```: The weight
 * ```h```: The humidity
-
-<br>
-
-## [GET] /api/data/scales
-### Params: ```token, w, n```
-In the case of multiple scales being attached to the system, this endpoint can be used to send data from other scales. The row in the database that contains the data for this measurement will be updated accordingly. In case the main data for this measurement (temp, weight of scale 1 and humidity) isn't in yet and there is no row, the system takes care of this automatically.
-* ```token```: Value defined as _'insert_token'_ in config.py
-* ```w```: The weight this scale has determined
-* ```n```: The number/id/name of the scale (a column with the name of this value has to exist otherwise the data won't be accepted)
-
-<br>
-
-## [GET] /api/gallery/list
-### Params: ```token```
-Returns a list of all categories (subdirectories) and the images contained in them. The image files and optionally their corresponding subdirectories go into the **_gallery_** folder.
-
-```token``` requires the value defined as _'display_token'_ in config.py.

@@ -66,18 +66,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
-async function fetchData() {
-    var date = luxon.DateTime.fromJSDate(datePickerTo.date);
-    var dateTwo = luxon.DateTime.fromJSDate(datePickerFrom.date);
+async function fetchData(date_from, date_to) {
+    var date, date_two;
+
+    if (date_from && date_to){
+        date = date_from;
+        date_two = date_to;
+    } else {
+        date = luxon.DateTime.fromJSDate(datePickerFrom.date);
+        date_two = luxon.DateTime.fromJSDate(datePickerTo.date);
+    }
     
     // Calculating difference between dates to determine whether or not 'compressed' should be used 
-    var diff = date.diff(dateTwo, 'days');
+    var diff = date.diff(date_two, 'days');
     diff = diff.toObject().days;
 
     date = date.toISODate();
-    dateTwo = dateTwo.toISODate();
+    date_two = date_two.toISODate();
 
-    var url = '/api/data/get?from=' + dateTwo + '&to=' + date;
+    var url = '/api/data/get?from=' + date + '&to=' + date_two;
     
     // When more than or 10 days are requested add 'compressed'
     if(diff > 10) url += '&compressed'
@@ -89,7 +96,9 @@ async function fetchData() {
         document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
         document.getElementById('loading-text').innerHTML = `
             <hr>
-            <b>Das Laden der Daten ist fehlgeschlagen!</b><br>
+            <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b>
+            <br>
+            <hr>
             Dies kann daran liegen, dass unsere Datenschnittstelle gerade offline ist,
             wir Wartungen vornehmen oder aufgrund eines Vorfalls keine aktuellen Daten
             aufgezeichnet wurden.<hr>
@@ -103,26 +112,38 @@ async function fetchData() {
 
 // Function for updating the 'current data' section
 async function updateData() {
-    response = await fetchData();
+    var date_today = luxon.DateTime.now();
+    var date_yesterday = luxon.DateTime.now().minus({ days: 1 });
     
+    // Query all records from yesterday to today
+    // Yesterday's records are needed for delta calculation
+    response = await fetchData(date_yesterday, date_today);
+    
+    // Get the datetime from latest record
     last_measured = response[Object.keys(response).length - 1].measured;
     var measured = luxon.DateTime.fromISO(last_measured).toRelative({ locale: 'de' });
 
     document.querySelector('main').classList.remove('hide');
     document.querySelector('#temperature').innerHTML = response[Object.keys(response).length - 1].temperature + ' °C';
-    document.querySelector('#weight').innerHTML = response[Object.keys(response).length - 1].weight + ' kg';
+    
+    // Get weight from most recent record
+    var weight_current = response[Object.keys(response).length - 1].weight;
+    // Get weight from the record in the middle of the array (measured approximately 24 hours ago)
+    // This is done in case there is no record from *exactly* 24 hours ago
+    var weight_start_index = Math.floor(((Object.keys(response).length - 1) / 2))
+    var weight_start = response[weight_start_index].weight;
+    // Calculate the delta of the current and start weight
+    var weight_delta = weight_current - weight_start;
+    // Limit float to 2 decimal places
+    weight_delta = Number(weight_delta.toFixed(2));
+    // Format HTML string with green color for weight growth and red color for weight decline
+    var weight_delta_string = weight_delta >= 0 ? `<p style="color: #8aff6b;">+${weight_delta}</p>` : `<p style="color: #fe7373;">${weight_delta}</p>`;
+    
+    document.querySelector('#weight').innerHTML = weight_current + ' kg';
+    document.querySelector('#weight-delta').innerHTML = weight_delta_string;
     document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
     document.querySelector('#updated').innerHTML = measured;
     document.querySelector('#loading').classList.add('hide');
-}
-
-async function getStatistics() {
-    let req = await fetch('/api/stats');
-    let res = await req.json();
-
-    document.querySelector('#inserted-count').innerHTML = res['insert_calls'];
-    document.querySelector('#requested-count').innerHTML = res['data_calls'];
-    document.querySelector('#website-count').innerHTML = res['website'];
 }
 
 async function drawCharts() {
