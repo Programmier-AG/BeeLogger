@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             checkbox = document.getElementById("scale-switch");
             checkbox.addEventListener("change", async (e) => {
                 element = document.getElementById("scale-switch");
-                if (element.checked) await drawCompareChart(data, true);
+                if(element.checked) await drawCompareChart(data, true);
                 else await drawCompareChart(data, false);
             });
             checkbox.checked = false;
@@ -75,6 +75,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
+/**
+ * When the button for changing the date is pressed,
+ * this function gets executed to load the new data into
+ * the document-wide, cache of the API class and invoke
+ * the chart re-renders.
+ */
 async function changeDateRange() {
     var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
     var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
@@ -95,7 +101,16 @@ async function changeDateRange() {
     await drawCharts(data);
 }
 
-// Function for updating the 'current data' section
+/**
+ * Function that updates the 'current data' section
+ * in the DOM that is located on top of the page.
+ * The display software utilizes this function as well
+ * for the same purpose.
+ * If there is an error loading data from the data API,
+ * an error message is shown in the DOM.
+ * 
+ * @param {Object} data Data object from the data API
+ */
 async function updateCurrentData(data) {
     if(data === null) {
         document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
@@ -128,4 +143,28 @@ async function updateCurrentData(data) {
     document.querySelector('#humidity').innerHTML = humidityCurrent + ' %';
     document.querySelector('#updated').innerHTML = measured;
     document.querySelector('#loading').classList.add('hide');
+}
+
+/**
+ * Gets newest and oldest weight from the passed data Object
+ * and returns the difference ("delta").
+ * 
+ * @param {Object} data Data object from the data API
+ * @returns {string} HTML containing the weight delta (in a fitting color)
+ */
+function getWeightDelta(data) {
+    // Get weight from most recent record
+    var weightCurrent = data[Object.keys(data).length - 1].weight;
+    // Get weight from the record in the middle of the array (measured approximately 24 hours ago)
+    // This is done in case there is no record from *exactly* 24 hours ago
+    var weightStartIndex = Math.floor(((Object.keys(data).length - 1) / 2))
+    var weightStart = data[weightStartIndex].weight;
+    // Calculate the delta of the current and start weight
+    var weightDelta = weightCurrent - weightStart;
+    // Limit float to 2 decimal places
+    weightDelta = Number(weightDelta.toFixed(2));
+    // Format HTML string with green color for weight growth and red color for weight decline
+    var weightDeltaString = weightDelta >= 0 ? `<p style="color: #8aff6b;">+${weightDelta}</p>` : `<p style="color: #fe7373;">${weightDelta}</p>`;
+    
+    return weightDeltaString;
 }

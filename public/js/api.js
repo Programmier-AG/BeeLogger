@@ -18,8 +18,29 @@ class BeeLoggerAPI {
      * Documentation: https://github.com/Programmier-AG/BeeLogger/wiki/REST-API
      */
     constructor() {
+        /**
+         * Store for data that has been fetched
+         * from the API.
+         * 
+         * @type {Object}
+         */
         this.data = {
+            /**
+             * Latest data (usually from about the last 24 hours)
+             * This is the data represented in the 'current data'
+             * section of the page.
+             * 
+             * @type {Object.<string, Object>}
+             */
             current: {},
+            /**
+             * Document-wide cache for storing data in
+             * an instance of this class. The data in
+             * this cache is usually the data shown
+             * in the charts.
+             * 
+             * @type {Object.<string, Object>}
+             */
             cache: {}
         }
     }
