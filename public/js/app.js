@@ -6,14 +6,20 @@
     Copyright (c) 2020-2021 Fabian R., Sönke K.
 */
 
-// Global variables
-var last_measured;
-var response;
-
 // Initializing both date pickers as globals
 var datePickerFrom, datePickerTo;
 
+const beeLoggerAPI = new BeeLoggerAPI();
+
 document.addEventListener('DOMContentLoaded', async () => {
+    var dateToday = luxon.DateTime.now().toISODate();
+    var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
+    
+    // Query all records from yesterday to today
+    // Yesterday's records are needed for delta calculation
+    var data = await beeLoggerAPI.getData(dateYesterday, dateToday, false);
+    beeLoggerAPI.data.current = data;
+
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
     M.Modal.init(document.querySelectorAll('.modal'), {});
@@ -34,11 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setDefaultDate: true
     });
 
-    response = await fetchData();
-
     // Setting up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
-        var measured = luxon.DateTime.fromISO(last_measured).toRelative({ locale: 'de' });
+        var measuredLast = data[Object.keys(data).length - 1].measured;
+        var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
         document.querySelector('#updated').innerHTML = measured;
     }, 15000);
 
@@ -47,52 +52,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         'packages': ['corechart'],
         // Callback to just draw charts and show data if charts lib is loaded
         'callback': async () => {
-            await updateData();
-            await drawCharts();
+            await updateCurrentData(data);
+            await drawCharts(data);
+
             checkbox = document.getElementById("scale-switch");
-            checkbox.addEventListener("change", async function(e) {
+            checkbox.addEventListener("change", async (e) => {
                 element = document.getElementById("scale-switch");
-                if (element.checked) { await drawCompareChart(true); }
-                else {await drawCompareChart(false); }
+                if (element.checked) await drawCompareChart(data, true);
+                else await drawCompareChart(data, false);
             });
             checkbox.checked = false;
 
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
-                await drawCharts();
+                // Load currently displayed data from cache.
+                data = beeLoggerAPI.data.cache;
+                await drawCharts(data);
             };
         }
     });
 
 });
 
-async function fetchData(date_from, date_to) {
-    var date, date_two;
+async function changeDateRange() {
+    var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
+    var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
 
-    if (date_from && date_to){
-        date = date_from;
-        date_two = date_to;
-    } else {
-        date = luxon.DateTime.fromJSDate(datePickerFrom.date);
-        date_two = luxon.DateTime.fromJSDate(datePickerTo.date);
-    }
-    
-    // Calculating difference between dates to determine whether or not 'compressed' should be used 
-    var diff = date.diff(date_two, 'days');
+    // Calculate difference between dates
+    var diff = fromDate.diff(toDate, 'days');
     diff = diff.toObject().days;
 
-    date = date.toISODate();
-    date_two = date_two.toISODate();
+    // Append 'compressed' option when difference is > 10 days.
+    var compressed = diff > 10 ? true : false;
 
-    var url = '/api/data/get?from=' + date + '&to=' + date_two;
-    
-    // When more than or 10 days are requested add 'compressed'
-    if(diff > 10) url += '&compressed'
-    
-    response = await fetch(url);
+    fromDate = fromDate.toISODate();
+    toDate = toDate.toISODate();
 
-    // Checking if valid data is returned and not some error
-    if(!response.ok) {
+    var data = await beeLoggerAPI.getData(fromDate, toDate, compressed);
+    beeLoggerAPI.data.cache = data;
+
+    console.log(data);
+    await drawCharts(data);
+}
+
+// Function for updating the 'current data' section
+async function updateCurrentData(data) {
+    if(data === null) {
         document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
         document.getElementById('loading-text').innerHTML = `
             <hr>
@@ -106,191 +111,21 @@ async function fetchData(date_from, date_to) {
         `;
         document.getElementById('loading-progress').classList.remove('progress');
     }
-
-    return await response.json();
-}
-
-// Function for updating the 'current data' section
-async function updateData() {
-    var date_today = luxon.DateTime.now();
-    var date_yesterday = luxon.DateTime.now().minus({ days: 1 });
     
-    // Query all records from yesterday to today
-    // Yesterday's records are needed for delta calculation
-    response = await fetchData(date_yesterday, date_today);
-    
-    // Get the datetime from latest record
-    last_measured = response[Object.keys(response).length - 1].measured;
-    var measured = luxon.DateTime.fromISO(last_measured).toRelative({ locale: 'de' });
+    // Get the measured timestamp from latest record
+    var measuredLast = data[Object.keys(data).length - 1].measured;
+    var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
 
     document.querySelector('main').classList.remove('hide');
-    document.querySelector('#temperature').innerHTML = response[Object.keys(response).length - 1].temperature + ' °C';
+    document.querySelector('#temperature').innerHTML = data[Object.keys(data).length - 1].temperature + ' °C';
     
-    // Get weight from most recent record
-    var weight_current = response[Object.keys(response).length - 1].weight;
-    // Get weight from the record in the middle of the array (measured approximately 24 hours ago)
-    // This is done in case there is no record from *exactly* 24 hours ago
-    var weight_start_index = Math.floor(((Object.keys(response).length - 1) / 2))
-    var weight_start = response[weight_start_index].weight;
-    // Calculate the delta of the current and start weight
-    var weight_delta = weight_current - weight_start;
-    // Limit float to 2 decimal places
-    weight_delta = Number(weight_delta.toFixed(2));
-    // Format HTML string with green color for weight growth and red color for weight decline
-    var weight_delta_string = weight_delta >= 0 ? `<p style="color: #8aff6b;">+${weight_delta}</p>` : `<p style="color: #fe7373;">${weight_delta}</p>`;
+    var weightCurrent = data[Object.keys(data).length - 1].weight;
+    var weightDelta = getWeightDelta(data);
+    var humidityCurrent = data[Object.keys(data).length - 1].humidity;
     
-    document.querySelector('#weight').innerHTML = weight_current + ' kg';
-    document.querySelector('#weight-delta').innerHTML = weight_delta_string;
-    document.querySelector('#humidity').innerHTML = response[Object.keys(response).length - 1].humidity + ' %';
+    document.querySelector('#weight').innerHTML = weightCurrent + ' kg';
+    document.querySelector('#weight-delta').innerHTML = weightDelta;
+    document.querySelector('#humidity').innerHTML = humidityCurrent + ' %';
     document.querySelector('#updated').innerHTML = measured;
     document.querySelector('#loading').classList.add('hide');
 }
-
-async function drawCharts() {
-    await drawCompareChart(false);
-    await drawTempChart();
-    await drawWeightChart();
-    await drawHumidityChart();
-}
-
-async function updateCharts() {
-    response = await fetchData();
-    await drawCharts();
-}
-
-async function drawCompareChart(seperate_weight) {
-    var compareData = [
-        ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
-    ];
-
-    for (row in response) {
-        var measured = new Date(response[row].measured);
-        compareData.push([measured, response[row].temperature, response[row].weight, response[row].humidity]);
-    }
-
-    var from = luxon.DateTime.fromJSDate(compareData[1][0]).toISODate();
-    var to = luxon.DateTime.fromJSDate(compareData[compareData.length - 1][0]).toISODate();
-
-    var data = google.visualization.arrayToDataTable(compareData);
-    var options = {
-        title: `Daten von ${from} bis ${to}`,
-        curveType: 'function',
-        legend: {
-            position: 'bottom'
-        },
-        colors: ['red', 'black', 'blue'],
-        lineWidth: 2,
-        width: '100%',
-        height: '70%',
-        chartArea: {
-            left: '10%',
-            top: '10%',
-            right: '10%',
-            width: '100%',
-            height: '70%'
-        },
-        series: {
-            0: {targetAxisIndex: 0},
-            1: {targetAxisIndex: 1},
-            2: {targetAxisIndex: 0},
-        },
-        vAxes: {
-            0: {title: "Temperatur und Lauftfeuchtigkeit"},
-            1: {title: "Gewicht"}
-        },
-    };
-
-    if (seperate_weight == false) {
-        delete options["series"]
-        delete options["vAxes"]
-    }
-
-    var chart = new google.visualization.LineChart(document.getElementById('chart'));
-    await chart.draw(data, options);
-}
-
-async function drawTempChart() {
-    var tempData = [['Gemessen', 'Temperatur (°C)']];
-
-    for (row in response) {
-        var measured = new Date(response[row].measured);
-        tempData.push([measured, response[row].temperature]);
-    }
-
-    var data_temp = google.visualization.arrayToDataTable(tempData);
-    var temp_chart = new google.visualization.LineChart(document.getElementById('temp_chart'));
-    temp_chart.draw(data_temp, {
-        height: '100%',
-        width: '100%',
-        lineWidth: 2,
-        colors: ['red'],
-        chartArea: {
-            left: '10%',
-            top: '10%',
-            right: '10%',
-            width: '100%',
-            height: '70%'
-        },
-        legend: {
-            position: 'bottom'
-        },
-        vAxis: {minValue: 0}
-    });
-}
-
-async function drawWeightChart() {
-    var weightData = [['Gemessen', 'Gewicht (kg)']];
-
-    for (row in response) {
-        var measured = new Date(response[row].measured);
-        weightData.push([measured, response[row].weight]);
-    }
-
-    var data_weight = google.visualization.arrayToDataTable(weightData);
-    var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
-    weight_chart.draw(data_weight, {
-        height: '100%',
-        lineWidth: 2,
-        colors: ['black'],
-        chartArea: {
-            left: '10%',
-            top: '10%',
-            right: '10%',
-            width: '100%',
-            height: '70%'
-        },
-        legend: {
-            position: 'bottom'
-        },
-    });
-}
-
-async function drawHumidityChart() {
-    var humidityData = [['Gemessen', 'Luftfeuchtigkeit (%)']];
-
-    for (row in response) {
-        var measured = new Date(response[row].measured);
-        humidityData.push([measured, response[row].humidity]);
-    }
-
-    var data_humidity = google.visualization.arrayToDataTable(humidityData);
-    var humidity_chart = new google.visualization.LineChart(document.getElementById('humidity_chart'));
-    humidity_chart.draw(data_humidity, {
-        height: '100%',
-        width: '100%',
-        lineWidth: 2,
-        colors: ['blue'],
-        chartArea: {
-            left: '10%',
-            top: '10%',
-            right: '10%',
-            width: '100%',
-            height: '70%'
-        },
-        legend: {
-            position: 'bottom'
-        },
-        vAxis: {minValue: 0}
-    });
-}
-
