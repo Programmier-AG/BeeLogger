@@ -5,7 +5,7 @@ async function drawCharts(data) {
     await drawHumidityChart(data);
 }
 
-async function drawCompareChart(data, seperate_weight) {
+async function drawCompareChart(data, seperateWeight) {
     var compareData = [
         ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
     ];
@@ -47,7 +47,7 @@ async function drawCompareChart(data, seperate_weight) {
         },
     };
 
-    if (seperate_weight == false) {
+    if (seperateWeight == false) {
         delete options["series"]
         delete options["vAxes"]
     }

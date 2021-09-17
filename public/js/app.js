@@ -1,12 +1,12 @@
 /*
                     BeeLogger
 
-        JS for dashboard and display page
+     Base JavaScript for dashboard and display
     
-    Copyright (c) 2020-2021 Fabian R., Sönke K.
+     Copyright (c) 2020-2021 Fabian R., Sönke K.
 */
 
-// Initializing both date pickers as globals
+// Initialize both date pickers as globals
 var datePickerFrom, datePickerTo;
 
 const beeLoggerAPI = new BeeLoggerAPI();
@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Yesterday's records are needed for delta calculation
     var data = await beeLoggerAPI.getData(dateYesterday, dateToday, false);
     beeLoggerAPI.data.current = data;
+    beeLoggerAPI.data.cache = data;
 
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -80,7 +81,7 @@ async function changeDateRange() {
 
     // Calculate difference between dates
     var diff = fromDate.diff(toDate, 'days');
-    diff = diff.toObject().days;
+    diff = Math.abs(diff.toObject().days);
 
     // Append 'compressed' option when difference is > 10 days.
     var compressed = diff > 10 ? true : false;
@@ -91,7 +92,6 @@ async function changeDateRange() {
     var data = await beeLoggerAPI.getData(fromDate, toDate, compressed);
     beeLoggerAPI.data.cache = data;
 
-    console.log(data);
     await drawCharts(data);
 }
 
