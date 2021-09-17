@@ -40,7 +40,7 @@ class BeeLoggerAPI {
     async getData(fromDate, toDate, compressed) {
         // Construct URL for the API call.
         var url = '/api/data/get?from=' + fromDate + '&to=' + toDate + `${compressed && '&compressed'}`;
-        
+
         var response = await fetch(url);
     
         // Checking if valid data is returned and not some error
