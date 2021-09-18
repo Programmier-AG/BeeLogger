@@ -9,17 +9,15 @@
 // Initialize both date pickers as globals
 var datePickerFrom, datePickerTo;
 
-const beeLoggerAPI = new BeeLoggerAPI();
+const beeLogger = new BeeLogger();
 
 document.addEventListener('DOMContentLoaded', async () => {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
     
-    // Query all records from yesterday to today
-    // Yesterday's records are needed for delta calculation
-    var data = await beeLoggerAPI.getData(dateYesterday, dateToday, false);
-    beeLoggerAPI.data.current = data;
-    beeLoggerAPI.data.cache = data;
+    // Get data from the last 24 hours and populate beeLogger.data.current.
+    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
+        .catch(err => errorHandler(err));
 
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -53,8 +51,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         'packages': ['corechart'],
         // Callback to just draw charts and show data if charts lib is loaded
         'callback': async () => {
-            await updateCurrentData(data);
-            await drawCharts(data);
+            await updateCurrentData(data)
+                .catch(err => { throw err; });
+            
+            await drawCharts(data)
+                .catch(err => { throw err; });;
 
             checkbox = document.getElementById("scale-switch");
             checkbox.addEventListener("change", async (e) => {
@@ -67,8 +68,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
                 // Load currently displayed data from cache.
-                data = beeLoggerAPI.data.cache;
-                await drawCharts(data);
+                data = beeLogger.data.cache;
+                await drawCharts(data)
+                    .catch(err => { throw err; });;
             };
         }
     });
@@ -95,8 +97,9 @@ async function changeDateRange() {
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
-    var data = await beeLoggerAPI.getData(fromDate, toDate, compressed);
-    beeLoggerAPI.data.cache = data;
+    // Get data from the last 24 hours and (re-)populate beeLogger.data.cache.
+    var data = await beeLogger.getData(fromDate, toDate, compressed)
+        .catch(err => errorHandler(err));
 
     await drawCharts(data);
 }
@@ -112,21 +115,8 @@ async function changeDateRange() {
  * @param {Object} data Data object from the data API
  */
 async function updateCurrentData(data) {
-    if(data === null) {
-        document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
-        document.getElementById('loading-text').innerHTML = `
-            <hr>
-            <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b>
-            <br>
-            <hr>
-            Dies kann daran liegen, dass unsere Datenschnittstelle gerade offline ist,
-            wir Wartungen vornehmen oder aufgrund eines Vorfalls keine aktuellen Daten
-            aufgezeichnet wurden.<hr>
-            <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
-        `;
-        document.getElementById('loading-progress').classList.remove('progress');
-    }
-    
+    if(!data) throw new Error('Unable to update current data due to missing data.');
+
     // Get the measured timestamp from latest record
     var measuredLast = data[Object.keys(data).length - 1].measured;
     var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
@@ -167,4 +157,33 @@ function getWeightDelta(data) {
     var weightDeltaString = weightDelta >= 0 ? `<p style="color: #8aff6b;">+${weightDelta}</p>` : `<p style="color: #fe7373;">${weightDelta}</p>`;
     
     return weightDeltaString;
+}
+
+/**
+ * Handler function for when the API returns an error.
+ * This function will catch the error and display an error
+ * message to the user.
+ * 
+ * @param {number} err HTTP error code passed on promise rejection.
+ */
+function errorHandler(err) {
+    document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
+    document.getElementById('loading-text').innerHTML = `
+        <hr>
+        <br><br>
+        <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b>
+        <br><br>
+        <b style="font-size: 120%;">Fehlercode: ${err}</b>
+        <br><br>
+        <hr>
+        <br><br>
+        Dies kann daran liegen, dass unsere Datenschnittstelle gerade offline ist,
+        wir Wartungen vornehmen oder aufgrund eines Vorfalls keine aktuellen Daten
+        aufgezeichnet wurden.
+        <br><br>
+        <hr>
+        <br><br>
+        <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
+    `;
+    document.getElementById('loading-progress').classList.remove('progress');
 }
