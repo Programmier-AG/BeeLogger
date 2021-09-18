@@ -82,7 +82,11 @@ class BeeLogger {
         var url = '/api/data/get?from=' + fromDate + '&to=' + toDate + `${compressed}`;
         
         return new Promise(async (resolve, reject) => {
-            var response = await fetch(url);
+            var response = await fetch(url)
+                .catch(err => reject(500));
+            
+            if(!response) return;
+
             if(!response.ok) {
                 // Reject promise with HTTP error code on error on the API side.
                 reject(response.status);

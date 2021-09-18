@@ -11,9 +11,26 @@
  * API and writes it to the cache.
  */
 async function refreshData() {
+    var dateToday = luxon.DateTime.now().toISODate();
+    var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
+
     // Refresh data in beeLogger.data.current and beeLogger.data.cache.
     await beeLogger.getCurrentData(dateYesterday, dateToday)
-        .catch(err => errorHandler(err));
+        .catch(err => {
+            errorHandler(err);
+            throw new Error('Unable to refresh data because an error occured while fetching the new data.');
+        });
+    
+    // Cache is now filled with valid data.
+    // Hence, chart and current data sections can be shown again.
+    document.getElementById('charts').classList.remove('hide');
+    document.getElementById('beelogger-current').classList.remove('hide');
+    
+    // Also, the error boxes can be hidden.
+    errorBoxes = document.querySelectorAll('.beelogger-error-box');
+    errorBoxes.forEach(errorBox => {
+        errorBox.classList.add('hide');
+    });
 }
 
 /**
@@ -26,6 +43,11 @@ async function charts() {
     // Timeout for the time it roughly takes to switch tabs
     setTimeout(async () => {
         var data = beeLogger.data.cache;
+
+        if(!data || Object.keys(data).length <= 0) {
+            errorHandler(1001);
+            throw new Error('Unable to draw charts due to missing data.');
+        }
         await drawCharts(data);
         document.getElementById('loading').classList.add('hide');
     }, 1000);
@@ -50,8 +72,7 @@ async function home() {
  */
 function pages(url) {
     document.querySelector('body').style.backgroundImage = 'none';
-    console.log(url)
-    navigatePages(url)
+    navigatePages(url);
 }
 
 /**
@@ -60,7 +81,7 @@ function pages(url) {
  */
 function timetable() {
     document.querySelector('body').style.backgroundImage = 'none';
-    document.getElementById("plan-frame").setAttribute("src", "https://tgg-leer.de/stundenplaene/stundenplaene.html")
+    document.getElementById("plan-frame").setAttribute("src", "https://tgg-leer.de/stundenplaene/stundenplaene.html");
 }
 
 /**
@@ -118,3 +139,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     M.Tabs.init(document.querySelectorAll('.tabs'), {});
     setupTimers();
 });
+
+/**
+ * Modified errorHandler function (defined in app.js).
+ * 
+ * Handler function for when the API returns an error.
+ * This function will catch the error and display an error
+ * message to the user.
+ * 
+ * @param {number} err HTTP error code passed on promise rejection.
+ */
+ function errorHandler(err) {
+    var errorBoxes = document.querySelectorAll('.beelogger-error-box');
+    errorBoxes.forEach(errorBox => {
+        errorBox.classList.remove('hide');
+        errorBox.innerHTML = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
+        errorBox.innerHTML += `<p>Sobald die Verbindung wieder hergestellt ist, werden hier wieder aktuelle Daten angezeigt.</p>`;
+    });
+
+    document.getElementById('charts').classList.add('hide');
+    document.getElementById('beelogger-current').classList.add('hide');
+    document.getElementById('loading').classList.remove('progress');
+}
