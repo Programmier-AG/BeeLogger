@@ -45,10 +45,14 @@
                 </p>
             </div>
 
+            <div class="beelogger-error-box hide"></div>
+
             {% include './components/current-data.html' %}
         </div>
 
         <div id="charts-tab" class="center col s12">
+            <div class="beelogger-error-box hide"></div>
+
             <main id="charts">
                 <div class="fixed-action-btn">
                     <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
@@ -98,6 +102,6 @@
 <script src="/js/app.js"></script>
 <script src="/js/display.js"></script>
 <script>
-    window.setInterval(refreshData, 600000);
+    window.setInterval(refreshData, 15000);
 </script>
 {% endblock %}
