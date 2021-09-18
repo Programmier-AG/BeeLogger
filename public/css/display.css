@@ -61,6 +61,22 @@ h1 p#date {
     height: 75vh;
 }
 
+.beelogger-error-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    background-color: rgba(99, 106, 107, 0.7) !important;
+    border-radius: 10px;
+    margin: 5% 15% 0% 15%;
+}
+
+
+.beelogger-error-box p {
+    font-size: 115%;
+}
+
 #beelogger-current {
     margin-top: 4%;
     padding: 0px 10% 0px 10%;
