@@ -1,11 +1,7 @@
 {% extends "base.html" %}
 
 {% block custom_header %}
-<script src="/js/display.js"></script>
 <link rel="stylesheet" href="/css/display.css">
-<script>
-    window.setInterval(updateData, 600000)
-</script>
 {% endblock %}
 
 {% block content %}
@@ -23,7 +19,7 @@
                 <li class="tab col s2"><a href="#charts-tab" onclick="charts()">Diagramme</a></li>
                 {% set pageValues = pages.values()|list %}
                 <li class="tab col s2"><a href="#pages-tab" onclick="pages('{{ pageValues[0] }}')">Seiten</a></li>
-                <li class="tab col s2"><a href="#stundenplan-tab" onclick="stundenplan()">Stundenplan</a></li>
+                <li class="tab col s2"><a href="#stundenplan-tab" onclick="timetable()">Stundenplan</a></li>
                 <li class="tab col s3"><a href="#about-tab" onclick="about()">About</a></li>
             </ul>
         </div>
@@ -94,4 +90,14 @@
         </div>
     </div>
 </main>
+{% endblock %}
+
+{% block custom_footer %}
+<script src="/js/beelogger.js"></script>
+<script src="/js/charts.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/display.js"></script>
+<script>
+    window.setInterval(refreshData, 600000);
+</script>
 {% endblock %}
