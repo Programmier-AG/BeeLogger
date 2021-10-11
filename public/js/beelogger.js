@@ -1,13 +1,14 @@
 /*
-    Client-side API wrapper for BeeLogger's REST API
+             Client-side API wrapper for BeeLogger's REST API
 
-    Written by Fabian Reinders (https://github.com/fabiancdng)
+                        Written by Fabian Reinders
+                      (https://github.com/fabiancdng)
 
-    Copyright (c) 2021 Fabian Reinders
+                     Copyright (c) 2021 Fabian Reinders
 */
 
 /**
- * An object representing one data record
+ * An object representing one data record.
  * 
  * @typedef {Object} BeeLoggerData
  * @property {number} humidity
@@ -20,7 +21,7 @@
 /**
  * Wrapper class for the BeeLogger REST API.
  * 
- * @author Fabian Reinders <fabian@fabiancdng.com>
+ * @author Fabian Reinders <https://github.com/fabiancdng>
  */
 class BeeLogger {
     /**
@@ -33,36 +34,35 @@ class BeeLogger {
          * Store for data that has been fetched
          * from the API.
          * 
-         * @type {{current: Object.<string, BeeLoggerData>, cache: Object.<string, BeeLoggerData>}}
+         * Holds the latest data (from about the
+         * last 24 hours) after `getCurrentData()` is run.
+         * 
+         * This is used to store the current data separately.
+         * BeeLogger's dashboard utilizes this for example to 
+         * provide the 'current data' section on top of the page.
+         * 
+         * @type {Object.<string, BeeLoggerData>}
          */
-        this.data = {
-            /**
-             * Holds the latest data (from about the
-             * last 24 hours) after `getCurrentData()` is run.
-             * This is used to store the current data separately.
-             * BeeLogger's dashboard utilizes this for example to 
-             * provide the 'current data' section on top of the page.
-             * 
-             * @type {Object.<string, BeeLoggerData>}
-             */
-            current: {},
+        this.currentData = {}
 
-            /**
-             * Holds the data that has last been fetched with
-             * `getData()` to prevent having to use global variables
-             * or re-fetch data from elsewhere in the document.
-             * 
-             * @type {Object.<string, BeeLoggerData>}
-             */
-            cache: {}
-        }
+        /**
+         * Store for data that has been fetched
+         * from the API.
+         * 
+         * Holds the data that has last been fetched with
+         * `getData()` to prevent having to use global variables
+         * or re-fetch data from elsewhere in the document.
+         * 
+         * @type {Object.<string, BeeLoggerData>}
+         */
+        this.cachedData = {}
     }
 
     /**
-     * Retrieve measured data for the specified time span.
+     * Retrieves measured data for the specified time span.
      * 
      * Data fetched with this function will also be stored in the
-     * `this.data.cache` attribute.
+     * `this.cachedData` attribute.
      * 
      * Wrapper for `api/data/get`.
      * 
@@ -78,7 +78,7 @@ class BeeLogger {
         // Append compressed option when boolean is true
         compressed = compressed ? '&compressed' : '';
 
-        // Construct URL for the API call.
+        // Construct URL for the API call
         var url = '/api/data/get?from=' + fromDate + '&to=' + toDate + `${compressed}`;
         
         return new Promise(async (resolve, reject) => {
@@ -88,23 +88,23 @@ class BeeLogger {
             if(!response) return;
 
             if(!response.ok) {
-                // Reject promise with HTTP error code on error on the API side.
+                // Reject promise with HTTP error code on error on the API side
                 reject(response.status);
             } else {
                 var data = await response.json();
-                // Save data to the cache attribute.
-                this.data.cache = data;
-                // Resolve promise with parsed data.
+                // Save data to the cache attribute
+                this.cachedData = data;
+                // Resolve promise with parsed data
                 resolve(data);
             };
         });
     }
 
     /**
-     * Retrieve data measured in about the last 24 hours.
+     * Retrieves data measured in about the last 24 hours.
      * 
      * Data fetched with this function will also be stored in the
-     * `this.data.current` attribute.
+     * `this.currentData` attribute.
      * 
      * @param {String} fromDate ISO formatted date from which the data should start
      * @param {String} toDate ISO formatted date at which the data should end
@@ -116,9 +116,9 @@ class BeeLogger {
             var data = await this.getData(fromDate, toDate, false)
                 .catch(err => reject(err));
             
-            // Save data to current attribute.
-            this.data.current = data;
-            // Resolve promise with parsed data.
+            // Save data to current attribute
+            this.currentData = data;
+            // Resolve promise with parsed data
             resolve(data);
         });
     }
