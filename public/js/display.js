@@ -14,19 +14,19 @@ async function refreshData() {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
 
-    // Refresh data in beeLogger.currentData and beeLogger.cachedData.
+    // Refresh data in beeLogger.currentData and beeLogger.cachedData
     await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => {
             errorHandler(err);
             throw new Error('Unable to refresh data because an error occured while fetching the new data.');
         });
     
-    // Cache is now filled with valid data.
-    // Hence, chart and current data sections can be shown again.
+    // Cache is now filled with valid data
+    // Hence, chart and current data sections can be shown again
     document.getElementById('charts').classList.remove('hide');
     document.getElementById('beelogger-current').classList.remove('hide');
     
-    // Also, the error boxes can be hidden.
+    // Also, the error boxes can be hidden
     errorBoxes = document.querySelectorAll('.beelogger-error-box');
     errorBoxes.forEach(errorBox => {
         errorBox.classList.add('hide');
@@ -127,14 +127,14 @@ function doInactive() {
  * (https://github.com/Programmier-AG/BeeLogger/pull/48)
  * to the passed URL.
  * 
- * @param {string} url URL to navigate the page iframe to.
+ * @param {string} url URL to navigate the page iframe to
  */
 function navigatePages(url) {
     document.getElementById("page-frame").setAttribute("src", url)
     M.Sidenav.getInstance(document.querySelector('#slide-out')).close();
 }
 
-// Register timers and tabs when document is fully loaded.
+// Register timers and tabs when document is fully loaded
 document.addEventListener('DOMContentLoaded', async () => {
     M.Tabs.init(document.querySelectorAll('.tabs'), {});
     setupTimers();
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * This function will catch the error and display an error
  * message to the user.
  * 
- * @param {number} err HTTP error code passed on promise rejection.
+ * @param {number} err HTTP error code passed on promise rejection
  */
  function errorHandler(err) {
     var errorBoxes = document.querySelectorAll('.beelogger-error-box');
