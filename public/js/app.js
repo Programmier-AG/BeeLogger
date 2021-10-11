@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
     
-    // Get data from the last 24 hours and populate beeLogger.currentData.
+    // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => errorHandler(err));
 
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
-                // Load currently displayed data from cache.
+                // Load currently displayed data from cache
                 data = beeLogger.data.cachedData;
                 await drawCharts(data)
                     .catch(err => { throw err; });;
@@ -91,13 +91,13 @@ async function changeDateRange() {
     var diff = fromDate.diff(toDate, 'days');
     diff = Math.abs(diff.toObject().days);
 
-    // Append 'compressed' option when difference is > 10 days.
+    // Append 'compressed' option when difference is > 10 days
     var compressed = diff > 10 ? true : false;
 
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
-    // Get data from the last 24 hours and (re-)populate beeLogger.cachedData.
+    // Get data from the last 24 hours and (re-)populate beeLogger.cachedData
     var data = await beeLogger.getData(fromDate, toDate, compressed)
         .catch(err => errorHandler(err));
 
@@ -164,7 +164,7 @@ function getWeightDelta(data) {
  * This function will catch the error and display an error
  * message to the user.
  * 
- * @param {number} err HTTP error code passed on promise rejection.
+ * @param {number} err HTTP error code passed on promise rejection
  */
 function errorHandler(err) {
     document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
