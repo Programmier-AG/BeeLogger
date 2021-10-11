@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
     
-    // Get data from the last 24 hours and populate beeLogger.data.current.
+    // Get data from the last 24 hours and populate beeLogger.currentData.
     var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => errorHandler(err));
 
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
                 // Load currently displayed data from cache.
-                data = beeLogger.data.cache;
+                data = beeLogger.data.cachedData;
                 await drawCharts(data)
                     .catch(err => { throw err; });;
             };
@@ -97,7 +97,7 @@ async function changeDateRange() {
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
-    // Get data from the last 24 hours and (re-)populate beeLogger.data.cache.
+    // Get data from the last 24 hours and (re-)populate beeLogger.cachedData.
     var data = await beeLogger.getData(fromDate, toDate, compressed)
         .catch(err => errorHandler(err));
 

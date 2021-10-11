@@ -14,7 +14,7 @@ async function refreshData() {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
 
-    // Refresh data in beeLogger.data.current and beeLogger.data.cache.
+    // Refresh data in beeLogger.currentData and beeLogger.cachedData.
     await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => {
             errorHandler(err);
@@ -42,7 +42,7 @@ async function charts() {
 
     // Timeout for the time it roughly takes to switch tabs
     setTimeout(async () => {
-        var data = beeLogger.data.cache;
+        var data = beeLogger.cachedData;
 
         if(!data || Object.keys(data).length <= 0) {
             errorHandler(1001);
@@ -60,7 +60,7 @@ async function charts() {
  * home tab.
  */
 async function home() {
-    var data = beeLogger.data.current;
+    var data = beeLogger.currentData;
 
     document.querySelector('body').style.backgroundImage = `url('/assets/slideshow/bee-background.jpg')`;
     await updateCurrentData(data);
