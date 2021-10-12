@@ -1,9 +1,11 @@
 /*
-                          BeeLogger
+                               BeeLogger
 
-    Addition to base JavaScript specifically for the display page
+    Addition to base JavaScript (app.js) specifically for the display page
+            
+              Depends on beelogger.js, charts.js and app.js.
     
-            Copyright (c) 2020-2021 Fabian R., Sönke K.
+                Copyright (c) 2020-2021 Fabian R., Sönke K.
 */
 
 /**
@@ -14,19 +16,19 @@ async function refreshData() {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
 
-    // Refresh data in beeLogger.data.current and beeLogger.data.cache.
+    // Refresh data in beeLogger.currentData and beeLogger.cachedData
     await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => {
             errorHandler(err);
             throw new Error('Unable to refresh data because an error occured while fetching the new data.');
         });
     
-    // Cache is now filled with valid data.
-    // Hence, chart and current data sections can be shown again.
+    // Cache is now filled with valid data
+    // Hence, chart and current data sections can be shown again
     document.getElementById('charts').classList.remove('hide');
     document.getElementById('beelogger-current').classList.remove('hide');
     
-    // Also, the error boxes can be hidden.
+    // Also, the error boxes can be hidden
     errorBoxes = document.querySelectorAll('.beelogger-error-box');
     errorBoxes.forEach(errorBox => {
         errorBox.classList.add('hide');
@@ -42,7 +44,7 @@ async function charts() {
 
     // Timeout for the time it roughly takes to switch tabs
     setTimeout(async () => {
-        var data = beeLogger.data.cache;
+        var data = beeLogger.cachedData;
 
         if(!data || Object.keys(data).length <= 0) {
             errorHandler(1001);
@@ -60,7 +62,7 @@ async function charts() {
  * home tab.
  */
 async function home() {
-    var data = beeLogger.data.current;
+    var data = beeLogger.currentData;
 
     document.querySelector('body').style.backgroundImage = `url('/assets/slideshow/bee-background.jpg')`;
     await updateCurrentData(data);
@@ -127,14 +129,14 @@ function doInactive() {
  * (https://github.com/Programmier-AG/BeeLogger/pull/48)
  * to the passed URL.
  * 
- * @param {string} url URL to navigate the page iframe to.
+ * @param {string} url URL to navigate the page iframe to
  */
 function navigatePages(url) {
     document.getElementById("page-frame").setAttribute("src", url)
     M.Sidenav.getInstance(document.querySelector('#slide-out')).close();
 }
 
-// Register timers and tabs when document is fully loaded.
+// Register timers and tabs when document is fully loaded
 document.addEventListener('DOMContentLoaded', async () => {
     M.Tabs.init(document.querySelectorAll('.tabs'), {});
     setupTimers();
@@ -147,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * This function will catch the error and display an error
  * message to the user.
  * 
- * @param {number} err HTTP error code passed on promise rejection.
+ * @param {number} err HTTP error code passed on promise rejection
  */
  function errorHandler(err) {
     var errorBoxes = document.querySelectorAll('.beelogger-error-box');

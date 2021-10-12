@@ -1,3 +1,22 @@
+/*
+                            BeeLogger
+
+         Front-end charts module for generating and rendering
+              charts using the Google Charts library
+                (https://developers.google.com/chart)
+    
+           Copyright (c) 2020-2021 Fabian Reinders, Sönke K.
+*/
+
+/**
+ * Takes in an array containing BeeLogger data records (from the API) and passes
+ * it on to all chart draw functions.
+ * 
+ * Therefore, a compare, temperature, weight and humidity chart will be generated
+ * and rendered on the page from that array.
+ * 
+ * @param {Array} data Array containing the data records that should be used to generate the charts from
+ */
 async function drawCharts(data) {
     await drawCompareChart(data, false);
     await drawTempChart(data);
@@ -5,6 +24,12 @@ async function drawCharts(data) {
     await drawHumidityChart(data);
 }
 
+/**
+ * Generates and renders the compare chart on the page.
+ * 
+ * @param {Array} data Array containing the data records that the graph should be generated from
+ * @param {boolean} seperateWeight Whether the weight should have its own axis (to be able to see even small changes)
+ */
 async function drawCompareChart(data, seperateWeight) {
     var compareData = [
         ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
@@ -56,6 +81,11 @@ async function drawCompareChart(data, seperateWeight) {
     await chart.draw(dataTable, options);
 }
 
+/**
+ * Generates and renders the temperature chart on the page.
+ * 
+ * @param {Array} data Array containing the data records that the graph should be generated from
+ */
 async function drawTempChart(data) {
     var tempData = [['Gemessen', 'Temperatur (°C)']];
 
@@ -85,6 +115,11 @@ async function drawTempChart(data) {
     });
 }
 
+/**
+ * Generates and renders the weight chart on the page.
+ * 
+ * @param {Array} data Array containing the data records that the graph should be generated from
+ */
 async function drawWeightChart(data) {
     var weightData = [['Gemessen', 'Gewicht (kg)']];
 
@@ -112,6 +147,11 @@ async function drawWeightChart(data) {
     });
 }
 
+/**
+ * Generates and renders the humidity chart on the page.
+ * 
+ * @param {Array} data Array containing the data records that the graph should be generated from
+ */
 async function drawHumidityChart(data) {
     var humidityData = [['Gemessen', 'Luftfeuchtigkeit (%)']];
 
