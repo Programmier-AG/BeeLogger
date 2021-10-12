@@ -1,9 +1,11 @@
 /*
-                    BeeLogger
+                        BeeLogger
 
-     Base JavaScript for dashboard and display
+         Base JavaScript for dashboard and display
+
+           Depends on beelogger.js and charts.js.
     
-     Copyright (c) 2020-2021 Fabian R., Sönke K.
+      Copyright (c) 2020-2021 Fabian Reinders, Sönke K.
 */
 
 // Initialize both date pickers as globals

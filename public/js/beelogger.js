@@ -1,10 +1,12 @@
 /*
-             Client-side API wrapper for BeeLogger's REST API
-
-                        Written by Fabian Reinders
-                      (https://github.com/fabiancdng)
-
-                     Copyright (c) 2021 Fabian Reinders
+                            BeeLogger
+    
+         Client-side API wrapper for BeeLogger's REST API
+    
+                    Written by Fabian Reinders
+                  (https://github.com/fabiancdng)
+    
+                 Copyright (c) 2021 Fabian Reinders
 */
 
 /**

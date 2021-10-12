@@ -1,3 +1,13 @@
+/*
+                            BeeLogger
+
+         Front-end charts module for generating and rendering
+              charts using the Google Charts library
+                (https://developers.google.com/chart)
+    
+           Copyright (c) 2020-2021 Fabian Reinders, Sönke K.
+*/
+
 /**
  * Takes in an array containing BeeLogger data records (from the API) and passes
  * it on to all chart draw functions.
