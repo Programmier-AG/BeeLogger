@@ -1,9 +1,11 @@
 /*
-                          BeeLogger
+                               BeeLogger
 
-    Addition to base JavaScript specifically for the display page
+    Addition to base JavaScript (app.js) specifically for the display page
+            
+              Depends on beelogger.js, charts.js and app.js.
     
-            Copyright (c) 2020-2021 Fabian R., Sönke K.
+                Copyright (c) 2020-2021 Fabian R., Sönke K.
 */
 
 /**
