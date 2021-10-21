@@ -17,16 +17,27 @@ async function refreshData() {
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
 
     // Refresh data in beeLogger.currentData and beeLogger.cachedData
-    await beeLogger.getCurrentData(dateYesterday, dateToday)
+    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => {
-            errorHandler(err);
-            throw new Error('Unable to refresh data because an error occured while fetching the new data.');
+            errorHandler('data', 404);
+            throw new Error('Unable to refresh data.');
         });
-    
-    // Cache is now filled with valid data
-    // Hence, chart and current data sections can be shown again
-    document.getElementById('charts').classList.remove('hide');
-    document.getElementById('beelogger-current').classList.remove('hide');
+
+    // Received data is empty
+    if (Object.keys(data) < 1) {
+        errorHandler('current-data', 204);
+        // Enable charts tab again because only current data
+        // seems to be affected currently
+        var chartsTabLink = document.getElementById('charts-button');
+        chartsTabLink.setAttribute('href', '#charts-tab');
+        chartsTabLink.setAttribute('onclick', 'charts()');
+        throw new Error('Unable to refresh data.');
+    }
+
+    // Enable charts tab since there's data again
+    var chartsTabLink = document.getElementById('charts-button');
+    chartsTabLink.setAttribute('href', '#charts-tab');
+    chartsTabLink.setAttribute('onclick', 'charts()');
     
     // Also, the error boxes can be hidden
     errorBoxes = document.querySelectorAll('.beelogger-error-box');
@@ -46,10 +57,12 @@ async function charts() {
     setTimeout(async () => {
         var data = beeLogger.cachedData;
 
-        if(!data || Object.keys(data).length <= 0) {
-            errorHandler(1001);
+        if (!data || Object.keys(data).length < 1) {
+            errorHandler('charts', 204);
+            document.getElementById('loading').classList.add('hide');
             throw new Error('Unable to draw charts due to missing data.');
         }
+
         await drawCharts(data);
         document.getElementById('loading').classList.add('hide');
     }, 1000);
@@ -83,7 +96,7 @@ function pages(url) {
  */
 function timetable() {
     document.querySelector('body').style.backgroundImage = 'none';
-    document.getElementById("plan-frame").setAttribute("src", "https://tgg-leer.de/stundenplaene/stundenplaene.html");
+    document.getElementById('plan-frame').setAttribute('src', 'https://tgg-leer.de/stundenplaene/stundenplaene.html');
 }
 
 /**
@@ -112,16 +125,16 @@ function setupTimers () {
     document.addEventListener('keypress', resetTimer, false);
     document.addEventListener('touchmove', resetTimer, false);
     
-    document.getElementById("page-frame").addEventListener('mousemove', resetTimer, false);
-    document.getElementById("page-frame").addEventListener('mousedown', resetTimer, false);
-    document.getElementById("page-frame").addEventListener('keypress', resetTimer, false);
-    document.getElementById("page-frame").addEventListener('touchmove', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('mousemove', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('mousedown', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('keypress', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('touchmove', resetTimer, false);
      
     startTimer();
 }
 
 function doInactive() {
-    document.getElementById("home-button").click();
+    document.getElementById('home-button').click();
 }
 
 /**
@@ -132,7 +145,7 @@ function doInactive() {
  * @param {string} url URL to navigate the page iframe to
  */
 function navigatePages(url) {
-    document.getElementById("page-frame").setAttribute("src", url)
+    document.getElementById('page-frame').setAttribute('src', url)
     M.Sidenav.getInstance(document.querySelector('#slide-out')).close();
 }
 
@@ -149,17 +162,77 @@ document.addEventListener('DOMContentLoaded', async () => {
  * This function will catch the error and display an error
  * message to the user.
  * 
+ * @param {string} scope Identifier for where in the program the error occurred.
  * @param {number} err HTTP error code passed on promise rejection
  */
- function errorHandler(err) {
-    var errorBoxes = document.querySelectorAll('.beelogger-error-box');
-    errorBoxes.forEach(errorBox => {
-        errorBox.classList.remove('hide');
-        errorBox.innerHTML = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
-        errorBox.innerHTML += `<p>Sobald die Verbindung wieder hergestellt ist, werden hier wieder aktuelle Daten angezeigt.</p>`;
-    });
+ function errorHandler(scope, err) {
+    // The error to display to the user
+    var error = {
+        title: '',
+        description: ''
+    }
 
-    document.getElementById('charts').classList.add('hide');
-    document.getElementById('beelogger-current').classList.add('hide');
-    document.getElementById('loading').classList.remove('progress');
+    // Get error message that fits the error code (if defined)
+    switch (err) {
+        // 204 - No content i.e. no data available
+        case 204:
+            error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
+            error.description += `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
+            an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
+            Daten im Tab "Diagramme" ansehen, indem du dort über den Knopf unten in der Ecke den Zeitraum anpasst.</p>`
+            break;
+
+        // When there hasn't been a match with a specific error code
+        default:
+            error.title = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
+            error.description = `<p>Sobald die Verbindung wieder hergestellt ist, werden hier wieder aktuelle Daten angezeigt.</p>`;
+            // Disable charts tab as a connection to the API can't be established anyway
+            var chartsTabLink = document.getElementById('charts-button');
+            chartsTabLink.removeAttribute('href');
+            chartsTabLink.removeAttribute('onclick');
+            break;
+    }
+
+    // Check what sections of the front end are affected by this error
+    // and hide or un-hide them accordingly.
+    switch (scope) {
+        // Error only concerns current data (from about the last 24 hours)
+        case 'current-data':
+            // Only current-data section has to be hidden
+            var currentDataErrorBox = document.getElementById('beelogger-current-data-error-box');
+            currentDataErrorBox.innerHTML = error.title +  error.description;
+            currentDataErrorBox.classList.remove('hide');
+
+            // Access to historical data should still be available
+            document.getElementById('loading').classList.add('hide');
+            document.getElementById('beelogger-current-data').classList.add('hide');
+
+            // Put at least an info in the chart tab's error box as the user
+            // has to change the time span manually first to get something to
+            // show up in the charts.
+            var chartsErrorBox = document.getElementById('beelogger-charts-error-box');
+            chartsErrorBox.innerHTML = error.title +  error.description;
+            chartsErrorBox.classList.remove('hide');
+            break;
+
+        // Error only concerns charts
+        case 'charts':
+            var errorBox = document.getElementById('beelogger-charts-error-box');
+            errorBox.innerHTML = error.title +  error.description;
+            errorBox.classList.remove('hide');
+            break;
+
+        // Something mandatory is broken
+        default:
+            // Update error message in 'current data' section
+            var currentDataErrorBox = document.getElementById('beelogger-current-data-error-box');
+            currentDataErrorBox.innerHTML = error.title +  error.description;
+            currentDataErrorBox.classList.remove('hide');
+            
+            // Update error message in 'charts' tab
+            var chartsErrorBox = document.getElementById('beelogger-charts-error-box');
+            chartsErrorBox.innerHTML = error.title +  error.description;
+            chartsErrorBox.classList.remove('hide');
+
+    }
 }

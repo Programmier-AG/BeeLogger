@@ -69,9 +69,8 @@ h1 p#date {
     height: 200px;
     background-color: rgba(99, 106, 107, 0.7) !important;
     border-radius: 10px;
-    margin: 5% 15% 0% 15%;
+    color: #fff;
 }
-
 
 .beelogger-error-box p {
     font-size: 115%;

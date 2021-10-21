@@ -16,10 +16,6 @@ const beeLogger = new BeeLogger();
 document.addEventListener('DOMContentLoaded', async () => {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
-    
-    // Get data from the last 24 hours and populate beeLogger.currentData
-    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
-        .catch(err => errorHandler(err));
 
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -41,11 +37,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         setDefaultDate: true
     });
 
-    // Setting up background task for keeping the 'measured' date up-to-date
+    // Get data from the last 24 hours and populate beeLogger.currentData
+    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
+        .catch(err => errorHandler('current-data', err));
+    
+    // If no current data is available,
+    if (Object.keys(data).length < 1) {
+        // display corresponding error/warning
+        errorHandler('current-data', 204);
+    }
+
+    // Set up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
-        var measuredLast = data[Object.keys(data).length - 1].measured;
-        var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
-        document.querySelector('#updated').innerHTML = measured;
+        if (data[Object.keys(data).length - 1]) {
+            var measuredLast = data[Object.keys(data).length - 1].measured;
+            var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
+            document.querySelector('#updated').innerHTML = measured;
+        } else {
+            return;
+        }
     }, 15000);
 
     // Initializing google charts
@@ -54,10 +64,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Callback to just draw charts and show data if charts lib is loaded
         'callback': async () => {
             await updateCurrentData(data)
-                .catch(err => { throw err; });
+                .catch(err => {});
             
             await drawCharts(data)
-                .catch(err => { throw err; });;
+                .catch(err => {});
 
             checkbox = document.getElementById("scale-switch");
             checkbox.addEventListener("change", async (e) => {
@@ -99,10 +109,16 @@ async function changeDateRange() {
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
-    // Get data from the last 24 hours and (re-)populate beeLogger.cachedData
+    // Get data for the specified time span
     var data = await beeLogger.getData(fromDate, toDate, compressed)
-        .catch(err => errorHandler(err));
+        .catch(err => errorHandler('data', err));
 
+    // No data available for the requested time span
+    if (Object.keys(data).length < 1) {
+        errorHandler('data', 204);
+        return;
+    }
+    
     await drawCharts(data);
 }
 
@@ -117,7 +133,9 @@ async function changeDateRange() {
  * @param {Object} data Data object from the data API
  */
 async function updateCurrentData(data) {
-    if(!data) throw new Error('Unable to update current data due to missing data.');
+    if (!data || Object.keys(data) < 1) {
+        throw new Error('Unable to update current data due to missing data.');
+    }
 
     // Get the measured timestamp from latest record
     var measuredLast = data[Object.keys(data).length - 1].measured;
@@ -166,26 +184,67 @@ function getWeightDelta(data) {
  * This function will catch the error and display an error
  * message to the user.
  * 
+ * @param {string} scope Identifier for where in the program the error occurred.
  * @param {number} err HTTP error code passed on promise rejection
  */
-function errorHandler(err) {
-    document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
-    document.getElementById('loading-text').innerHTML = `
-        <hr>
-        <br><br>
-        <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b>
-        <br><br>
-        <b style="font-size: 120%;">Fehlercode: ${err}</b>
-        <br><br>
-        <hr>
-        <br><br>
-        Dies kann daran liegen, dass unsere Datenschnittstelle gerade offline ist,
-        wir Wartungen vornehmen oder aufgrund eines Vorfalls keine aktuellen Daten
-        aufgezeichnet wurden.
-        <br><br>
-        <hr>
-        <br><br>
-        <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
-    `;
+function errorHandler(scope, err) {
+    // The error to display to the user
+    var error = {
+        title: '',
+        description: ''
+    }
+
+    // Get error message that fits the error code (if defined)
+    switch (err) {
+        // 204 - No content i.e. no data available
+        case 204:
+            error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
+            error.description += `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
+            an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
+            Daten ansehen. Passe dafür einfach den Zeitraum der Diagramme über den Knopf unten in der Ecke
+            an.</p>`;
+            break;
+        // When there hasn't been a match with a specific error code
+        default:
+            error.title = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
+            error.description = `
+                <hr><br><br>
+                <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b><br><br>
+                <b style="font-size: 120%;">Fehlercode: ${err}</b><br><br>
+                <hr><br><br>
+                Dies kann zum Beispiel daran liegen, dass unsere Datenschnittstelle gerade offline
+                ist oder wir Wartungen vornehmen.<br><br>
+                <hr><br><br>
+                <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
+            `;
+            scope = 'data';
+            break;
+    }
+
+    // Check what sections of the front end are affected by this error
+    // and hide or un-hide them accordingly.
+    switch (scope) {
+        // Error only concerns current data (from about the last 24 hours)
+        case 'current-data':
+            // Only current-data section has to be hidden
+            var errorBox = document.getElementById('beelogger-current-data-error-box');
+            errorBox.innerHTML = error.title +  error.description;
+            errorBox.classList.remove('hide');
+            // Access to historical data should still be available
+            document.getElementById('loading').classList.add('hide');
+            document.getElementsByTagName('main')[0].classList.remove('hide');
+            document.getElementById('beelogger-current-data').classList.add('hide');
+            break;
+
+        // Something mandatory is broken, show error message across the entire screen
+        // and hide all other elements
+        default:
+            // Write error message to the error card
+            document.getElementById('loading-title').innerHTML = error.title;
+            document.getElementById('loading-text').innerHTML = error.description;
+            break;
+    }
+    
+    // API request is done, hide spinner
     document.getElementById('loading-progress').classList.remove('progress');
 }

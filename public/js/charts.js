@@ -73,8 +73,8 @@ async function drawCompareChart(data, seperateWeight) {
     };
 
     if (seperateWeight == false) {
-        delete options["series"]
-        delete options["vAxes"]
+        delete options["series"];
+        delete options["vAxes"];
     }
 
     var chart = new google.visualization.LineChart(document.getElementById('chart'));
