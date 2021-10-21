@@ -46,10 +46,11 @@ async function charts() {
     setTimeout(async () => {
         var data = beeLogger.cachedData;
 
-        if(!data || Object.keys(data).length <= 0) {
-            errorHandler(1001);
+        if (!data || Object.keys(data).length < 1) {
+            errorHandler(204);
             throw new Error('Unable to draw charts due to missing data.');
         }
+
         await drawCharts(data);
         document.getElementById('loading').classList.add('hide');
     }, 1000);
@@ -83,7 +84,7 @@ function pages(url) {
  */
 function timetable() {
     document.querySelector('body').style.backgroundImage = 'none';
-    document.getElementById("plan-frame").setAttribute("src", "https://tgg-leer.de/stundenplaene/stundenplaene.html");
+    document.getElementById('plan-frame').setAttribute('src', 'https://tgg-leer.de/stundenplaene/stundenplaene.html');
 }
 
 /**
@@ -112,16 +113,16 @@ function setupTimers () {
     document.addEventListener('keypress', resetTimer, false);
     document.addEventListener('touchmove', resetTimer, false);
     
-    document.getElementById("page-frame").addEventListener('mousemove', resetTimer, false);
-    document.getElementById("page-frame").addEventListener('mousedown', resetTimer, false);
-    document.getElementById("page-frame").addEventListener('keypress', resetTimer, false);
-    document.getElementById("page-frame").addEventListener('touchmove', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('mousemove', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('mousedown', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('keypress', resetTimer, false);
+    document.getElementById('page-frame').addEventListener('touchmove', resetTimer, false);
      
     startTimer();
 }
 
 function doInactive() {
-    document.getElementById("home-button").click();
+    document.getElementById('home-button').click();
 }
 
 /**
@@ -132,7 +133,7 @@ function doInactive() {
  * @param {string} url URL to navigate the page iframe to
  */
 function navigatePages(url) {
-    document.getElementById("page-frame").setAttribute("src", url)
+    document.getElementById('page-frame').setAttribute('src', url)
     M.Sidenav.getInstance(document.querySelector('#slide-out')).close();
 }
 
@@ -152,13 +153,34 @@ document.addEventListener('DOMContentLoaded', async () => {
  * @param {number} err HTTP error code passed on promise rejection
  */
  function errorHandler(err) {
+    // The error to display to the user
+    var error = {
+        title: '',
+        description: ''
+    }
+
+    // Get error message that fits the error code (if defined)
+    switch (err) {
+        case 204:
+            error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
+            error.description += `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich an einem Ausfall unsererseits liegt.</p>`;
+            break;
+        default:
+            error.title = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
+            error.description = `<p>Sobald die Verbindung wieder hergestellt ist, werden hier wieder aktuelle Daten angezeigt.</p>`;
+            break;
+    }
+
+    // Since the error has to show up in multiple places on the display,
+    // iterate over all 'errorBoxes' on the page and write the error to it
     var errorBoxes = document.querySelectorAll('.beelogger-error-box');
     errorBoxes.forEach(errorBox => {
         errorBox.classList.remove('hide');
-        errorBox.innerHTML = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
-        errorBox.innerHTML += `<p>Sobald die Verbindung wieder hergestellt ist, werden hier wieder aktuelle Daten angezeigt.</p>`;
+        errorBox.innerHTML = error.title;
+        errorBox.innerHTML += error.description;
     });
 
+    // Hide elements that would require the missing data to work
     document.getElementById('charts').classList.add('hide');
     document.getElementById('beelogger-current').classList.add('hide');
     document.getElementById('loading').classList.remove('progress');

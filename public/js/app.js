@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => errorHandler(err));
+    
+    // No data available for the requested time span
+    if (Object.keys(data).length < 1) {
+        errorHandler(204);
+        return;
+    }
 
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -103,6 +109,12 @@ async function changeDateRange() {
     var data = await beeLogger.getData(fromDate, toDate, compressed)
         .catch(err => errorHandler(err));
 
+    // No data available for the requested time span
+    if (Object.keys(data).length < 1) {
+        errorHandler(204);
+        return;
+    }
+    
     await drawCharts(data);
 }
 
@@ -169,23 +181,46 @@ function getWeightDelta(data) {
  * @param {number} err HTTP error code passed on promise rejection
  */
 function errorHandler(err) {
-    document.getElementById('loading-title').innerHTML = '❌ Momentan nicht verfügbar';
-    document.getElementById('loading-text').innerHTML = `
-        <hr>
-        <br><br>
-        <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b>
-        <br><br>
-        <b style="font-size: 120%;">Fehlercode: ${err}</b>
-        <br><br>
-        <hr>
-        <br><br>
-        Dies kann daran liegen, dass unsere Datenschnittstelle gerade offline ist,
-        wir Wartungen vornehmen oder aufgrund eines Vorfalls keine aktuellen Daten
-        aufgezeichnet wurden.
-        <br><br>
-        <hr>
-        <br><br>
-        <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
-    `;
+    // The error to display to the user
+    var error = {
+        title: '',
+        description: ''
+    }
+
+    // Get error message that fits the error code (if defined)
+    switch (err) {
+        case 204:
+            error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
+            error.description += `
+                <hr><br><br>
+                <b style="font-size: 120%;">Es sind keine aktuellen Daten verfügbar!</b><br><br>
+                <b style="font-size: 120%;">Fehlercode: ${err}</b><br><br>
+                <hr><br><br>
+                Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich an einem
+                Ausfall unsererseits liegt.<br><br>
+                <hr><br><br>
+                <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
+            `;
+            break;
+        default:
+            error.title = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
+            error.description = `
+                <hr><br><br>
+                <b style="font-size: 120%;">Das Abrufen der Daten ist fehlgeschlagen!</b><br><br>
+                <b style="font-size: 120%;">Fehlercode: ${err}</b><br><br>
+                <hr><br><br>
+                Dies kann zum Beispiel daran liegen, dass unsere Datenschnittstelle gerade offline
+                ist oder wir Wartungen vornehmen.<br><br>
+                <hr><br><br>
+                <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
+            `;
+            break;
+    }
+
+    // Write error message to the error card
+    document.getElementById('loading-title').innerHTML = error.title;
+    document.getElementById('loading-text').innerHTML = error.description;
+    
+    // API request is done, hide spinner
     document.getElementById('loading-progress').classList.remove('progress');
 }
