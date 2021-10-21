@@ -19,7 +19,7 @@ async function refreshData() {
     // Refresh data in beeLogger.currentData and beeLogger.cachedData
     var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => {
-            errorHandler('data', err);
+            errorHandler('data', 404);
             throw new Error('Unable to refresh data.');
         });
 
@@ -58,7 +58,7 @@ async function charts() {
         var data = beeLogger.cachedData;
 
         if (!data || Object.keys(data).length < 1) {
-            errorHandler('data', 404);
+            errorHandler('charts', 204);
             throw new Error('Unable to draw charts due to missing data.');
         }
 
@@ -176,13 +176,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 204 - No content i.e. no data available
         case 204:
             error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
-            error.description += scope === 'data'
-            ? `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
+            error.description += `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
             an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
-            Daten ansehen, indem du über den Knopf unten in der Ecke den Zeitraum anpasst.</p>`
-            : `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
-            an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
-            Daten über den Tab "Diagramme" ansehen.</p>`; 
+            Daten im Tab "Diagramme" ansehen, indem du dort über den Knopf unten in der Ecke den Zeitraum anpasst.</p>`
             break;
         // When there hasn't been a match with a specific error code
         default:
@@ -201,18 +197,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Error only concerns current data (from about the last 24 hours)
         case 'current-data':
             // Only current-data section has to be hidden
-            var errorBox = document.getElementById('beelogger-current-data-error-box');
-            errorBox.innerHTML = error.title +  error.description;
-            errorBox.classList.remove('hide');
+            var currentDataErrorBox = document.getElementById('beelogger-current-data-error-box');
+            currentDataErrorBox.innerHTML = error.title +  error.description;
+            currentDataErrorBox.classList.remove('hide');
+
             // Access to historic data should still be available
             document.getElementById('loading').classList.add('hide');
             document.getElementById('beelogger-current-data').classList.add('hide');
+
+            // Put at least an info in the chart tab's error box as the user
+            // has to change the time span manually first to get something to
+            // show up in the charts.
+            var chartsErrorBox = document.getElementById('beelogger-charts-error-box');
+            chartsErrorBox.innerHTML = error.title +  error.description;
+            chartsErrorBox.classList.remove('hide');
             break;
         // Error only concerns charts
-        default:
+        case 'charts':
             var errorBox = document.getElementById('beelogger-charts-error-box');
             errorBox.innerHTML = error.title +  error.description;
             errorBox.classList.remove('hide');
             break;
+        // Something mandatory is broken
+        default:
+            // Update error message in 'current data' section
+            var currentDataErrorBox = document.getElementById('beelogger-current-data-error-box');
+            currentDataErrorBox.innerHTML = error.title +  error.description;
+            currentDataErrorBox.classList.remove('hide');
+            
+            // Update error message in 'charts' tab
+            var chartsErrorBox = document.getElementById('beelogger-charts-error-box');
+            chartsErrorBox.innerHTML = error.title +  error.description;
+            chartsErrorBox.classList.remove('hide');
+
     }
 }
