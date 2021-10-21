@@ -16,16 +16,6 @@ const beeLogger = new BeeLogger();
 document.addEventListener('DOMContentLoaded', async () => {
     var dateToday = luxon.DateTime.now().toISODate();
     var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
-    
-    // Get data from the last 24 hours and populate beeLogger.currentData
-    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
-        .catch(err => errorHandler('current-data', err));
-    
-    // No current data available
-    if (Object.keys(data).length < 1) {
-        errorHandler('current-data', 204);
-        return;
-    }
 
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -47,11 +37,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         setDefaultDate: true
     });
 
-    // Setting up background task for keeping the 'measured' date up-to-date
+    // Get data from the last 24 hours and populate beeLogger.currentData
+    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
+        .catch(err => errorHandler('current-data', err));
+    
+    // If no current data is available,
+    if (Object.keys(data).length < 1) {
+        // display corresponding error/warning
+        errorHandler('current-data', 204);
+    }
+
+    // Set up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
-        var measuredLast = data[Object.keys(data).length - 1].measured;
-        var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
-        document.querySelector('#updated').innerHTML = measured;
+        if (data[Object.keys(data).length - 1]) {
+            var measuredLast = data[Object.keys(data).length - 1].measured;
+            var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
+            document.querySelector('#updated').innerHTML = measured;
+        } else {
+            return;
+        }
     }, 15000);
 
     // Initializing google charts
@@ -60,10 +64,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Callback to just draw charts and show data if charts lib is loaded
         'callback': async () => {
             await updateCurrentData(data)
-                .catch(err => { throw err; });
+                .catch(err => {});
             
             await drawCharts(data)
-                .catch(err => { throw err; });;
+                .catch(err => {});
 
             checkbox = document.getElementById("scale-switch");
             checkbox.addEventListener("change", async (e) => {
@@ -224,11 +228,12 @@ function errorHandler(scope, err) {
             var errorBox = document.getElementById('beelogger-current-data-error-box');
             errorBox.innerHTML = error.title +  error.description;
             errorBox.classList.remove('hide');
-            // Access to historic data should still be available
+            // Access to historical data should still be available
             document.getElementById('loading').classList.add('hide');
             document.getElementsByTagName('main')[0].classList.remove('hide');
             document.getElementById('beelogger-current-data').classList.add('hide');
             break;
+
         // Something mandatory is broken, show error message across the entire screen
         // and hide all other elements
         default:

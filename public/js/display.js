@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
             Daten im Tab "Diagramme" ansehen, indem du dort über den Knopf unten in der Ecke den Zeitraum anpasst.</p>`
             break;
+
         // When there hasn't been a match with a specific error code
         default:
             error.title = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
@@ -201,7 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentDataErrorBox.innerHTML = error.title +  error.description;
             currentDataErrorBox.classList.remove('hide');
 
-            // Access to historic data should still be available
+            // Access to historical data should still be available
             document.getElementById('loading').classList.add('hide');
             document.getElementById('beelogger-current-data').classList.add('hide');
 
@@ -212,12 +213,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             chartsErrorBox.innerHTML = error.title +  error.description;
             chartsErrorBox.classList.remove('hide');
             break;
+
         // Error only concerns charts
         case 'charts':
             var errorBox = document.getElementById('beelogger-charts-error-box');
             errorBox.innerHTML = error.title +  error.description;
             errorBox.classList.remove('hide');
             break;
+
         // Something mandatory is broken
         default:
             // Update error message in 'current data' section
