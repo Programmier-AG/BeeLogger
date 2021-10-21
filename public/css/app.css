@@ -87,6 +87,16 @@ h3.chart-title {
     margin-top: 5px;
 }
 
+#beelogger-current-data-error-box {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    margin: 5px 30px 5px 20px;
+}
+
 footer {
     margin-top: 100px !important;
 }

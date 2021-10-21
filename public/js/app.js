@@ -19,11 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
-        .catch(err => errorHandler(err));
+        .catch(err => errorHandler('current-data', err));
     
-    // No data available for the requested time span
+    // No current data available
     if (Object.keys(data).length < 1) {
-        errorHandler(204);
+        errorHandler('current-data', 204);
         return;
     }
 
@@ -105,13 +105,13 @@ async function changeDateRange() {
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
-    // Get data from the last 24 hours and (re-)populate beeLogger.cachedData
+    // Get data for the specified time span
     var data = await beeLogger.getData(fromDate, toDate, compressed)
-        .catch(err => errorHandler(err));
+        .catch(err => errorHandler('data', err));
 
     // No data available for the requested time span
     if (Object.keys(data).length < 1) {
-        errorHandler(204);
+        errorHandler('data', 204);
         return;
     }
     
@@ -178,9 +178,10 @@ function getWeightDelta(data) {
  * This function will catch the error and display an error
  * message to the user.
  * 
+ * @param {string} scope Identifier for where in the program the error occurred.
  * @param {number} err HTTP error code passed on promise rejection
  */
-function errorHandler(err) {
+function errorHandler(scope, err) {
     // The error to display to the user
     var error = {
         title: '',
@@ -189,19 +190,15 @@ function errorHandler(err) {
 
     // Get error message that fits the error code (if defined)
     switch (err) {
+        // 204 - No content i.e. no data available
         case 204:
             error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
-            error.description += `
-                <hr><br><br>
-                <b style="font-size: 120%;">Es sind keine aktuellen Daten verfügbar!</b><br><br>
-                <b style="font-size: 120%;">Fehlercode: ${err}</b><br><br>
-                <hr><br><br>
-                Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich an einem
-                Ausfall unsererseits liegt.<br><br>
-                <hr><br><br>
-                <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
-            `;
+            error.description += `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
+            an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
+            Daten ansehen. Passe dafür einfach den Zeitraum der Diagramme über den Knopf unten in der Ecke
+            an.</p>`;
             break;
+        // When there hasn't been a match with a specific error code
         default:
             error.title = `<h5>❌ Keine Verbindung zur BeeLogger API möglich (${err}).</h5>`;
             error.description = `
@@ -214,12 +211,32 @@ function errorHandler(err) {
                 <hr><br><br>
                 <b>Schaue einfach später nochmal vorbei</b>, wir haben das sicher bald repariert!
             `;
+            scope = 'data';
             break;
     }
 
-    // Write error message to the error card
-    document.getElementById('loading-title').innerHTML = error.title;
-    document.getElementById('loading-text').innerHTML = error.description;
+    // Check what sections of the front end are affected by this error
+    // and hide or un-hide them accordingly.
+    switch (scope) {
+        // Error only concerns current data (from about the last 24 hours)
+        case 'current-data':
+            // Only current-data section has to be hidden
+            var errorBox = document.getElementById('beelogger-current-data-error-box');
+            errorBox.innerHTML = error.title +  error.description;
+            errorBox.classList.remove('hide');
+            // Access to historic data should still be available
+            document.getElementById('loading').classList.add('hide');
+            document.getElementsByTagName('main')[0].classList.remove('hide');
+            document.getElementById('beelogger-current-data').classList.add('hide');
+            break;
+        // Something mandatory is broken, show error message across the entire screen
+        // and hide all other elements
+        default:
+            // Write error message to the error card
+            document.getElementById('loading-title').innerHTML = error.title;
+            document.getElementById('loading-text').innerHTML = error.description;
+            break;
+    }
     
     // API request is done, hide spinner
     document.getElementById('loading-progress').classList.remove('progress');

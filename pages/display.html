@@ -16,7 +16,7 @@
         <div class="col s12 black">
             <ul class="tabs tabs-transparent">
                 <li class="tab col s3"><a id="home-button" href="#index-tab" onclick="home()">Dashboard</a></li>
-                <li class="tab col s2"><a href="#charts-tab" onclick="charts()">Diagramme</a></li>
+                <li class="tab col s2"><a id="charts-button" href="#charts-tab" onclick="charts()">Diagramme</a></li>
                 {% set pageValues = pages.values()|list %}
                 <li class="tab col s2"><a href="#pages-tab" onclick="pages('{{ pageValues[0] }}')">Seiten</a></li>
                 <li class="tab col s2"><a href="#stundenplan-tab" onclick="timetable()">Stundenplan</a></li>
@@ -45,14 +45,10 @@
                 </p>
             </div>
 
-            <div class="beelogger-error-box hide"></div>
-
             {% include './components/current-data.html' %}
         </div>
 
         <div id="charts-tab" class="center col s12">
-            <div class="beelogger-error-box hide"></div>
-
             <main id="charts">
                 <div class="fixed-action-btn">
                     <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
@@ -103,5 +99,7 @@
 <script src="/js/display.js"></script>
 <script>
     window.setInterval(refreshData, 300000);
+    // For development purposes:
+    // window.setInterval(refreshData, 5000);
 </script>
 {% endblock %}
