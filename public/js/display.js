@@ -59,6 +59,7 @@ async function charts() {
 
         if (!data || Object.keys(data).length < 1) {
             errorHandler('charts', 204);
+            document.getElementById('loading').classList.add('hide');
             throw new Error('Unable to draw charts due to missing data.');
         }
 

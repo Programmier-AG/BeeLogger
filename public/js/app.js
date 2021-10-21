@@ -133,7 +133,9 @@ async function changeDateRange() {
  * @param {Object} data Data object from the data API
  */
 async function updateCurrentData(data) {
-    if(!data) throw new Error('Unable to update current data due to missing data.');
+    if (!data || Object.keys(data) < 1) {
+        throw new Error('Unable to update current data due to missing data.');
+    }
 
     // Get the measured timestamp from latest record
     var measuredLast = data[Object.keys(data).length - 1].measured;
