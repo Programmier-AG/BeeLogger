@@ -19,7 +19,7 @@ async function refreshData() {
     // Refresh data in beeLogger.currentData and beeLogger.cachedData
     var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => {
-            errorHandler('data', 404);
+            errorHandler('charts', 404);
             throw new Error('Unable to refresh data.');
         });
 

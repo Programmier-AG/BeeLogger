@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
         .catch(err => errorHandler('current-data', err));
+    data = data["data"]
     
     // If no current data is available,
     if (Object.keys(data).length < 1) {
@@ -79,10 +80,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
+                changeDateRange(hide=false);
+                /*
                 // Load currently displayed data from cache
                 data = beeLogger.data.cachedData;
                 await drawCharts(data)
                     .catch(err => { throw err; });;
+                */
             };
         }
     });
@@ -95,7 +99,11 @@ document.addEventListener('DOMContentLoaded', async () => {
  * the document-wide, cache of the API class and invoke
  * the chart re-renders.
  */
-async function changeDateRange() {
+async function changeDateRange(hide=true) {
+    let chartsErrorBox = document.getElementById('beelogger-charts-error-box');
+    chartsErrorBox.classList.add('hide');
+    if(hide) { document.getElementById("charts").classList.add("hide"); }
+    
     var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
     var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
 
@@ -111,11 +119,14 @@ async function changeDateRange() {
 
     // Get data for the specified time span
     var data = await beeLogger.getData(fromDate, toDate, compressed)
-        .catch(err => errorHandler('data', err));
+        .catch(err => errorHandler('charts', err));
 
     // No data available for the requested time span
-    if (Object.keys(data).length < 1) {
-        errorHandler('data', 204);
+    if (data === undefined) {
+        errorHandler("charts", 204)
+        return;
+    } else if (Object.keys(data).length < 1) {
+        errorHandler('charts', 204);
         return;
     }
     
@@ -188,6 +199,7 @@ function getWeightDelta(data) {
  * @param {number} err HTTP error code passed on promise rejection
  */
 function errorHandler(scope, err) {
+    console.log("handle error: " + scope + err.toString());
     // The error to display to the user
     var error = {
         title: '',
@@ -198,11 +210,9 @@ function errorHandler(scope, err) {
     switch (err) {
         // 204 - No content i.e. no data available
         case 204:
-            error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
-            error.description += `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
-            an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
-            Daten ansehen. Passe dafür einfach den Zeitraum der Diagramme über den Knopf unten in der Ecke
-            an.</p>`;
+            error.title = `<h5>❌ Keine Daten verfügbar (${err}).</h5>`;
+            error.description += `<p>Es sind leider keine Daten verfügbar, was wahrscheinlich
+            an einem temporären Ausfall unsererseits liegt.</p>`;
             break;
         // When there hasn't been a match with a specific error code
         default:
@@ -227,6 +237,11 @@ function errorHandler(scope, err) {
         // Error only concerns current data (from about the last 24 hours)
         case 'current-data':
             // Only current-data section has to be hidden
+            error.description += `
+                <p>Du kannst dir jedoch trotzdem historische
+                Daten ansehen. Passe dafür einfach den Zeitraum der Diagramme über den Knopf unten in der Ecke
+                an.</p>
+            `;
             var errorBox = document.getElementById('beelogger-current-data-error-box');
             errorBox.innerHTML = error.title +  error.description;
             errorBox.classList.remove('hide');
@@ -235,6 +250,18 @@ function errorHandler(scope, err) {
             document.getElementsByTagName('main')[0].classList.remove('hide');
             document.getElementById('beelogger-current-data').classList.add('hide');
             break;
+
+        case 'charts':
+            error.description += `
+                <p>Das Abrufen der Daten ist für den ausgewählten Bereich fehlgeschlagen.</p>
+            `;
+            let chartsErrorBox = document.getElementById('beelogger-charts-error-box');
+            chartsErrorBox.innerHTML = error.title +  error.description;
+            chartsErrorBox.classList.remove('hide');
+            
+            document.getElementById("charts").classList.add("hide");
+            document.getElementById("beelogger-charts-loader").classList.add("hide");
+
 
         // Something mandatory is broken, show error message across the entire screen
         // and hide all other elements

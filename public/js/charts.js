@@ -18,10 +18,39 @@
  * @param {Array} data Array containing the data records that should be used to generate the charts from
  */
 async function drawCharts(data) {
+    if ("rows" in data) {
+        var info_text = `Gezeigt werden Rohdaten aus ${data["rows"]} Einträgen.`
+    } else {
+        var info_text = `Gezeigt werden ${data["compressed"]} komprimierte Daten aus ${data["original"]} Einträgen. (Es wurden je ${data["interval"]} Einträge approximentiert).`
+    }
+
+    data = data["data"]
+
+    if (data == undefined || data == [] || Object.keys(data) == 0) {
+        errorHandler("charts", 204)
+
+        let info_text_elements = document.getElementsByClassName("display-info");
+        for(let i = 0; i < info_text_elements.length; i++)
+        {
+            info_text_elements[i].innerHTML = "";
+        }
+        return;
+    }
+
+    let info_text_elements = document.getElementsByClassName("display-info");
+    for(let i = 0; i < info_text_elements.length; i++)
+    {
+        info_text_elements[i].innerHTML = info_text;
+    }
+
+    document.getElementById("charts").classList.remove("hide");
+
     await drawCompareChart(data, false);
     await drawTempChart(data);
     await drawWeightChart(data);
     await drawHumidityChart(data);
+
+    document.getElementById("beelogger-charts-loader").classList.add("hide");
 }
 
 /**
@@ -32,7 +61,7 @@ async function drawCharts(data) {
  */
 async function drawCompareChart(data, seperateWeight) {
     var compareData = [
-        ['Tag', 'Temperatur (°C)', 'Gewicht (KG)', 'Luftfeuchtigkeit (%)']
+        ['Tag', 'Temperatur (°C)', 'Gewicht (kg)', 'Luftfeuchtigkeit (%)']
     ];
 
     for (row in data) {
@@ -46,7 +75,7 @@ async function drawCompareChart(data, seperateWeight) {
     var dataTable = google.visualization.arrayToDataTable(compareData);
     var options = {
         title: `Daten von ${from} bis ${to}`,
-        curveType: 'function',
+        //curveType: 'function',
         legend: {
             position: 'bottom'
         },

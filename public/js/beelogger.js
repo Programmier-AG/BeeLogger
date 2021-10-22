@@ -77,8 +77,10 @@ class BeeLogger {
      * @returns {Promise<Object|number>} Promise that resolves with parsed data or rejects with HTTP error code on error.
      */
     getData(fromDate, toDate, compressed) {
+        document.getElementById("beelogger-charts-loader").classList.remove("hide");
+
         // Append compressed option when boolean is true
-        compressed = compressed ? '&compressed' : '';
+        compressed = compressed ? `&compressed&width=${window.innerWidth}` : '';
 
         // Construct URL for the API call
         var url = '/api/data/get?from=' + fromDate + '&to=' + toDate + `${compressed}`;
