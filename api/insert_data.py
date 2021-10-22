@@ -1,7 +1,6 @@
 from flask.globals import request
 from database import Database
 from flask import request
-import pymysql
 import config
 
 
