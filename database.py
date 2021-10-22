@@ -13,6 +13,43 @@ class Database:
             "charset": "utf8mb4",
             "cursorclass": pymysql.cursors.DictCursor
         }
+    
+    def get_sql_from_file(self):
+        """
+        Reads and parses SQL queries from provided .sql file.
+        """
+        from os import path
+
+        file = "database.sql"
+
+        # File did not exists
+        if path.isfile(file) is False:
+            print("Unable to open sql file '{}'.".format(file))
+            return False
+        else:
+            with open(file, "r") as sql_file:
+                query = sql_file.read().split(';')
+                query.pop()
+                return query
+
+    def prepare_database(self) -> None:
+        """
+        Utilizes SQL from 'database.sql' to create all needed
+        tables automatically.
+        """
+        connection = pymysql.connect(**self.mysql_args)
+        cursor = connection.cursor()
+        
+        # SQL queries as a list
+        queries = self.get_sql_from_file()
+        for query in queries:
+            cursor.execute(query)
+
+        # Commit changes and close connection
+        connection.commit()
+        connection.close()
+        return
+        
 
     def get_data(self, from_date, to_date):
         connection = pymysql.connect(**self.mysql_args)

@@ -3,6 +3,7 @@ import os
 from blueprints.api import api
 from blueprints.views import views
 from flask import Flask
+from database import Database
 from jsonencoder import CustomJSONEncoder
 
 # from crossdomain import crossdomain
@@ -18,6 +19,18 @@ print("#    -----------------------   #")
 print("#    by Fabian R., Soenke K.   #")
 print("################################")
 
+print("\nInitializing database...")
+
+database = Database()
+
+try:
+    database.prepare_database()
+    print("Database prepared.")
+except Exception as exception:
+    print("An error occurred while trying to connect to (and prepare) the database:")
+    raise exception
+
+# Initialize Flask app
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.json_encoder = CustomJSONEncoder
