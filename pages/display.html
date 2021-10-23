@@ -16,10 +16,16 @@
         <div class="col s12 black">
             <ul class="tabs tabs-transparent">
                 <li class="tab col s3"><a id="home-button" href="#index-tab" onclick="home()">Dashboard</a></li>
-                <li class="tab col s2"><a id="charts-button" href="#charts-tab" onclick="charts()">Diagramme</a></li>
+                <li class="tab col {% if pages.keys()|length >= 1 %} s2 {% else %} s3 {% endif %}">
+                    <a id="charts-button" href="#charts-tab" onclick="charts()">Diagramme</a>
+                </li>
                 {% set pageValues = pages.values()|list %}
-                <li class="tab col s2"><a href="#pages-tab" onclick="pages('{{ pageValues[0] }}')">Seiten</a></li>
-                <li class="tab col s2"><a href="#stundenplan-tab" onclick="timetable()">Stundenplan</a></li>
+                {% if pages.keys()|length >= 1 %}
+                    <li class="tab col s2"><a href="#pages-tab" onclick="pages('{{ pageValues[0] }}')">Seiten</a></li>
+                {% endif %}
+                <li class="tab col {% if pages.keys()|length >= 1 %} s2 {% else %} s3 {% endif %}">
+                    <a href="#stundenplan-tab" onclick="timetable()">Stundenplan</a>
+                </li>
                 <li class="tab col s3"><a href="#about-tab" onclick="about()">About</a></li>
             </ul>
         </div>
@@ -61,20 +67,22 @@
             </main>
         </div>
 
-        <div id="pages-tab" class="col s12">
-            <ul id="slide-out" class="center sidenav">
-                <li><h4 style="color: black">Externe Seiten</h4></li><br>
-                {% for page in pages %}
-                    <li class="collection-item left-align" onclick="navigatePages('{{ pages[page] }}')"><a style="cursor: pointer;"><i class="material-icons-outlined">link</i> {{ page }}</a></li>
-                {% endfor %}
-            </ul>
+        {% if pages.keys()|length >= 1 %}
+            <div id="pages-tab" class="col s12">
+                <ul id="slide-out" class="center sidenav">
+                    <li><h4 style="color: black">Externe Seiten</h4></li><br>
+                    {% for page in pages %}
+                        <li class="collection-item left-align" onclick="navigatePages('{{ pages[page] }}')"><a style="cursor: pointer;"><i class="material-icons-outlined">link</i> {{ page }}</a></li>
+                    {% endfor %}
+                </ul>
 
-            <a href="#" data-target="slide-out" class="sidenav-trigger"><i style="font-size: 50px; padding: 20px;" class="material-icons">menu</i></a>
+                <a href="#" data-target="slide-out" class="sidenav-trigger"><i style="font-size: 50px; padding: 20px;" class="material-icons">menu</i></a>
 
-            <div class="iframe">
-                <iframe sandbox="allow-scripts allow-forms allow-modals allow-same-origin allow-popups allow-popups-to-escape-sandbox" id="page-frame" src="{{ pages[0] }}" frameborder="0"></iframe>
+                <div class="iframe">
+                    <iframe sandbox="allow-scripts allow-forms allow-modals allow-same-origin allow-popups allow-popups-to-escape-sandbox" id="page-frame" src="{{ pages[0] }}" frameborder="0"></iframe>
+                </div>
             </div>
-        </div>
+        {% endif %}
 
         <div id="stundenplan-tab" class="col s12">
             <div class="iframe">
