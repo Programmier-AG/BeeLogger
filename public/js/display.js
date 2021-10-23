@@ -13,18 +13,15 @@
  * API and writes it to the cache.
  */
 async function refreshData() {
-    var dateToday = luxon.DateTime.now().toISODate();
-    var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
-
     // Refresh data in beeLogger.currentData and beeLogger.cachedData
-    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
+    var data = await beeLogger.getCurrentData()
         .catch(err => {
             errorHandler('charts', 404);
             throw new Error('Unable to refresh data.');
         });
 
     // Received data is empty
-    if (Object.keys(data) < 1) {
+    if (Object.keys(data).length < 1) {
         errorHandler('current-data', 204);
         // Enable charts tab again because only current data
         // seems to be affected currently
@@ -51,12 +48,16 @@ async function refreshData() {
  * charts tab.
  */
 async function charts() {
-    document.getElementById('loading').classList.remove('hide');
+    //document.getElementById('loading').classList.remove('hide');
+
+    document.querySelector('body').style.backgroundImage = 'none';
+
+    await changeDateRange();
 
     // Timeout for the time it roughly takes to switch tabs
+    /*
     setTimeout(async () => {
-        var data = beeLogger.cachedData;
-
+        
         if (!data || Object.keys(data).length < 1) {
             errorHandler('charts', 204);
             document.getElementById('loading').classList.add('hide');
@@ -66,8 +67,8 @@ async function charts() {
         await drawCharts(data);
         document.getElementById('loading').classList.add('hide');
     }, 1000);
+    */
 
-    document.querySelector('body').style.backgroundImage = 'none';
 }
 
 /**
@@ -75,7 +76,7 @@ async function charts() {
  * home tab.
  */
 async function home() {
-    var data = beeLogger.currentData;
+    var data = beeLogger.currentData["data"];
 
     document.querySelector('body').style.backgroundImage = `url('/assets/slideshow/bee-background.jpg')`;
     await updateCurrentData(data);
@@ -165,6 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
  * @param {string} scope Identifier for where in the program the error occurred.
  * @param {number} err HTTP error code passed on promise rejection
  */
+
+/*
  function errorHandler(scope, err) {
     // The error to display to the user
     var error = {
@@ -236,3 +239,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     }
 }
+*/

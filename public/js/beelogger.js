@@ -113,15 +113,28 @@ class BeeLogger {
      * 
      * @returns {Promise<Object|number>} Promise that resolves with parsed data or rejects with HTTP error code on error.
      */
-    getCurrentData(fromDate, toDate) {
+    getCurrentData() {
+        var fromDate = luxon.DateTime.now().minus({ days: 1 }).toISODate();
+        var toDate = luxon.DateTime.now().toISODate();
+        
+        var url = '/api/data/get?from=' + fromDate + '&to=' + toDate;
+
         return new Promise(async (resolve, reject) => {
-            var data = await this.getData(fromDate, toDate, false)
-                .catch(err => reject(err));
+            var response = await fetch(url)
+                .catch(err => reject(500));
             
-            // Save data to current attribute
-            this.currentData = data;
-            // Resolve promise with parsed data
-            resolve(data);
+            if(!response) return;
+
+            if(!response.ok) {
+                // Reject promise with HTTP error code on error on the API side
+                reject(response.status);
+            } else {
+                var data = await response.json();
+                // Save data to current attribute
+                this.currentData = data;
+                // Resolve promise with parsed data
+                resolve(data);
+            };
         });
     }
 }

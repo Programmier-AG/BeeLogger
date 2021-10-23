@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Get data from the last 24 hours and populate beeLogger.currentData
-    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
+    var data = await beeLogger.getCurrentData()
         .catch(err => errorHandler('current-data', err));
     data = data["data"]
     
@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // display corresponding error/warning
         errorHandler('current-data', 204);
     }
+
+    await updateCurrentData(data);
 
     // Set up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
@@ -64,18 +66,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     await google.charts.load('current', {
         'packages': ['corechart'],
         // Callback to just draw charts and show data if charts lib is loaded
-        'callback': async () => {
-            await updateCurrentData(data)
-                .catch(err => {});
-            
+        'callback': async () => {            
             await drawCharts(data)
                 .catch(err => {});
 
             checkbox = document.getElementById("scale-switch");
             checkbox.addEventListener("change", async (e) => {
+                let fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
+                let toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
+
+                // Calculate difference between dates
+                let diff = fromDate.diff(toDate, 'days');
+                diff = Math.abs(diff.toObject().days);
+
+                // Append 'compressed' option when difference is > 10 days
+                let compressed = diff > 10 ? true : false;
                 element = document.getElementById("scale-switch");
-                if(element.checked) await drawCompareChart(data, true);
-                else await drawCompareChart(data, false);
+                await drawCompareChart(beeLogger.cachedData["data"], element.checked);
             });
             checkbox.checked = false;
 
@@ -84,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 clearTimeout(waitChangeWidth);
                 waitChangeWidth = setTimeout(() => {
                     changeDateRange(hide=false);
-                }, 2000);
+                }, 20);
                 /*
                 // Load currently displayed data from cache
                 data = beeLogger.data.cachedData;
@@ -104,8 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * the chart re-renders.
  */
 async function changeDateRange(hide=true) {
-    let chartsErrorBox = document.getElementById('beelogger-charts-error-box');
-    chartsErrorBox.classList.add('hide');
+    document.getElementById('beelogger-charts-error-box').classList.add('hide');
     if(hide) { document.getElementById("charts").classList.add("hide"); }
     
     var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
@@ -149,8 +155,9 @@ async function changeDateRange(hide=true) {
  * @param {Object} data Data object from the data API
  */
 async function updateCurrentData(data) {
-    if (!data || Object.keys(data) < 1) {
-        throw new Error('Unable to update current data due to missing data.');
+    if (!data || Object.keys(data).length < 1) {
+        console.log(data);
+        errorHandler("current-data", 204)
     }
 
     // Get the measured timestamp from latest record
@@ -267,6 +274,7 @@ function errorHandler(scope, err) {
             document.getElementById("charts").classList.add("hide");
             document.getElementById("beelogger-charts-loader").classList.add("hide");
 
+            break;
 
         // Something mandatory is broken, show error message across the entire screen
         // and hide all other elements
@@ -278,5 +286,5 @@ function errorHandler(scope, err) {
     }
     
     // API request is done, hide spinner
-    document.getElementById('loading-progress').classList.remove('progress');
+    //document.getElementById('loading-progress').classList.remove('progress');
 }

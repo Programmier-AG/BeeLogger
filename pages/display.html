@@ -49,13 +49,26 @@
         </div>
 
         <div id="charts-tab" class="center col s12">
-            <main id="charts">
-                <div class="fixed-action-btn">
-                    <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
-                        <i class="large material-icons">edit_calendar</i>
-                    </a>
-                </div>
+            <div class="fixed-action-btn">
+                <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
+                    <i class="large material-icons">edit_calendar</i>
+                </a>
+            </div>
 
+            <div id="beelogger-charts-error-box" class="beelogger-error-box card blue-grey darken-1 hide"></div>
+            <div id="beelogger-charts-loader" class="beelogger-error-box card blue-grey darken-1 hide">
+                <div class="row center" id="loading">
+                    <div class="card-content white-text">
+                        <span id="loading-title" class="card-title">Daten werden geladen...</span>
+                        <div id="loading-progress" class="progress">
+                            <div class="indeterminate"></div>
+                        </div>
+                        <p id="loading-text">Die Daten werden aus unserer Datenbank abgerufen. Dies kann einen Moment dauern.</p>
+                    </div>
+                </div>
+            </div>
+
+            <main id="charts">
                 {% include './components/charts.html' %}
 
             </main>
