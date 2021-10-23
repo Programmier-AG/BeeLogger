@@ -10,6 +10,7 @@
 
 // Initialize both date pickers as globals
 var datePickerFrom, datePickerTo;
+var waitChangeWidth = setTimeout(() => {}, 0);;
 
 const beeLogger = new BeeLogger();
 
@@ -80,7 +81,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
-                changeDateRange(hide=false);
+                clearTimeout(waitChangeWidth);
+                waitChangeWidth = setTimeout(() => {
+                    changeDateRange(hide=false);
+                }, 2000);
                 /*
                 // Load currently displayed data from cache
                 data = beeLogger.data.cachedData;
@@ -117,6 +121,7 @@ async function changeDateRange(hide=true) {
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
+    document.getElementById("beelogger-charts-loader").classList.remove("hide");
     // Get data for the specified time span
     var data = await beeLogger.getData(fromDate, toDate, compressed)
         .catch(err => errorHandler('charts', err));
