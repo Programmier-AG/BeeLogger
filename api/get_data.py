@@ -30,10 +30,14 @@ def get_data():
         row_count += 1
 
     if compressed:
-        width = int(request.args["width"])
         compressed_data = []
-        amount = width / 8  # Tune Value for row_count vs. width values
-        amount = int(amount) + 1  # Account for float values
+
+        if "width" in request.args.keys():
+            width = int(request.args["width"])
+            amount = width / 8  # Tune Value for row_count vs. width values
+            amount = int(amount) + 1  # Account for float values
+        else:
+            amount = int(request.args["amount"])
 
         compress_count = round(row_count / amount)
 
@@ -54,8 +58,8 @@ def get_data():
                     date.append(fetched_data[c_row_count]["measured"])
                 except KeyError:
                     break
-
-                c_row_count += 1
+                finally:
+                    c_row_count += 1
 
             # Average data
             temp_avg = sum(temp) / len(temp)
