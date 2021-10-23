@@ -157,7 +157,8 @@ async function changeDateRange(hide=true) {
 async function updateCurrentData(data) {
     if (!data || Object.keys(data).length < 1) {
         console.log(data);
-        errorHandler("current-data", 204)
+        errorHandler("current-data", 204);
+        return;
     }
 
     // Get the measured timestamp from latest record
