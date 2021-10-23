@@ -7,5 +7,5 @@ backup/
 contact/
 autoreload
 autoreload.py
-insert.log
+logs/insert.log
 config.py

@@ -28,7 +28,7 @@ print("downloading MySql database")
 os.popen("mysqldump -h %s -u %s -p%s %s > %sdb_backup.sql" % (MySql.host, MySql.user, MySql.password, MySql.db, dest)).readlines()
 
 print("copying files")
-copyfile("insert.log", dest + "insert.log")
+copyfile("logs/insert.log", dest + "insert.log")
 # copytree("stats", dest + "stats/")
 
 print("packing files")

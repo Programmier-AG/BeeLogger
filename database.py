@@ -37,6 +37,20 @@ class Database:
         Utilizes SQL from 'database.sql' to create all needed
         tables automatically.
         """
+        connection = pymysql.connect(
+            host=self.mysql_args["host"],
+            port=self.mysql_args["port"],
+            user=self.mysql_args["user"],
+            password=self.mysql_args["password"]
+        )
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.mysql_args['db']}")
+            except pymysql.err.Error as e:
+                raise e
+            connection.commit()
+            connection.close()
+
         connection = pymysql.connect(**self.mysql_args)
         cursor = connection.cursor()
         
@@ -72,7 +86,7 @@ class Database:
         else:
             sql = "INSERT INTO `data` (`number`, `temperature`, `weight`, `humidity`, `measured`) VALUES (0, %s, %s, %s, '%s')" % (float(temperature), float(weight) * config.correction[0] - config.real_tare[0], float(humidity), date)
 
-        log = open("insert.log", mode="a")
+        log = open("logs/insert.log", mode="a")
         log.write("\n[%s] - %s" % (time.asctime(), sql))
         log.close()
 
@@ -103,7 +117,7 @@ class Database:
         connection.commit()
         connection.close()
 
-        log = open("insert.log", mode="a")
+        log = open("logs/insert.log", mode="a")
         log.write("\n[%s] - %s" % (time.asctime(), sql))
         log.close()
         return

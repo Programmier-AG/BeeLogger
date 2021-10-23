@@ -1,0 +1,57 @@
+version: '3.1'
+
+services:
+  db:
+    image: mariadb:10.3
+    restart: always
+    ports:
+      - 3306
+    volumes:
+      - "./docker_volumes/mariadb:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: "changeme!1"
+
+  beelogger:
+    image: beelogger
+    depends_on:
+      - db
+    restart: "no"
+    ports:
+      - 2688:2688
+    volumes:
+      - "./docker_volumes/contact:/app/contact"
+      - "./docker_volumes/backup:/app/backup"
+      - "./docker_volumes/logs:/app/logs"
+    environment:
+      insert_token: "changeme!2"
+      display_token: "changeme!3"
+      
+      correction: '{"0": 1}'
+      tare: '{"0": 0}'
+      real_tare: '{"0": 0}'
+
+      mysql_host: "db"
+      mysql_port: "3306"
+      mysql_user: "root"
+      mysql_pass: "changeme!1"
+      mysql_db: "beelogger"
+
+      pages: '{}'
+
+      mysql_backup_host: ""
+      mysql_backup_port: "0"
+      mysql_backup_user: ""
+      mysql_backup_pass: ""
+      mysql_backup_db: ""
+
+      backup_host: ""
+      backup_port: "0"
+      backup_user: ""
+      backup_pass: ""
+      backup_dir: ""
+
+      mail_host: ""
+      mail_port: "0"
+      mail_user: ""
+      mail_pass: ""
+      mail_rec: ""
