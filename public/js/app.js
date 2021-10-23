@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData()
         .catch(err => errorHandler('current-data', err));
-    data = data["data"]
+
+    data = data['data'];
     
     // If no current data is available,
     if (Object.keys(data).length < 1) {
@@ -70,8 +71,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             await drawCharts(data)
                 .catch(err => {});
 
-            checkbox = document.getElementById("scale-switch");
-            checkbox.addEventListener("change", async (e) => {
+            checkbox = document.getElementById('scale-switch');
+
+            checkbox.addEventListener('change', async (e) => {
                 let fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
                 let toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
 
@@ -79,25 +81,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let diff = fromDate.diff(toDate, 'days');
                 diff = Math.abs(diff.toObject().days);
 
-                // Append 'compressed' option when difference is > 10 days
-                let compressed = diff > 10 ? true : false;
-                element = document.getElementById("scale-switch");
-                await drawCompareChart(beeLogger.cachedData["data"], element.checked);
+                // Redraw chart when the state of the switch changed
+                element = document.getElementById('scale-switch');
+                await drawCompareChart(beeLogger.cachedData['data'], element.checked);
             });
+
             checkbox.checked = false;
 
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
-                clearTimeout(waitChangeWidth);
-                waitChangeWidth = setTimeout(() => {
-                    changeDateRange(hide=false);
-                }, 20);
-                /*
                 // Load currently displayed data from cache
-                data = beeLogger.data.cachedData;
+                data = beeLogger.cachedData;
                 await drawCharts(data)
-                    .catch(err => { throw err; });;
-                */
+                    .catch(err => { throw err; });
             };
         }
     });
@@ -110,10 +106,9 @@ document.addEventListener('DOMContentLoaded', async () => {
  * the document-wide, cache of the API class and invoke
  * the chart re-renders.
  */
-async function changeDateRange(hide=true) {
+async function changeDateRange() {
     document.getElementById('beelogger-charts-error-box').classList.add('hide');
-    if(hide) { document.getElementById("charts").classList.add("hide"); }
-    
+
     var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
     var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
 
@@ -127,14 +122,15 @@ async function changeDateRange(hide=true) {
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
-    document.getElementById("beelogger-charts-loader").classList.remove("hide");
+    document.getElementById('beelogger-charts-loader').classList.remove('hide');
+
     // Get data for the specified time span
     var data = await beeLogger.getData(fromDate, toDate, compressed)
         .catch(err => errorHandler('charts', err));
 
     // No data available for the requested time span
     if (data === undefined) {
-        errorHandler("charts", 204)
+        errorHandler('charts', 204);
         return;
     } else if (Object.keys(data).length < 1) {
         errorHandler('charts', 204);
@@ -156,8 +152,7 @@ async function changeDateRange(hide=true) {
  */
 async function updateCurrentData(data) {
     if (!data || Object.keys(data).length < 1) {
-        console.log(data);
-        errorHandler("current-data", 204);
+        errorHandler('current-data', 204);
         return;
     }
 
@@ -181,7 +176,7 @@ async function updateCurrentData(data) {
 
 /**
  * Gets newest and oldest weight from the passed data Object
- * and returns the difference ("delta").
+ * and returns the difference ('delta').
  * 
  * @param {Object} data Data object from the data API
  * @returns {string} HTML containing the weight delta (in a fitting color)
@@ -198,8 +193,7 @@ function getWeightDelta(data) {
     // Limit float to 2 decimal places
     weightDelta = Number(weightDelta.toFixed(2));
     // Format HTML string with green color for weight growth and red color for weight decline
-    var weightDeltaString = weightDelta >= 0 ? `<p style="color: #8aff6b;">+${weightDelta}</p>` : `<p style="color: #fe7373;">${weightDelta}</p>`;
-    
+    var weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta}</p>` : `<p style='color: #fe7373;'>${weightDelta}</p>`;
     return weightDeltaString;
 }
 
@@ -212,7 +206,6 @@ function getWeightDelta(data) {
  * @param {number} err HTTP error code passed on promise rejection
  */
 function errorHandler(scope, err) {
-    console.log("handle error: " + scope + err.toString());
     // The error to display to the user
     var error = {
         title: '',
@@ -255,9 +248,12 @@ function errorHandler(scope, err) {
                 Daten ansehen. Passe dafür einfach den Zeitraum der Diagramme über den Knopf unten in der Ecke
                 an.</p>
             `;
+
+            // Replace current data section with error message
             var errorBox = document.getElementById('beelogger-current-data-error-box');
             errorBox.innerHTML = error.title +  error.description;
             errorBox.classList.remove('hide');
+
             // Access to historical data should still be available
             document.getElementById('loading').classList.add('hide');
             document.getElementsByTagName('main')[0].classList.remove('hide');
@@ -265,16 +261,14 @@ function errorHandler(scope, err) {
             break;
 
         case 'charts':
-            error.description += `
-                <p>Das Abrufen der Daten ist für den ausgewählten Bereich fehlgeschlagen.</p>
-            `;
+            error.description += '<p>Das Abrufen der Daten ist für den ausgewählten Bereich fehlgeschlagen.</p>';
+
+            // Replace charts section with error message
             let chartsErrorBox = document.getElementById('beelogger-charts-error-box');
             chartsErrorBox.innerHTML = error.title +  error.description;
             chartsErrorBox.classList.remove('hide');
-            
-            document.getElementById("charts").classList.add("hide");
-            document.getElementById("beelogger-charts-loader").classList.add("hide");
-
+            document.getElementById('charts').classList.add('hide');
+            document.getElementById('beelogger-charts-loader').classList.add('hide');
             break;
 
         // Something mandatory is broken, show error message across the entire screen
@@ -285,7 +279,4 @@ function errorHandler(scope, err) {
             document.getElementById('loading-text').innerHTML = error.description;
             break;
     }
-    
-    // API request is done, hide spinner
-    //document.getElementById('loading-progress').classList.remove('progress');
 }

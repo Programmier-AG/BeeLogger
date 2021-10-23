@@ -78,11 +78,12 @@ class BeeLogger {
      */
     getData(fromDate, toDate, compressed) {
         // Append compressed option when boolean is true
+        // TODO: Pass window.innerWidth as function param
         compressed = compressed ? `&compressed&width=${window.innerWidth}` : '';
 
         // Construct URL for the API call
         var url = '/api/data/get?from=' + fromDate + '&to=' + toDate + `${compressed}`;
-        
+
         return new Promise(async (resolve, reject) => {
             var response = await fetch(url)
                 .catch(err => reject(500));
@@ -123,9 +124,9 @@ class BeeLogger {
             var response = await fetch(url)
                 .catch(err => reject(500));
             
-            if(!response) return;
+            if (!response) return;
 
-            if(!response.ok) {
+            if (!response.ok) {
                 // Reject promise with HTTP error code on error on the API side
                 reject(response.status);
             } else {

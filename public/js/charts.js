@@ -18,48 +18,46 @@
  * @param {Array} data Array containing the data records that should be used to generate the charts from
  */
 async function drawCharts(data) {
-    if ("rows" in data) {
-        var info_text = `Gezeigt werden Rohdaten aus ${data["rows"]} Einträgen.`
+    if ('rows' in data) {
+        var infoText = `Gezeigt werden Rohdaten aus ${data['rows']} Einträgen.`;
     } else {
-        var info_text = `Gezeigt werden ${data["compressed"]} komprimierte Daten aus ${data["original"]} Einträgen. (Es wurden je ${data["interval"]} Einträge approximentiert).`
+        var infoText = `
+            Gezeigt werden ${data['compressed']} komprimierte Daten aus
+            ${data['original']} Einträgen. (Es wurden je ${data['interval']} Einträge
+            approximentiert).
+        `;
     }
 
-    data = data["data"]
+    data = data['data'];
 
     if (data == undefined || data == [] || Object.keys(data) == 0) {
-        errorHandler("charts", 204)
-
-        let info_text_elements = document.getElementsByClassName("display-info");
-        for(let i = 0; i < info_text_elements.length; i++)
-        {
-            info_text_elements[i].innerHTML = "";
-        }
+        errorHandler('charts', 204);
         return;
     }
 
-    let info_text_elements = document.getElementsByClassName("display-info");
-    for(let i = 0; i < info_text_elements.length; i++)
-    {
-        info_text_elements[i].innerHTML = info_text;
-    }
+    let infoTextElements = document.querySelectorAll('.display-info');
 
-    document.getElementById("charts").classList.remove("hide");
+    infoTextElements.forEach(infoTextElement => {
+        infoTextElement.innerHTML = infoText;
+    });
+
+    document.getElementById('charts').classList.remove('hide');
 
     await drawCompareChart(data, false);
     await drawTempChart(data);
     await drawWeightChart(data);
     await drawHumidityChart(data);
 
-    document.getElementById("beelogger-charts-loader").classList.add("hide");
+    document.getElementById('beelogger-charts-loader').classList.add('hide');
 }
 
 /**
  * Generates and renders the compare chart on the page.
  * 
  * @param {Array} data Array containing the data records that the graph should be generated from
- * @param {boolean} seperateWeight Whether the weight should have its own axis (to be able to see even small changes)
+ * @param {boolean} separateWeight Whether the weight should have its own axis (to be able to see even small changes)
  */
-async function drawCompareChart(data, seperateWeight) {
+async function drawCompareChart(data, separateWeight) {
     var compareData = [
         ['Tag', 'Temperatur (°C)', 'Gewicht (kg)', 'Luftfeuchtigkeit (%)']
     ];
@@ -69,13 +67,8 @@ async function drawCompareChart(data, seperateWeight) {
         compareData.push([measured, data[row].temperature, data[row].weight, data[row].humidity]);
     }
 
-    var from = luxon.DateTime.fromJSDate(compareData[1][0]).toISODate();
-    var to = luxon.DateTime.fromJSDate(compareData[compareData.length - 1][0]).toISODate();
-
     var dataTable = google.visualization.arrayToDataTable(compareData);
     var options = {
-        title: `Daten von ${from} bis ${to}`,
-        //curveType: 'function',
         legend: {
             position: 'bottom'
         },
@@ -96,14 +89,14 @@ async function drawCompareChart(data, seperateWeight) {
             2: {targetAxisIndex: 0},
         },
         vAxes: {
-            0: {title: "Temperatur und Lauftfeuchtigkeit"},
-            1: {title: "Gewicht"}
+            0: {title: 'Temperatur und Lauftfeuchtigkeit'},
+            1: {title: 'Gewicht'}
         },
     };
 
-    if (seperateWeight == false) {
-        delete options["series"];
-        delete options["vAxes"];
+    if (separateWeight == false) {
+        delete options['series'];
+        delete options['vAxes'];
     }
 
     var chart = new google.visualization.LineChart(document.getElementById('chart'));
@@ -123,9 +116,10 @@ async function drawTempChart(data) {
         tempData.push([measured, data[row].temperature]);
     }
 
-    var data_temp = google.visualization.arrayToDataTable(tempData);
-    var temp_chart = new google.visualization.LineChart(document.getElementById('temp_chart'));
-    temp_chart.draw(data_temp, {
+    var temperatureDataTable = google.visualization.arrayToDataTable(tempData);
+    var temperatureChart = new google.visualization.LineChart(document.getElementById('temp_chart'));
+    
+    temperatureChart.draw(temperatureDataTable, {
         height: '100%',
         width: '100%',
         lineWidth: 2,
@@ -157,9 +151,10 @@ async function drawWeightChart(data) {
         weightData.push([measured, data[row].weight]);
     }
 
-    var data_weight = google.visualization.arrayToDataTable(weightData);
-    var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart'));
-    weight_chart.draw(data_weight, {
+    var weightDataTable = google.visualization.arrayToDataTable(weightData);
+    var weightChart = new google.visualization.LineChart(document.getElementById('weight_chart'));
+    
+    weightChart.draw(weightDataTable, {
         height: '100%',
         lineWidth: 2,
         colors: ['black'],
@@ -189,9 +184,10 @@ async function drawHumidityChart(data) {
         humidityData.push([measured, data[row].humidity]);
     }
 
-    var data_humidity = google.visualization.arrayToDataTable(humidityData);
-    var humidity_chart = new google.visualization.LineChart(document.getElementById('humidity_chart'));
-    humidity_chart.draw(data_humidity, {
+    var humidityDataTable = google.visualization.arrayToDataTable(humidityData);
+    var humidityChart = new google.visualization.LineChart(document.getElementById('humidity_chart'));
+    
+    humidityChart.draw(humidityDataTable, {
         height: '100%',
         width: '100%',
         lineWidth: 2,

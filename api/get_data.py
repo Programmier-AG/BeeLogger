@@ -41,7 +41,7 @@ def get_data():
 
         compress_count = round(row_count / amount)
 
-        print("compressing from %s to %s values with interval %s" % (row_count, amount, compress_count))
+        print(">> Compressing from %s to %s values with interval %s" % (row_count, amount, compress_count))
 
         c_row_count = 0
         temp = []
