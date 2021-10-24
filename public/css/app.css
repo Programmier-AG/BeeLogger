@@ -93,8 +93,33 @@ h3.chart-title {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
     color: #fff;
     margin: 5px 30px 5px 20px;
+    padding: 0px 30px 0px 30px;
+}
+
+#beelogger-charts-error-box {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    margin: 5px 30px 5px 20px;
+    padding: 0px 30px 0px 30px;
+}
+#beelogger-charts-loader {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    margin: 5px 30px 5px 20px;
+    padding: 0px 30px 0px 30px;
 }
 
 footer {
@@ -109,4 +134,8 @@ footer {
     padding: 0 20px !important;
     border-radius: 10px;
     font-weight: bold;
+}
+.display-info {
+    text-align: center;
+    margin-bottom: 0%;
 }

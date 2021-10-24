@@ -10,6 +10,7 @@
 
 // Initialize both date pickers as globals
 var datePickerFrom, datePickerTo;
+var waitChangeWidth = setTimeout(() => {}, 0);;
 
 const beeLogger = new BeeLogger();
 
@@ -38,14 +39,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Get data from the last 24 hours and populate beeLogger.currentData
-    var data = await beeLogger.getCurrentData(dateYesterday, dateToday)
+    var data = await beeLogger.getCurrentData()
         .catch(err => errorHandler('current-data', err));
+
+    data = data['data'];
     
     // If no current data is available,
     if (Object.keys(data).length < 1) {
         // display corresponding error/warning
         errorHandler('current-data', 204);
     }
+
+    await updateCurrentData(data);
 
     // Set up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
@@ -62,27 +67,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     await google.charts.load('current', {
         'packages': ['corechart'],
         // Callback to just draw charts and show data if charts lib is loaded
-        'callback': async () => {
-            await updateCurrentData(data)
-                .catch(err => {});
-            
+        'callback': async () => {            
             await drawCharts(data)
                 .catch(err => {});
 
-            checkbox = document.getElementById("scale-switch");
-            checkbox.addEventListener("change", async (e) => {
-                element = document.getElementById("scale-switch");
-                if(element.checked) await drawCompareChart(data, true);
-                else await drawCompareChart(data, false);
+            checkbox = document.getElementById('scale-switch');
+
+            checkbox.addEventListener('change', async (e) => {
+                let fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
+                let toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
+
+                // Calculate difference between dates
+                let diff = fromDate.diff(toDate, 'days');
+                diff = Math.abs(diff.toObject().days);
+
+                // Redraw chart when the state of the switch changed
+                element = document.getElementById('scale-switch');
+                await drawCompareChart(beeLogger.cachedData['data'], element.checked);
             });
+
             checkbox.checked = false;
 
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
                 // Load currently displayed data from cache
-                data = beeLogger.data.cachedData;
+                data = beeLogger.cachedData;
                 await drawCharts(data)
-                    .catch(err => { throw err; });;
+                    .catch(err => { throw err; });
             };
         }
     });
@@ -96,6 +107,8 @@ document.addEventListener('DOMContentLoaded', async () => {
  * the chart re-renders.
  */
 async function changeDateRange() {
+    document.getElementById('beelogger-charts-error-box').classList.add('hide');
+
     var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
     var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
 
@@ -109,13 +122,18 @@ async function changeDateRange() {
     fromDate = fromDate.toISODate();
     toDate = toDate.toISODate();
 
+    document.getElementById('beelogger-charts-loader').classList.remove('hide');
+
     // Get data for the specified time span
     var data = await beeLogger.getData(fromDate, toDate, compressed)
-        .catch(err => errorHandler('data', err));
+        .catch(err => errorHandler('charts', err));
 
     // No data available for the requested time span
-    if (Object.keys(data).length < 1) {
-        errorHandler('data', 204);
+    if (data === undefined) {
+        errorHandler('charts', 204);
+        return;
+    } else if (Object.keys(data).length < 1) {
+        errorHandler('charts', 204);
         return;
     }
     
@@ -133,8 +151,9 @@ async function changeDateRange() {
  * @param {Object} data Data object from the data API
  */
 async function updateCurrentData(data) {
-    if (!data || Object.keys(data) < 1) {
-        throw new Error('Unable to update current data due to missing data.');
+    if (!data || Object.keys(data).length < 1) {
+        errorHandler('current-data', 204);
+        return;
     }
 
     // Get the measured timestamp from latest record
@@ -157,7 +176,7 @@ async function updateCurrentData(data) {
 
 /**
  * Gets newest and oldest weight from the passed data Object
- * and returns the difference ("delta").
+ * and returns the difference ('delta').
  * 
  * @param {Object} data Data object from the data API
  * @returns {string} HTML containing the weight delta (in a fitting color)
@@ -174,8 +193,7 @@ function getWeightDelta(data) {
     // Limit float to 2 decimal places
     weightDelta = Number(weightDelta.toFixed(2));
     // Format HTML string with green color for weight growth and red color for weight decline
-    var weightDeltaString = weightDelta >= 0 ? `<p style="color: #8aff6b;">+${weightDelta}</p>` : `<p style="color: #fe7373;">${weightDelta}</p>`;
-    
+    var weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta}</p>` : `<p style='color: #fe7373;'>${weightDelta}</p>`;
     return weightDeltaString;
 }
 
@@ -198,11 +216,9 @@ function errorHandler(scope, err) {
     switch (err) {
         // 204 - No content i.e. no data available
         case 204:
-            error.title = `<h5>❌ Keine aktuellen Daten verfügbar (${err}).</h5>`;
-            error.description += `<p>Es sind leider keine aktuellen Daten verfügbar, was wahrscheinlich
-            an einem temporären Ausfall unsererseits liegt.<br>Du kannst dir jedoch trotzdem historische
-            Daten ansehen. Passe dafür einfach den Zeitraum der Diagramme über den Knopf unten in der Ecke
-            an.</p>`;
+            error.title = `<h5>❌ Keine Daten verfügbar (${err}).</h5>`;
+            error.description += `<p>Es sind leider keine Daten verfügbar, was wahrscheinlich
+            an einem temporären Ausfall unsererseits liegt.</p>`;
             break;
         // When there hasn't been a match with a specific error code
         default:
@@ -227,13 +243,32 @@ function errorHandler(scope, err) {
         // Error only concerns current data (from about the last 24 hours)
         case 'current-data':
             // Only current-data section has to be hidden
+            error.description += `
+                <p>Du kannst dir jedoch trotzdem historische
+                Daten ansehen. Passe dafür einfach den Zeitraum der Diagramme über den Knopf unten in der Ecke
+                an.</p>
+            `;
+
+            // Replace current data section with error message
             var errorBox = document.getElementById('beelogger-current-data-error-box');
             errorBox.innerHTML = error.title +  error.description;
             errorBox.classList.remove('hide');
+
             // Access to historical data should still be available
             document.getElementById('loading').classList.add('hide');
             document.getElementsByTagName('main')[0].classList.remove('hide');
             document.getElementById('beelogger-current-data').classList.add('hide');
+            break;
+
+        case 'charts':
+            error.description += '<p>Das Abrufen der Daten ist für den ausgewählten Bereich fehlgeschlagen.</p>';
+
+            // Replace charts section with error message
+            let chartsErrorBox = document.getElementById('beelogger-charts-error-box');
+            chartsErrorBox.innerHTML = error.title +  error.description;
+            chartsErrorBox.classList.remove('hide');
+            document.getElementById('charts').classList.add('hide');
+            document.getElementById('beelogger-charts-loader').classList.add('hide');
             break;
 
         // Something mandatory is broken, show error message across the entire screen
@@ -244,7 +279,4 @@ function errorHandler(scope, err) {
             document.getElementById('loading-text').innerHTML = error.description;
             break;
     }
-    
-    // API request is done, hide spinner
-    document.getElementById('loading-progress').classList.remove('progress');
 }
