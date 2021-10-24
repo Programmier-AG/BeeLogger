@@ -22,10 +22,11 @@ services:
       - "./docker_volumes/contact:/app/contact"
       - "./docker_volumes/backup:/app/backup"
       - "./docker_volumes/logs:/app/logs"
+      - "./docker_volumes/secrets:/app/secrets"
     environment:
       insert_token: "changeme!2"
       display_token: "changeme!3"
-      
+
       correction: '{"0": 1}'
       tare: '{"0": 0}'
       real_tare: '{"0": 0}'
@@ -39,19 +40,20 @@ services:
       pages: '{}'
 
       mysql_backup_host: ""
-      mysql_backup_port: "0"
+      mysql_backup_port: "3306"
       mysql_backup_user: ""
       mysql_backup_pass: ""
       mysql_backup_db: ""
 
       backup_host: ""
-      backup_port: "0"
+      backup_port: "22"
       backup_user: ""
       backup_pass: ""
+      backup_key: ""
       backup_dir: ""
 
       mail_host: ""
-      mail_port: "0"
+      mail_port: "465"
       mail_user: ""
       mail_pass: ""
       mail_rec: ""

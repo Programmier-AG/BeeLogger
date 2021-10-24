@@ -9,3 +9,4 @@ autoreload
 autoreload.py
 logs/insert.log
 config.py
+dev-docker-compose.yml
