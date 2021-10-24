@@ -89,3 +89,6 @@ Note that this plugin makes the browser otherwise unusable since it forces to on
 * [Materialize](https://materializecss.com/)
 * [Material Icons](https://fonts.google.com/icons)
 * [Google Charts](https://developers.google.com/chart)
+
+## Docker
+* [wait-for-it](https://github.com/vishnubob/wait-for-it) (Licence=MIT)
