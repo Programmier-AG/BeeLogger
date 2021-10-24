@@ -40,6 +40,7 @@ if not use_env:
         port = 2232
         user = ""
         password = ""
+        key = ""
         directory = ""
 
     class Mail:
@@ -85,6 +86,7 @@ else:
         port = int(os.environ["backup_port"])
         user = os.environ["backup_user"]
         password = os.environ["backup_pass"]
+        key = os.environ["backup_key"]
         directory = os.environ["backup_dir"]
 
 
