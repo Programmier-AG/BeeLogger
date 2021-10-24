@@ -41,7 +41,8 @@ class Database:
             host=self.mysql_args["host"],
             port=self.mysql_args["port"],
             user=self.mysql_args["user"],
-            password=self.mysql_args["password"]
+            password=self.mysql_args["password"],
+            charset="utf8mb4"
         )
         with connection.cursor() as cursor:
             try:

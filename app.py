@@ -7,7 +7,7 @@ from database import Database
 from jsonencoder import CustomJSONEncoder
 
 print("waiting until db is ready")
-os.popen(f"wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
+os.popen(f"/bin/bash ./wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
 print("db ready")
 
 # from crossdomain import crossdomain
