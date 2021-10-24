@@ -17,7 +17,7 @@ services:
       - db
     restart: "no"
     ports:
-      - 2688:2688
+      - 2688:8000
     volumes:
       - "./docker_volumes/contact:/app/contact"
       - "./docker_volumes/backup:/app/backup"
