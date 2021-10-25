@@ -10,13 +10,13 @@
 
 // Initialize both date pickers as globals
 var datePickerFrom, datePickerTo;
-var waitChangeWidth = setTimeout(() => {}, 0);;
 
 const beeLogger = new BeeLogger();
 
 document.addEventListener('DOMContentLoaded', async () => {
-    var dateToday = luxon.DateTime.now().toISODate();
-    var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
+    // ? Unnecessary
+    // var dateToday = luxon.DateTime.now().toISODate();
+    // var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
 
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
@@ -87,13 +87,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             checkbox.checked = false;
-
+            
+            // Timeout function in variable to later be able to stop it again
+            // when the window was resized again
+            var chartReload = setTimeout(() => {}, 0);
+            
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
-                // Load currently displayed data from cache
-                data = beeLogger.cachedData;
-                await drawCharts(data)
-                    .catch(err => { throw err; });
+                // Stop scheduled call of `changeDateRange()` (if scheduled)
+                clearTimeout(chartReload);
+
+                // Schedule data reload (with the changed width passed)
+                // to make sure data compression is done properly
+                chartReload = setTimeout(() => {
+                    var chartsSection = document.getElementById('charts');
+                    // Hide charts section for the time being
+                    chartsSection.classList.add('hide');
+                    
+                    changeDateRange()
+                        .then(() => chartsSection.classList.remove('hide'))
+                        // Error already handled by `changeDateRange()`
+                        .catch(() => {});
+                }, 500);
+
+                /*
+                    Legacy / old implementation without new API call.
+                    That has become necessary however as with recent
+                    changes to /api/data/get, the new width after the resize,
+                    has to be considered in case ?compressed is needed.
+                    // Load currently displayed data from cache
+                    data = beeLogger.cachedData;
+                    await drawCharts(data)
+                        .catch(err => { throw err; });
+                */
             };
         }
     });
@@ -105,39 +131,46 @@ document.addEventListener('DOMContentLoaded', async () => {
  * this function gets executed to load the new data into
  * the document-wide, cache of the API class and invoke
  * the chart re-renders.
+ * 
+ * @returns {Promise} Resolves when done re-drawing the charts and rejects on error
  */
-async function changeDateRange() {
-    document.getElementById('beelogger-charts-error-box').classList.add('hide');
+function changeDateRange() {
+    return new Promise(async (resolve, reject) => {
+        document.getElementById('beelogger-charts-error-box').classList.add('hide');
 
-    var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
-    var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
-
-    // Calculate difference between dates
-    var diff = fromDate.diff(toDate, 'days');
-    diff = Math.abs(diff.toObject().days);
-
-    // Append 'compressed' option when difference is > 10 days
-    var compressed = diff > 10 ? true : false;
-
-    fromDate = fromDate.toISODate();
-    toDate = toDate.toISODate();
-
-    document.getElementById('beelogger-charts-loader').classList.remove('hide');
-
-    // Get data for the specified time span
-    var data = await beeLogger.getData(fromDate, toDate, compressed)
-        .catch(err => errorHandler('charts', err));
-
-    // No data available for the requested time span
-    if (data === undefined) {
-        errorHandler('charts', 204);
-        return;
-    } else if (Object.keys(data).length < 1) {
-        errorHandler('charts', 204);
-        return;
-    }
+        var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
+        var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
     
-    await drawCharts(data);
+        // Calculate difference between dates
+        var diff = fromDate.diff(toDate, 'days');
+        diff = Math.abs(diff.toObject().days);
+    
+        // Append 'compressed' option when difference is > 10 days
+        var compressed = diff > 10 ? true : false;
+    
+        fromDate = fromDate.toISODate();
+        toDate = toDate.toISODate();
+    
+        document.getElementById('beelogger-charts-loader').classList.remove('hide');
+    
+        // Get data for the specified time span
+        var data = await beeLogger.getData(fromDate, toDate, compressed)
+            .catch(err => errorHandler('charts', err));
+    
+        // No data available for the requested time span
+        if (data === undefined) {
+            errorHandler('charts', 204);
+            reject();
+            return;
+        } else if (Object.keys(data).length < 1) {
+            errorHandler('charts', 204);
+            reject();
+            return;
+        }
+        
+        await drawCharts(data);
+        resolve();
+    });
 }
 
 /**
