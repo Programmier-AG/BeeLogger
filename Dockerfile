@@ -2,7 +2,7 @@ FROM python:3.8-alpine
 
 COPY . /app
 
-COPY example_config.py /app/example_config.py
+COPY example_config.py /app/config.py
 
 WORKDIR /app
 
