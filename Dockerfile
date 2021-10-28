@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3.9-alpine
 
 COPY . /app
 
@@ -27,9 +27,18 @@ RUN apk add --update \
   apache2-dev \
   gcc \
   g++ \
-  make
+  make \
+  openblas \
+  musl \
+  py3-numpy \
+  py3-numpy-dev
 
-RUN pip install --no-cache-dir -r requirements.txt
+ENV PYTHONPATH=/usr/lib/python3.9/site-packages
+
+RUN pip install --no-cache-dir -r docker-requirements.txt
+
+# This fixes an issue with "py3-numpy" where python won't find additional modules because of an musl vs. gcc error... credit: https://stackoverflow.com/a/69360361
+RUN find /usr/lib/python3.9/site-packages -iname "*.so" -exec sh -c 'x="{}"; mv "$x" "${x/cpython-39-x86_64-linux-musl./}"' \;
 
 RUN chmod +x ./wait-for-it.sh
 
