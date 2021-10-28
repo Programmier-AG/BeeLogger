@@ -160,7 +160,8 @@ class Database:
             log.close()
             return
 
-    def insert_rss_feed(self, feed, data):
+    @staticmethod
+    def insert_rss_feed(feed, data):
         """
         Inserts a new feed item into the database.
 
@@ -171,5 +172,18 @@ class Database:
             Currently only "data", "admin", or "warning".
         data : str
             The text to insert.
+        """
+        pass
+
+    @staticmethod
+    def get_rss_feed(feed):
+        """
+        Gets a feed from the database.
+
+        Parameters
+        ----------
+        feed : str
+            Name of the feed.
+            Currently only "data", "admin", or "warning".
         """
         pass
