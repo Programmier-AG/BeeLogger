@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     changeDateRange()
                         .then(() => chartsSection.classList.remove('hide'))
                         // Error already handled by `changeDateRange()`
-                        .catch(() => {});
+                        .catch(() => chartsSection.classList.add('hide'));
                 }, 500);
 
                 /*
@@ -156,13 +156,16 @@ function changeDateRange() {
         // Get data for the specified time span
         var data = await beeLogger.getData(fromDate, toDate, compressed)
             .catch(err => errorHandler('charts', err));
-    
+
+        // Object only with data from the BeeLogger API
+        var dataObject = data['data'];
+
         // No data available for the requested time span
-        if (data === undefined) {
+        if (dataObject === undefined) {
             errorHandler('charts', 204);
             reject();
             return;
-        } else if (Object.keys(data).length < 1) {
+        } else if (Object.keys(dataObject).length < 1) {
             errorHandler('charts', 204);
             reject();
             return;
