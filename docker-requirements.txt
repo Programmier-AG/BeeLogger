@@ -1,0 +1,4 @@
+Flask~=2.0.2
+Werkzeug~=2.0.2
+PyMySQL~=1.0.2
+mod_wsgi~=4.9.0
