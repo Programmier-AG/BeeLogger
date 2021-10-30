@@ -1,3 +1,6 @@
+import ast
+import json
+
 import mysql.connector.cursor
 import mysql.connector.errors
 from dbutils.pooled_db import PooledDB
@@ -160,30 +163,54 @@ class Database:
             log.close()
             return
 
-    @staticmethod
-    def insert_rss_feed(feed, data):
+    def insert_feed(self, feed_name, data):
         """
         Inserts a new feed item into the database.
 
         Parameters
         ----------
-        feed : str
+        feed_name : str
             Name of the feed.
             Currently only "data", "admin", or "warning".
-        data : str
-            The text to insert.
+        data : dict
+            The data that should get inserted.
         """
-        pass
 
-    @staticmethod
-    def get_rss_feed(feed):
+        with self.connection_pool.connection() as con, con.cursor(dictionary=True) as cursor:
+            insert = json.dumps(data, ensure_ascii=False).encode('utf8')
+            cursor.execute(f"INSERT INTO `notifications` (`feed`, `data`) VALUES (%s, %s)", [feed_name, insert])
+
+            con.commit()
+            con.close()
+
+        return True
+
+    def get_feed(self, feed_name):
         """
         Gets a feed from the database.
 
         Parameters
         ----------
-        feed : str
+        feed_name : str
             Name of the feed.
             Currently only "data", "admin", or "warning".
         """
-        pass
+
+        with self.connection_pool.connection() as con, con.cursor(dictionary=True) as cursor:
+            cursor.execute(f"SELECT `id`, `data` FROM `notifications` WHERE `feed`='{feed_name}'")
+
+            feed = []
+            for item in cursor.fetchall():
+                item["data"] = json.loads(item["data"])
+                feed.append({
+                    "time": item["data"]["time"],
+                    "title": bytes(item["data"]["title"], "utf8").decode("utf8"),
+                    "text": bytes(item["data"]["text"], "utf8").decode("utf8"),
+                    "id": item["id"]
+                })
+
+            con.close()
+
+        feed.reverse()
+
+        return feed

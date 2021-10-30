@@ -2,6 +2,7 @@ import config
 import os
 from blueprints.api import api
 from blueprints.views import views
+from blueprints.rss import rss
 from flask import Flask
 from database import Database
 from jsonencoder import CustomJSONEncoder
@@ -44,6 +45,9 @@ app.register_blueprint(views, url_prefix='/')
 
 # Initialize all routes of the REST API
 app.register_blueprint(api, url_prefix='/api')
+
+# Initialize all routes for the RSS feeds
+app.register_blueprint(rss, url_prefix='/rss')
 
 # Append headers
 @app.after_request
