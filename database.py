@@ -214,3 +214,65 @@ class Database:
         feed.reverse()
 
         return feed
+
+    def set_telegram_subscription(self, chat_id, feed_name, subscribe):
+        """
+        Changes the feed subscriptions of a telegram chat.
+
+        Parameters
+        ----------
+        chat_id : str
+            Chat ID of telegram chat. message.chat.id
+        feed_name : str
+            Name of the feed to change subscription. "data", "admin", "warning"
+        subscribe : bool
+            Specify whether to recieve updates on that feed.
+        """
+        with self.connection_pool.connection() as con, con.cursor(dictionary=True) as cursor:
+            cursor.execute(f"SELECT * FROM `subscriptions` WHERE `telegram_id`='{chat_id}'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"INSERT INTO `subscriptions` (`telegram_id`) VALUES ({chat_id})")
+
+            cursor.execute(f"UPDATE `subscriptions` SET `{feed_name}_feed`='{1 if subscribe else 0}' WHERE `telegram_id`='{chat_id}'")
+
+            con.commit()
+            con.close()
+
+        return True
+
+    def check_telegram_subscription(self, chat_id, feed_name):
+        """
+        Checks the feed subscriptions of a telegram chat.
+
+        Parameters
+        ----------
+        chat_id : str
+            Chat ID of telegram chat. message.chat.id
+        feed_name : str
+            Name of the feed to check subscription for. "data", "admin", "warning"
+        """
+        with self.connection_pool.connection() as con, con.cursor(dictionary=True) as cursor:
+            cursor.execute(f"SELECT * FROM `subscriptions` WHERE `telegram_id`='{chat_id}'")
+            if cursor.fetchone()[f"{feed_name}_feed"] == 1:
+                con.close()
+                return True
+            else:
+                con.close()
+                return False
+
+    def get_telegram_subscriptions(self, feed_name):
+        """
+        Gets all chats who have subscribed to a feed.
+
+        Parameters
+        ----------
+        feed_name : str
+            Name of the feed to check subscription for. "data", "admin", "warning"
+        """
+        with self.connection_pool.connection() as con, con.cursor(dictionary=True) as cursor:
+            cursor.execute(f"SELECT * FROM `subscriptions` WHERE `{feed_name}_feed`='1'")
+            res = cursor.fetchall()
+
+            con.close()
+
+        return [x["telegram_id"] for x in res]

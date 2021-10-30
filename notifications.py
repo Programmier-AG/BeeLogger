@@ -1,13 +1,14 @@
 import datetime
-import json
 import time
 
 import rfeed
-from flask import jsonify, request
+from flask import request
 
 import database
+from telegram import bot
 
 Database = database.Database()
+
 
 class Feed:
     def __init__(self):
@@ -53,6 +54,13 @@ class Feed:
 
         Database.insert_feed(feed, item)
 
+        ########### Telegram Bot ###########
+        message = f"{title}\n" \
+                  f"{text}\n\n" \
+                  f"Automatisch generierte Nachricht!"
+        for chat_id in Database.get_telegram_subscriptions(feed):
+            bot.send_message(chat_id, message)
+
         return True
 
     def get_feed(self, feed_name, rss_format=True):
@@ -89,4 +97,3 @@ class Feed:
             ).rss()
 
         return feed
-

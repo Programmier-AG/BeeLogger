@@ -1,11 +1,16 @@
-import config
 import os
-from blueprints.api import api
-from blueprints.views import views
-from blueprints.rss import rss
+import sys
+import threading
+
 from flask import Flask
+
+import config
+from blueprints.api import api
+from blueprints.rss import rss
+from blueprints.views import views
 from database import Database
 from jsonencoder import CustomJSONEncoder
+from telegram import bot as telegram_bot
 
 print("waiting until db is ready")
 os.popen(f"/bin/bash ./wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
@@ -66,4 +71,13 @@ def add_header(r):
 
 # Start the app
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=config.web_port)
+    telegram_bot_thread = threading.Thread(target=telegram_bot.infinity_polling)
+    telegram_bot_thread.daemon = True
+    telegram_bot_thread.start()
+
+    try:
+        app.run(host='0.0.0.0', port=config.web_port)
+    except (KeyboardInterrupt, SystemExit):
+        print(">>> Stopping BeeLogger...")
+        database.connection_pool.close()
+        sys.exit()
