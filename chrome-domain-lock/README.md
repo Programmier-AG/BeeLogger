@@ -1,2 +1,2 @@
-## Simple chrome extension to force browser to stay on the same domain
-We use this for the display running our display software. That display is hooked up to a Raspberry Pi that utilizes Chromium's "kiosk mode". In order to prohibit abuse of the display, we use this extension to force Chromium to stay on our domain.
+## `chrome-domain-lock` -  A simple chrome extension to force the browser to stay on the same domain
+See ["Optional Chrome Extension"](../README.md#optional-chrome-extension) for more information.

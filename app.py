@@ -7,7 +7,7 @@ from database import Database
 from utils.jsonencoder import CustomJSONEncoder
 
 print("waiting until db is ready")
-os.popen(f"/bin/bash ./wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
+os.popen(f"/bin/bash ./docker/wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
 print("db ready")
 
 # Check whether the script is started from the directory it's contained in
