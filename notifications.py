@@ -4,6 +4,7 @@ import time
 import rfeed
 from flask import request
 
+import config
 import database
 from telegram import bot
 
@@ -54,12 +55,14 @@ class Feed:
 
         Database.insert_feed(feed, item)
 
-        ########### Telegram Bot ###########
-        message = f"{title}\n" \
-                  f"{text}\n\n" \
-                  f"Automatisch generierte Nachricht!"
-        for chat_id in Database.get_telegram_subscriptions(feed):
-            bot.send_message(chat_id, message)
+        if not config.telegram_bot_token == "":
+            ########### Telegram Bot ###########
+            message = f">>>> {self.feed_names[feed]} <<<<\n" \
+                      f">>> {title} <<<\n" \
+                      f"{text}\n\n" \
+                      f"Automatisch generierte Nachricht!"
+            for chat_id in Database.get_telegram_subscriptions(feed):
+                bot.send_message(chat_id, message)
 
         return True
 
