@@ -35,16 +35,16 @@ RUN apk add --update \
 
 ENV PYTHONPATH=/usr/lib/python3.9/site-packages
 
-RUN pip install --no-cache-dir -r docker-requirements.txt
+RUN pip install --no-cache-dir -r docker/docker-requirements.txt
 
 # This fixes an issue with "py3-numpy" where python won't find additional modules because of an musl vs. gcc error... credit: https://stackoverflow.com/a/69360361
 RUN find /usr/lib/python3.9/site-packages -iname "*.so" -exec sh -c 'x="{}"; mv "$x" "${x/cpython-39-x86_64-linux-musl./}"' \;
 
-RUN chmod +x ./wait-for-it.sh
+RUN chmod +x ./docker/wait-for-it.sh
 
 EXPOSE 8000
 
-CMD tmux new -d -s wsgi 'mod_wsgi-express start-server docker-wsgi.wsgi --user www-data --group www-data' ; \
+CMD tmux new -d -s wsgi 'mod_wsgi-express start-server docker/docker-wsgi.wsgi --user www-data --group www-data' ; \
   mkdir -p /tmp/mod_wsgi-localhost:8000:0/ ; \
   touch /tmp/mod_wsgi-localhost:8000:0/error_log ; \
   tail -f /tmp/mod_wsgi-localhost:8000:0/error_log
