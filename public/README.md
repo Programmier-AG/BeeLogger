@@ -1,0 +1,2 @@
+## `public` - Folder containing static assets
+This folder contains all static assets needed by the front end (dashboard & display). That are things like CSS files, JavaScript files and images (also of libraries).

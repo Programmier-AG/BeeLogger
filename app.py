@@ -9,14 +9,12 @@ from blueprints.api import api
 from blueprints.rss import rss
 from blueprints.views import views
 from database import Database
-from jsonencoder import CustomJSONEncoder
+from utils.jsonencoder import CustomJSONEncoder
 from telegram import bot as telegram_bot
 
 print("waiting until db is ready")
-os.popen(f"/bin/bash ./wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
+os.popen(f"/bin/bash ./docker/wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
 print("db ready")
-
-# from crossdomain import crossdomain
 
 # Check whether the script is started from the directory it's contained in
 if not os.path.isfile("app.py"):

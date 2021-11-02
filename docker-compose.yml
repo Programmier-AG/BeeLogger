@@ -13,6 +13,8 @@ services:
 
   beelogger:
     image: ghcr.io/programmier-ag/beelogger:latest
+    # Uncomment if you'd like to build the image yourself.
+    # build: .
     depends_on:
       - db
     restart: "no"

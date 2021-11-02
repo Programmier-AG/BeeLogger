@@ -1,4 +1,8 @@
-import pymysql, config, time, datetime, random
+import pymysql
+import config
+import time
+import datetime
+import random
 
 connection = pymysql.connect(
     host=config.MySql.host,
