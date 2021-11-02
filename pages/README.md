@@ -1,0 +1,2 @@
+## `pages` - Folder containing all templates
+This folder contains all HTML templates that are needed to put together the UI of the web dashboard and display software. It's grouped into the base template of a page (which is in this folder), separate, re-usable components (`components/`) which are essentially 'partials' of the page and content (`content`).
