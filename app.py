@@ -9,6 +9,7 @@ from blueprints.api import api
 from blueprints.rss import rss
 from blueprints.views import views
 from database import Database
+from notifications import Feed
 from utils.jsonencoder import CustomJSONEncoder
 from telegram import bot as telegram_bot
 
@@ -77,6 +78,7 @@ if __name__ == "__main__":
         print(">>> Not starting telegram bot because there is no token")
 
     try:
+        Feed().push_notification("admin", "Beelogger startup event", "Beelogger has been started and is now running...")
         app.run(host='0.0.0.0', port=config.web_port)
     except (KeyboardInterrupt, SystemExit):
         print(">>> Stopping BeeLogger...")
