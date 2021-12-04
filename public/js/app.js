@@ -14,10 +14,6 @@ var datePickerFrom, datePickerTo;
 const beeLogger = new BeeLogger();
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // ? Unnecessary
-    // var dateToday = luxon.DateTime.now().toISODate();
-    // var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
-
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
     M.Modal.init(document.querySelectorAll('.modal'), {});
@@ -68,8 +64,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'packages': ['corechart'],
         // Callback to just draw charts and show data if charts lib is loaded
         'callback': async () => {            
-            await drawCharts(data)
-                .catch(err => {});
+            // Load charts when the library is ready
+            await loadCharts();
 
             checkbox = document.getElementById('scale-switch');
 
@@ -96,30 +92,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.onresize = async () => {
                 // Stop scheduled call of `changeDateRange()` (if scheduled)
                 clearTimeout(chartReload);
-
                 // Schedule data reload (with the changed width passed)
                 // to make sure data compression is done properly
-                chartReload = setTimeout(() => {
-                    var chartsSection = document.getElementById('charts');
-                    // Hide charts section for the time being
-                    chartsSection.classList.add('hide');
-                    
-                    changeDateRange()
-                        .then(() => chartsSection.classList.remove('hide'))
-                        // Error already handled by `changeDateRange()`
-                        .catch(() => chartsSection.classList.add('hide'));
-                }, 500);
-
-                /*
-                    Legacy / old implementation without new API call.
-                    That has become necessary however as with recent
-                    changes to /api/data/get, the new width after the resize,
-                    has to be considered in case ?compressed is needed.
-                    // Load currently displayed data from cache
-                    data = beeLogger.cachedData;
-                    await drawCharts(data)
-                        .catch(err => { throw err; });
-                */
+                chartReload = setTimeout(loadCharts, 500);
             };
         }
     });
@@ -174,6 +149,21 @@ function changeDateRange() {
         await drawCharts(data);
         resolve();
     });
+}
+
+/**
+ * Gets date range from date pickers, re-fetches data (if needed using ?compress)
+ * and invokes `drawCharts()` with the fetched data.
+ */
+async function loadCharts() {
+    var chartsSection = document.getElementById('charts');
+    // Hide charts section for the time being
+    chartsSection.classList.add('hide');
+    
+    changeDateRange()
+        .then(() => chartsSection.classList.remove('hide'))
+        // Error already handled by `changeDateRange()`
+        .catch(() => chartsSection.classList.add('hide'));
 }
 
 /**
