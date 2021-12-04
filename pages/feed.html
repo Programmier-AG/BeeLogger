@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 
-{% block custom_header %}
-<style>
-
-</style>
-{% endblock %}
+{% block custom_header %}{% endblock %}
 
 {% block content %}
 <main>
@@ -19,7 +15,7 @@
                     <p>{{ record["text"] }}</p>
                     </div>
                     <div class="card-action">
-                    <a href="/rss/{{ feed_name }}/{{ record['id'] }}">Ansehen</a>
+                    <a href="/rss/{{ feed_name }}/{{ record['id'] }}/?pretty">Ansehen</a>
                     </div>
                 </div>
             {% endfor %}
