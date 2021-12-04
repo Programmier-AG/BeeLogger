@@ -32,13 +32,12 @@ def show_article(feed, feed_id):
     feed_data = Notifications.get_feed(feed, rss_format=False)
     article = [x for x in feed_data if str(x["id"]) == feed_id][0]
 
-    # Return pretty, HTML-based version of the feed if ?pretty is passed
-    if "pretty" in args.keys():
-        return render_template("feed-article.html", feed_name=feed, article=article)
+    # Return just the text if ?raw is passed
+    if "raw" in args.keys():
+        return article["text"]
     # Return feed as valid JSON if ?json is passed
     elif "json" in args.keys():
         return article
-    # Return feed as valid XML (for instance for RSS readers)
+    # Return pretty, HTML-based version of the feed
     else:
-        # TODO: Return a single article in a proper RSS XML format (not just the text)!!
-        return article["text"]
+        return render_template("feed-article.html", feed_name=feed, article=article)
