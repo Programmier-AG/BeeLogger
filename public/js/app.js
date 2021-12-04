@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Callback to just draw charts and show data if charts lib is loaded
         'callback': async () => {            
             // Load charts when the library is ready
-            await loadCharts();
+            await createChartsForDateRange();
 
             checkbox = document.getElementById('scale-switch');
 
@@ -90,11 +90,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
-                // Stop scheduled call of `changeDateRange()` (if scheduled)
+                // Stop scheduled call of `applyDateRange()` (if scheduled)
                 clearTimeout(chartReload);
                 // Schedule data reload (with the changed width passed)
                 // to make sure data compression is done properly
-                chartReload = setTimeout(loadCharts, 500);
+                chartReload = setTimeout(createChartsForDateRange, 500);
             };
         }
     });
@@ -102,14 +102,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * When the button for changing the date is pressed,
- * this function gets executed to load the new data into
- * the document-wide, cache of the API class and invoke
- * the chart re-renders.
+ * Reads date range from date pickers, fetches data and draws charts
+ * for the specified time span. If necessary, `?compressed` is applied
+ * as well.
  * 
  * @returns {Promise} Resolves when done re-drawing the charts and rejects on error
  */
-function changeDateRange() {
+function applyDateRange() {
     return new Promise(async (resolve, reject) => {
         document.getElementById('beelogger-charts-error-box').classList.add('hide');
 
@@ -152,17 +151,17 @@ function changeDateRange() {
 }
 
 /**
- * Gets date range from date pickers, re-fetches data (if needed using ?compress)
- * and invokes `drawCharts()` with the fetched data.
+ * Creates/draws charts for the currently specified date range.
+ * Async wrapper for `applyDateRange()`. 
  */
-async function loadCharts() {
+async function createChartsForDateRange() {
     var chartsSection = document.getElementById('charts');
     // Hide charts section for the time being
     chartsSection.classList.add('hide');
     
-    changeDateRange()
+    applyDateRange()
         .then(() => chartsSection.classList.remove('hide'))
-        // Error already handled by `changeDateRange()`
+        // Error already handled by `applyDateRange()`
         .catch(() => chartsSection.classList.add('hide'));
 }
 
