@@ -24,7 +24,6 @@ if not use_env:
 
     class MySql:
         host = ""
-        host = ""
         port = 3306
         user = "beelogger"
         password = ""
