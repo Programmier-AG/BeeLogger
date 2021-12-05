@@ -6,6 +6,10 @@ Notifications = notifications.Feed()
 
 rss = Blueprint("rss", __name__)
 
+@rss.route("/feeds/", methods=["GET"])
+def show_feeds():
+    return render_template('feeds.html')
+
 @rss.route("/<feed>/", methods=["GET"])
 def show_feed(feed):
     # Get the HTTP request's GET params
