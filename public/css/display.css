@@ -42,6 +42,20 @@ h1 p#date {
     padding: 0;
 }
 
+.feeds-frame-wrapper {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.feeds-frame-wrapper iframe {
+    display: block;
+    border: none;
+    height: 100vh;
+    width: 100%;
+}
+
 #pages-tab, #stundenplan-tab {
     margin: 0 !important;
     padding: 0 !important;
