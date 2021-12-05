@@ -6,7 +6,13 @@
 <main>
     <div class="valign-wrapper">
         <div class="container">
-            <h1><i>{{ feed_name.upper() }}</i> Feed</h1>
+            <h1>{{ feed_name.upper() }} Feed</h1>
+
+            <div class="card blue-grey darken-1 center-align white-text" style="padding: 20px;">
+                <h5>QR Code zum {{ feed_name.upper() }} RSS Feed:</h5>
+                <img id="rss-qr-code" src="" alt="Unable to generate RSS QR code.">
+            </div>
+
             {% for record in records %}
                 <div class="card blue-grey darken-1">
                     <div class="card-content white-text">
@@ -24,4 +30,20 @@
 </main>
 {% endblock %}
 
-{% block custom_footer %}{% endblock %}
+{% block custom_footer %}
+<script>
+    // Get <img> tag that's supposed to hold the RSS QR code
+    let qrCodeHolder = document.getElementById('rss-qr-code');
+
+    // Get encoded URL to RSS feed (without '?pretty')
+    let rssFeedURL = window.location.href;
+    rssFeedURL = rssFeedURL.replace('/?pretty', '');
+    rssFeedURL = encodeURI(rssFeedURL);
+    console.log(rssFeedURL);
+    // Generate QR code using API and get the URL to the generated image
+    let qrCodeURL = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${rssFeedURL}`;
+
+    // Fill generated image URL into the <img> tag's "src" attribute
+    qrCodeHolder.setAttribute('src', qrCodeURL);
+</script>
+{% endblock %}
