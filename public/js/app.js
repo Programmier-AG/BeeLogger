@@ -14,10 +14,6 @@ var datePickerFrom, datePickerTo;
 const beeLogger = new BeeLogger();
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // ? Unnecessary
-    // var dateToday = luxon.DateTime.now().toISODate();
-    // var dateYesterday = luxon.DateTime.now().minus({ days: 1 }).toISODate();
-
     // Initializing used Materialize components
     M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
     M.Modal.init(document.querySelectorAll('.modal'), {});
@@ -68,8 +64,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'packages': ['corechart'],
         // Callback to just draw charts and show data if charts lib is loaded
         'callback': async () => {            
-            await drawCharts(data)
-                .catch(err => {});
+            // Load charts when the library is ready
+            await createChartsForDateRange();
 
             checkbox = document.getElementById('scale-switch');
 
@@ -94,32 +90,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Event handler for automatically resizing charts on screen resize
             window.onresize = async () => {
-                // Stop scheduled call of `changeDateRange()` (if scheduled)
+                // Stop scheduled call of `applyDateRange()` (if scheduled)
                 clearTimeout(chartReload);
-
                 // Schedule data reload (with the changed width passed)
                 // to make sure data compression is done properly
-                chartReload = setTimeout(() => {
-                    var chartsSection = document.getElementById('charts');
-                    // Hide charts section for the time being
-                    chartsSection.classList.add('hide');
-                    
-                    changeDateRange()
-                        .then(() => chartsSection.classList.remove('hide'))
-                        // Error already handled by `changeDateRange()`
-                        .catch(() => chartsSection.classList.add('hide'));
-                }, 500);
-
-                /*
-                    Legacy / old implementation without new API call.
-                    That has become necessary however as with recent
-                    changes to /api/data/get, the new width after the resize,
-                    has to be considered in case ?compressed is needed.
-                    // Load currently displayed data from cache
-                    data = beeLogger.cachedData;
-                    await drawCharts(data)
-                        .catch(err => { throw err; });
-                */
+                chartReload = setTimeout(createChartsForDateRange, 500);
             };
         }
     });
@@ -127,14 +102,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * When the button for changing the date is pressed,
- * this function gets executed to load the new data into
- * the document-wide, cache of the API class and invoke
- * the chart re-renders.
+ * Reads date range from date pickers, fetches data and draws charts
+ * for the specified time span. If necessary, `?compressed` is applied
+ * as well.
  * 
  * @returns {Promise} Resolves when done re-drawing the charts and rejects on error
  */
-function changeDateRange() {
+function applyDateRange() {
     return new Promise(async (resolve, reject) => {
         document.getElementById('beelogger-charts-error-box').classList.add('hide');
 
@@ -174,6 +148,21 @@ function changeDateRange() {
         await drawCharts(data);
         resolve();
     });
+}
+
+/**
+ * Creates/draws charts for the currently specified date range.
+ * Async wrapper for `applyDateRange()`. 
+ */
+async function createChartsForDateRange() {
+    var chartsSection = document.getElementById('charts');
+    // Hide charts section for the time being
+    chartsSection.classList.add('hide');
+    
+    applyDateRange()
+        .then(() => chartsSection.classList.remove('hide'))
+        // Error already handled by `applyDateRange()`
+        .catch(() => chartsSection.classList.add('hide'));
 }
 
 /**

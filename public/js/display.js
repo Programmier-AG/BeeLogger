@@ -53,7 +53,7 @@ async function refreshData() {
 async function charts() {
     // Invoke date range change to load data (as currently
     // there is none for the charts to use)
-    await changeDateRange();
+    await applyDateRange();
 
     // Remove background image
     document.querySelector('body').style.backgroundImage = 'none';
