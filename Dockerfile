@@ -42,6 +42,8 @@ RUN find /usr/lib/python3.9/site-packages -iname "*.so" -exec sh -c 'x="{}"; mv 
 
 RUN chmod +x ./docker/wait-for-it.sh
 
+RUN chown www-data:www-data /app/ -R
+
 EXPOSE 8000
 
 CMD tmux new -d -s wsgi 'mod_wsgi-express start-server docker/docker-wsgi.wsgi --user www-data --group www-data' ; \

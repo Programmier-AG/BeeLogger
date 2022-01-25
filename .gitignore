@@ -11,3 +11,4 @@ autoreload.py
 logs/insert.log
 config.py
 docker-compose.override.yml
+.env
