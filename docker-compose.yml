@@ -26,6 +26,8 @@ services:
       - "./docker_volumes/logs:/app/logs"
       - "./docker_volumes/secrets:/app/secrets"
     environment:
+      telegram_bot_token: ""
+
       insert_token: "changeme!2"
       display_token: "changeme!3"
 

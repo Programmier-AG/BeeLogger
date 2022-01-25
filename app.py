@@ -1,10 +1,17 @@
-import config
 import os
-from blueprints.api import api
-from blueprints.views import views
+import sys
+import threading
+
 from flask import Flask
+
+import config
+from blueprints.api import api
+from blueprints.rss import rss
+from blueprints.views import views
 from database import Database
+from notifications import Feed
 from utils.jsonencoder import CustomJSONEncoder
+from telegram import bot as telegram_bot
 
 print("waiting until db is ready")
 os.popen(f"/bin/bash ./docker/wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
@@ -43,6 +50,9 @@ app.register_blueprint(views, url_prefix='/')
 # Initialize all routes of the REST API
 app.register_blueprint(api, url_prefix='/api')
 
+# Initialize all routes for the RSS feeds
+app.register_blueprint(rss, url_prefix='/rss')
+
 # Append headers
 @app.after_request
 def add_header(r):
@@ -60,4 +70,17 @@ def add_header(r):
 
 # Start the app
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=config.web_port)
+    if not config.telegram_bot_token == "":
+        telegram_bot_thread = threading.Thread(target=telegram_bot.infinity_polling)
+        telegram_bot_thread.daemon = True
+        telegram_bot_thread.start()
+    else:
+        print(">>> Not starting telegram bot because there is no token")
+
+    try:
+        Feed().push_notification("admin", "Beelogger startup event", "Beelogger has been started and is now running...")
+        app.run(host='0.0.0.0', port=config.web_port)
+    except (KeyboardInterrupt, SystemExit):
+        print(">>> Stopping BeeLogger...")
+        database.connection_pool.close()
+        sys.exit()

@@ -1,4 +1,7 @@
+mod_wsgi~=4.9.0
 Flask~=2.0.2
 Werkzeug~=2.0.2
-PyMySQL~=1.0.2
-mod_wsgi~=4.9.0
+rfeed~=1.1.1
+mysql-connector-python~=8.0.27
+DBUtils~=2.0.2
+pyTelegramBotAPI~=4.1.1

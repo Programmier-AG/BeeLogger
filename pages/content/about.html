@@ -11,6 +11,15 @@
     </div>
 
     <div class="about-block">
+        <h5>Feeds</h5>
+        <p>Die komplette Aktivität des Projekts kann über unsere Echtzeit-Feeds eingesehen werden (auch im RSS-Format!)</p>
+        <button class="btn" onclick="showFeeds();">Klicke hier, um dir die Feeds anzeigen zu lassen.</button>
+        <div class="feeds-frame-wrapper">
+            <iframe id="feeds-frame" class="hide" width="100%" height="100%" src=""></iframe>
+        </div>
+    </div>
+
+    <div class="about-block">
         <h5>Credits</h5>
         <p>Das Web-Dashboard, das Display und die Daten- und Statistiken-API (Schnittstelle)
             wurden von <b>Fabian Reinders und Sönke Klock</b> entwickelt.</p>

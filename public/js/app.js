@@ -223,6 +223,15 @@ function getWeightDelta(data) {
 }
 
 /**
+ * When the 'show feeds' button has been clicked on the dashboard
+ * (not the display!), redirect to the feed page instead of showing
+ * the iframe.
+ */
+ function showFeeds() {
+    window.location.href += '/rss/feeds';
+}
+
+/**
  * Handler function for when the API returns an error.
  * This function will catch the error and display an error
  * message to the user.

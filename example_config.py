@@ -13,6 +13,8 @@ web_port = 2688
 
 
 if not use_env:
+    telegram_bot_token = ""
+
     insert_token = ""
     display_token = ""
 
@@ -21,7 +23,6 @@ if not use_env:
     real_tare = {0: 0}  # tare value before insertion into database
 
     class MySql:
-        host = ""
         host = ""
         port = 3306
         user = "beelogger"
@@ -57,6 +58,8 @@ if not use_env:
 
 
 else:
+    telegram_bot_token = os.environ["telegram_bot_token"]
+
     insert_token = os.environ["insert_token"]
     display_token = os.environ["display_token"]
 

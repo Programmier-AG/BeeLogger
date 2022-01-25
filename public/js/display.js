@@ -146,8 +146,19 @@ function navigatePages(url) {
     M.Sidenav.getInstance(document.querySelector('#slide-out')).close();
 }
 
+/**
+ * Make 'feeds' iframe on about page visible and navigate it
+ * to the feeds index page.
+ */
+function showFeeds() {
+    let feedsFrame = document.getElementById('feeds-frame');
+    feedsFrame.classList.toggle('hide');
+    feedsFrame.setAttribute('src', '/rss/feeds');
+}
+
 // Register timers and tabs when document is fully loaded
 document.addEventListener('DOMContentLoaded', async () => {
     M.Tabs.init(document.querySelectorAll('.tabs'), {});
+    M.Collapsible.init(document.querySelectorAll('.collapsible'), {});
     setupTimers();
 });
