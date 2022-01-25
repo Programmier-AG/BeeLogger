@@ -1,7 +1,10 @@
-from flask.globals import request
-from database import Database
+import datetime
+
 from flask import request
+
 import config
+import notifications
+from database import Database
 
 
 def insert_data():
@@ -11,6 +14,21 @@ def insert_data():
         print("INSERT >> Received valid data: ", r_data)
 
         database = Database()
+
+        # TODO: Implement proper check system
+        # Check for weight differences > 500g
+        try:
+            current = database.get_data(datetime.date.strftime(datetime.date.today()-datetime.timedelta(days=5), "%Y-%m-%d"),
+                                        datetime.date.strftime(datetime.date.today(), "%Y-%m-%d"))[-1]
+            if current["weight"] - float(r_data["w"]) > 0.5:
+                notifications.Feed().push_notification("warning",
+                                                       "Gewichtsabfall!",
+                                                       "Das Gewicht ist bei der aktuellen Messung um %skg abgefallen!"
+                                                       % str(round(float(r_data["w"]) - current["weight"], 2)))
+        except Exception as e:
+            print("Error while performing data checks!\n"
+                  "ignoring to still have data inserted\n%s" % e)
+
         database.insert_data(r_data["t"], r_data["w"], r_data["h"])
 
         return "data inserted"
