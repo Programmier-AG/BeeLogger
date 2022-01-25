@@ -25,6 +25,8 @@ class Feed:
             "warning": "BeeLogger Bienen Alarm!"
         }
 
+        self.push_notification("admin", "Beelogger gestartet", "BeeLogger wurde gerade gestartet...")
+
     def push_notification(self, feed, title, text):
         """
         Creates new item on the warning feed. E.g. temperature critical.

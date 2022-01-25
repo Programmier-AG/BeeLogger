@@ -68,19 +68,18 @@ def add_header(r):
     return r
 
 
+if not config.telegram_bot_token == "":
+    telegram_bot_thread = threading.Thread(target=telegram_bot.infinity_polling)
+    telegram_bot_thread.daemon = True
+    telegram_bot_thread.start()
+else:
+    print(">>> Not starting telegram bot because there is no token")
+
 # Start the app
 if __name__ == "__main__":
-    if not config.telegram_bot_token == "":
-        telegram_bot_thread = threading.Thread(target=telegram_bot.infinity_polling)
-        telegram_bot_thread.daemon = True
-        telegram_bot_thread.start()
-    else:
-        print(">>> Not starting telegram bot because there is no token")
-
     try:
-        Feed().push_notification("admin", "Beelogger startup event", "Beelogger has been started and is now running...")
         app.run(host='0.0.0.0', port=config.web_port)
     except (KeyboardInterrupt, SystemExit):
         print(">>> Stopping BeeLogger...")
         database.connection_pool.close()
-        sys.exit()
+        sys.exit(0)
