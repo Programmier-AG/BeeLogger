@@ -75,6 +75,8 @@ if not config.telegram_bot_token == "":
 else:
     print(">>> Not starting telegram bot because there is no token")
 
+Feed().push_notification("admin", "Beelogger gestartet", "BeeLogger wurde gerade gestartet...")
+
 # Start the app
 if __name__ == "__main__":
     try:
