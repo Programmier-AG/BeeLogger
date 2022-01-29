@@ -1,8 +1,10 @@
+import datetime
 import os
 import sys
 import threading
 
-from flask import Flask
+import flask
+from flask import Flask, request, render_template
 
 import config
 from blueprints.api import api
@@ -53,9 +55,27 @@ app.register_blueprint(api, url_prefix='/api')
 # Initialize all routes for the RSS feeds
 app.register_blueprint(rss, url_prefix='/rss')
 
-# Append headers
+
+@app.route("/opt-in")
+def opt_in():
+    if "OPT_IN_COMNFIRM" in request.args.keys():
+        response = flask.make_response(flask.redirect("/"))
+        response.set_cookie("opt-in", "true", max_age=36000, expires=(datetime.date.today()+datetime.timedelta(days=365)).toordinal())
+        return response
+    return render_template("opt-in.html", privacy_url=config.privacy_url)
+@app.route("/opt-out")
+def opt_out():
+    response = flask.make_response(flask.redirect("/"))
+    response.delete_cookie("opt-in")
+    return response
+
 @app.after_request
-def add_header(r):
+def add_header_check_cookies(r):
+    if request.cookies.get("opt-in") != "true" and request.path != "/opt-in":
+        response = flask.make_response(flask.redirect(flask.url_for("opt_in")))
+        for cookie in request.cookies:
+            response.delete_cookie(cookie)
+        return response
     """
     Add headers to both force latest IE rendering engine or Chrome Frame,
     and also to cache the rendered page for 10 minutes.
