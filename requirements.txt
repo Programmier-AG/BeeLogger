@@ -7,3 +7,4 @@ rfeed~=1.1.1
 mysql-connector-python~=8.0.27
 DBUtils~=2.0.2
 pyTelegramBotAPI~=4.1.1
+schedule~=1.1.0

@@ -7,9 +7,8 @@ from config import FileBackup, MySql
 
 
 def run_backup():
-    if not os.path.isfile("backup.py"):
-        print("You need to start this script from the directory it's contained in. Please cd into that folder.")
-        exit()
+    if not os.path.isfile("backup.py") and False:
+        raise "You need to start this script from the directory it's contained in. Please cd into that folder."
 
     print("checking backup directory")
 
@@ -18,7 +17,7 @@ def run_backup():
         os.mkdir("backup/")
 
     print("parsing backup name")
-    dir_name = time.asctime()
+    dir_name = time.strftime("%d-%m-%Y_%a_%H-%M-%S")
     dest = "backup/" + dir_name + "/"
     dest = dest.replace(" ", "-")
 
@@ -51,11 +50,18 @@ def run_backup():
 
     # cmd = "sshpass -p '%s' scp -P %s '%s.zip' '%s@%s:%s'" % (FileBackup.password, FileBackup.port, dest[:-1], FileBackup.user, FileBackup.host, FileBackup.directory)
 
-    print(cmd)
+    # print(cmd)
     print(os.popen(cmd).read())
 
 
-try:
-    run_backup()
-except Exception as e:
-    notifications.Feed().push_notification("admin", "Backup Fehler", "Beim Backupvorgang ist es zu einem Fehler gekommen!\n" + e)
+def run_with_notify():
+    try:
+        run_backup()
+        notifications.Feed().push_notification("admin", "Backup Erfolg", "Der Backupvorgang wurde erfolgreich abgeschlossen!")
+    except Exception as e:
+        print(">!> Error while running backup!\n"+str(e))
+        notifications.Feed().push_notification("admin", "Backup Fehler", "Beim Backupvorgang ist es zu einem Fehler gekommen!\n" + str(e))
+
+
+if __name__ == "__main__":
+    run_with_notify()
