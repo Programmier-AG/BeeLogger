@@ -5,7 +5,7 @@
 {% block content %}
 <main>
     <div class="container">
-        <a class="btn" style="margin-top: 30px;" href="/rss/{{ feed_name }}/?pretty">Zurück zum Feed</a>
+        <a class="btn" style="margin-top: 30px;" onclick="history.back();">Zurück zum Feed</a>
         <h1>{{ article["title"] }}</h1>
         <h5>{{ article["time"] }}</h5>
         <p style="font-size: 120%;">{{ article["text"] }}</p>
