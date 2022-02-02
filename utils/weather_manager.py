@@ -1,5 +1,7 @@
 import requests
 from geopy.geocoders import Nominatim
+from babel.dates import format_datetime, format_date
+
 
 import config
 
@@ -18,4 +20,9 @@ def update_weather():
                        f"&appid={config.Weather.api_key}").json()
 
     data["now"] = raw["current"]
+    data["now"]["datetime"] = format_datetime(data["now"]["dt"], "EEEE dd.MM.", locale=config.Weather.lang)
     data["forecast"] = raw["daily"]
+
+    for i in range(len(data["forecast"])-1):
+        data["forecast"][i]["datetime"] = format_datetime(data["forecast"][i]["dt"], "EEE dd.MM.", locale=config.Weather.lang)
+
