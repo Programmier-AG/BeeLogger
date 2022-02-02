@@ -1,0 +1,52 @@
+<div id="weather-card" class="row">
+    <div id="current-weather" class="col s4">
+        test
+    </div>
+    <div id="weather-forecast" class="col s8">
+        <div class="row">
+            {% for data in weather.forecast[:4] %}
+            <div class="weather-set col s3" style="background-color: {% if loop.index % 2 == 0 %}#2060CC{% else %}#2868FF{% endif %}">
+                <img src="/api/weather_icon?icon={{ data.weather[0].id }}" alt="{{ data.weather[0].description }}" class="weather-icon">
+
+                <div class="left-align">
+                    <p class="weather-temp">{{ data.temp.day }}°C</p>
+                </div>
+                <div class="right-align">
+                    <p class="weather-desc">{{ data.weather[0].description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    #weather-card {
+        color: white;
+        background-color: #2060CC;
+    }
+    #current-weather {
+        margin: auto;
+    }
+    #weather-forecast {
+        padding: 0 !important;
+    }
+    #weather-forecast .row {
+        margin: 0;
+    }
+    .weather-icon {
+        display: block;
+        margin: auto auto;
+        max-height: 50px;
+        max-width: 50px;
+    }
+    .weather-set {
+        padding: 10px !important;
+    }
+    .weather-temp {
+        margin: 0;
+    }
+    .weather-desc {
+        margin: 0;
+    }
+</style>
