@@ -1,0 +1,78 @@
+<div id="weather-card" class="row">
+    <div id="current-weather" class="col s6 m4">
+        <p>Wetter aktuell: {{ weather.now.datetime }}</p>
+        <div class="row">
+            <div class="col s3">
+                <img src="/api/weather_icon?icon={{ weather.now.weather[0].id }}" alt="{{ weather.now.weather[0].description }}" class="weather-icon">
+            </div>
+            <div class="col s9">
+                <p>{{ weather.now.weather[0].description }}</p>
+            </div>
+        </div>
+        <div id="current-weather-details" class="row">
+            <div class="col s4">
+                <p>{{ weather.now.temp }}°C</p>
+            </div>
+            <div class="col s8" style="text-align: right">
+                <p>{{ weather.now.humidity }}% Luftfeuchte</p>
+            </div>
+        </div>
+    </div>
+    <div id="weather-forecast" class="col s6 m8">
+        <div class="row">
+            {% for data in weather.forecast[1:5] %}
+            <div class="weather-set col s6 m3" style="background-color: {% if loop.index % 2 == 0 %}#2060CC{% else %}#2868FF{% endif %}">
+                <p>{{ data.datetime }}</p>
+                <img src="/api/weather_icon?icon={{ data.weather[0].id }}" alt="{{ data.weather[0].description }}" class="weather-icon">
+
+                <div class="row">
+                    <div class="col s5"><p class="weather-temp">{{ data.temp.day }}°C</p></div>
+                    <div class="col s7" style="text-align: right"><p class="weather-temp">{{ data.humidity }}%RH</p></div>
+                </div>
+                <p class="weather-desc">{{ data.weather[0].description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    #weather-card {
+        color: white;
+        background-color: #2060CC;
+    }
+    #current-weather {
+        margin: auto;
+    }
+    #current-weather-details .col p {
+        margin: 0;
+    }
+    #weather-forecast {
+        padding: 0 !important;
+    }
+    #current-weather .row,
+    #weather-forecast .row {
+        margin: 0;
+    }
+    .weather-icon {
+        display: block;
+        margin: auto auto;
+        max-height: 50px;
+        max-width: 50px;
+    }
+    .weather-set {
+        padding: 10px !important;
+    }
+    .weather-set p {
+        margin: 0;
+    }
+    .weather-set .row .col {
+        padding: 0;
+    }
+    .weather-temp {
+        margin: 0;
+    }
+    .weather-desc {
+        margin: 0;
+    }
+</style>
