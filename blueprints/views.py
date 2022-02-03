@@ -9,6 +9,7 @@ import ssl
 from flask import Blueprint
 from flask import render_template, request, redirect
 import config
+import utils.weather_manager
 
 # Initialize Blueprint for visible routes with templates
 views = Blueprint("views", __name__)
@@ -16,7 +17,7 @@ views = Blueprint("views", __name__)
 # /
 @views.route("/")
 def dashboard():
-    return render_template("index.html", pages=config.embedded_pages)
+    return render_template("index.html", pages=config.embedded_pages, weather_data=utils.weather_manager.data)
 
 # /display
 @views.route("/display")

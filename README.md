@@ -57,6 +57,7 @@ A full guide to both a [&rarr; Docker (& Docker Compose)](https://github.com/Pro
 * [Materialize](https://materializecss.com/)
 * [Material Icons](https://fonts.google.com/icons)
 * [Google Charts](https://developers.google.com/chart)
+* [amCharts weather icons](https://www.amcharts.com/free-animated-svg-weather-icons/) ([License](https://creativecommons.org/licenses/by/4.0/) CC BY 4.0; file names changed)
 
 ### Docker
 * [wait-for-it](https://github.com/vishnubob/wait-for-it) ([License](https://github.com/vishnubob/wait-for-it/blob/master/LICENSE) MIT)

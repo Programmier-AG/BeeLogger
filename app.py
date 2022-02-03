@@ -7,13 +7,15 @@ import flask
 from flask import Flask, request, render_template
 
 import config
+import utils.scheduler
+import utils.weather_manager
 from blueprints.api import api
 from blueprints.rss import rss
 from blueprints.views import views
 from database import Database
 from notifications import Feed
-from utils.jsonencoder import CustomJSONEncoder
 from telegram import bot as telegram_bot
+from utils.jsonencoder import CustomJSONEncoder
 
 print("waiting until db is ready")
 os.popen(f"/bin/bash ./docker/wait-for-it.sh {config.MySql.host}:{str(config.MySql.port)}").read()
@@ -94,6 +96,10 @@ if not config.telegram_bot_token == "":
     telegram_bot_thread.start()
 else:
     print(">>> Not starting telegram bot because there is no token")
+
+scheduler_thread = threading.Thread(target=utils.scheduler.run_tasks)
+scheduler_thread.daemon = True
+scheduler_thread.start()
 
 Feed().push_notification("admin", "Beelogger gestartet", "BeeLogger wurde gerade gestartet...")
 

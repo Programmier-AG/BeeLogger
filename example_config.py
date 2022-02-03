@@ -53,6 +53,11 @@ if not use_env:
         password = ""
         reciever = ""
 
+    class Weather:
+        location = ""
+        api_key = ""
+        lang = ""
+
 
     embedded_pages = {
 
@@ -103,6 +108,11 @@ else:
         user = os.environ["mail_user"]
         password = os.environ["mail_pass"]
         reciever = os.environ["mail_rec"]
+
+    class Weather:
+        location = os.environ["weather_location"]
+        api_key = os.environ["weather_apikey"]
+        lang = os.environ["weather_lang"]
 
 
     embedded_pages = json.loads(os.environ["pages"])
