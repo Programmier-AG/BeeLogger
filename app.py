@@ -26,6 +26,9 @@ if not os.path.isfile("app.py"):
     print("You need to start this script from the directory it's contained in. Please cd into that folder.")
     exit()
 
+path = os.path.abspath("logs")
+if not os.path.exists(path): os.mkdir(path)
+
 print("################################")
 print("#           BeeLogger          #")
 print("#    -----------------------   #")

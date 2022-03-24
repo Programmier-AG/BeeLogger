@@ -42,6 +42,8 @@ RUN find /usr/lib/python3.9/site-packages -iname "*.so" -exec sh -c 'x="{}"; mv 
 
 RUN chmod +x ./docker/wait-for-it.sh
 
+RUN chmod 764 /app/ -R
+
 RUN chown www-data:www-data /app/ -R
 
 EXPOSE 8000
