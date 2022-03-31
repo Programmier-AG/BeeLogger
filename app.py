@@ -87,7 +87,17 @@ def check_provider():
 
 @app.after_request
 def add_header_check_cookies(r):
-    if request.cookies.get("opt-in") != "true" and request.path.replace("/", "") not in ["opt-in", "display", "healthcheck", "opt-out", "api", "rss"]:
+    if request.cookies.get("opt-in") != "true" and request.path.split("/")[1] not in ["opt-in",
+                                                                                      "display",
+                                                                                      "healthcheck",
+                                                                                      "opt-out",
+                                                                                      "api",
+                                                                                      "rss",
+                                                                                      "lib",
+                                                                                      "assets",
+                                                                                      "css",
+                                                                                      "js",
+                                                                                      "favicon.ico"]:
         response = flask.make_response(flask.redirect(
             flask.url_for("opt_in", _external=True, _scheme=request.scheme)
         ))
