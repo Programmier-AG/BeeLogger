@@ -74,6 +74,17 @@ def opt_out():
     response.delete_cookie("opt-in")
     return response
 
+# Route to check if provider can insert
+@app.route("/healthcheck/")
+def check_provider():
+    if "insert" in request.args.keys():
+        if request.args["token"] == config.insert_token:
+            return "OK"
+        else:
+            return "Invalid token", 401
+    else:
+        return "Don't know how to check", 400
+
 @app.after_request
 def add_header_check_cookies(r):
     if request.cookies.get("opt-in") != "true" and request.path != "/opt-in":
