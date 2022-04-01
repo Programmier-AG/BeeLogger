@@ -81,7 +81,7 @@ else:
         host = os.environ.get("MYSQL_HOST", "")
         port = int(os.environ.get("MYSQL_PORT", 3306))
         user = os.environ.get("MYSQL_USER", "beelogger")
-        password = os.environ.get("MYSQL_PASSWORD", "")
+        password = os.environ.get("MYSQL_PASS", "")
         db = os.environ.get("MYSQL_DB", "beelogger")
 
 
@@ -89,7 +89,7 @@ else:
         host = os.environ.get("MYSQL_BACKUP_HOST", "")
         port = int(os.environ.get("MYSQL_BACKUP_PORT", 3306))
         user = os.environ.get("MYSQL_BACKUP_USER", "")
-        password = os.environ.get("MYSQL_BACKUP_PASSWORD", "")
+        password = os.environ.get("MYSQL_BACKUP_PASS", "")
         db = os.environ.get("MYSQL_BACKUP_DB", "")
 
 
@@ -97,7 +97,7 @@ else:
         host = os.environ.get("FILE_BACKUP_HOST", "")
         port = int(os.environ.get("FILE_BACKUP_PORT", 22))
         user = os.environ.get("FILE_BACKUP_USER", "")
-        password = os.environ.get("FILE_BACKUP_PASSWORD", "")
+        password = os.environ.get("FILE_BACKUP_PASS", "")
         key = os.environ.get("FILE_BACKUP_KEY", "")
         directory = os.environ.get("FILE_BACKUP_DIRECTORY", "")
 
@@ -106,7 +106,7 @@ else:
         host = os.environ.get("MAIL_HOST", "")
         port = int(os.environ.get("MAIL_PORT", 465))
         user = os.environ.get("MAIL_USER", "")
-        password = os.environ.get("MAIL_PASSWORD", "")
+        password = os.environ.get("MAIL_PASS", "")
         reciever = os.environ.get("MAIL_RECIEVER", "")
 
     class Weather:
