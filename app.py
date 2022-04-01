@@ -26,6 +26,9 @@ if not os.path.isfile("app.py"):
     print("You need to start this script from the directory it's contained in. Please cd into that folder.")
     exit()
 
+path = os.path.abspath("logs")
+if not os.path.exists(path): os.mkdir(path)
+
 print("################################")
 print("#           BeeLogger          #")
 print("#    -----------------------   #")
@@ -71,10 +74,33 @@ def opt_out():
     response.delete_cookie("opt-in")
     return response
 
+# Route to check if provider can insert
+@app.route("/healthcheck/")
+def check_provider():
+    if "insert" in request.args.keys():
+        if request.args["token"] == config.insert_token:
+            return "OK"
+        else:
+            return "Invalid token", 401
+    else:
+        return "Don't know how to check", 400
+
 @app.after_request
 def add_header_check_cookies(r):
-    if request.cookies.get("opt-in") != "true" and request.path != "/opt-in":
-        response = flask.make_response(flask.redirect(flask.url_for("opt_in")))
+    if request.cookies.get("opt-in") != "true" and request.path.split("/")[1] not in ["opt-in",
+                                                                                      "display",
+                                                                                      "healthcheck",
+                                                                                      "opt-out",
+                                                                                      "api",
+                                                                                      "rss",
+                                                                                      "lib",
+                                                                                      "assets",
+                                                                                      "css",
+                                                                                      "js",
+                                                                                      "favicon.ico"]:
+        response = flask.make_response(flask.redirect(
+            flask.url_for("opt_in", _external=True, _scheme=request.scheme)
+        ))
         for cookie in request.cookies:
             response.delete_cookie(cookie)
         return response
