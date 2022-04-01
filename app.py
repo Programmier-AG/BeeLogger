@@ -98,9 +98,8 @@ def add_header_check_cookies(r):
                                                                                       "css",
                                                                                       "js",
                                                                                       "favicon.ico"]:
-        response = flask.make_response(flask.redirect(
-            flask.url_for("opt_in", _external=True, _scheme=request.scheme)
-        ))
+        response = flask.make_response(flask.redirect("/opt-in"))
+
         for cookie in request.cookies:
             response.delete_cookie(cookie)
         return response
@@ -128,6 +127,7 @@ scheduler_thread.daemon = True
 scheduler_thread.start()
 
 Feed().push_notification("admin", "Beelogger gestartet", "BeeLogger wurde gerade gestartet...")
+
 
 # Start the app
 if __name__ == "__main__":
