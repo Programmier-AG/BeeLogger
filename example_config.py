@@ -65,54 +65,54 @@ if not use_env:
 
 
 else:
-    telegram_bot_token = os.environ["telegram_bot_token"]
+    telegram_bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 
-    privacy_url = os.environ["privacy_url"]
+    privacy_url = os.environ.get("PRIVACY_URL", "")
 
-    insert_token = os.environ["insert_token"]
-    display_token = os.environ["display_token"]
+    insert_token = os.environ.get("INSERT_TOKEN", "")
+    display_token = os.environ.get("DISPLAY_TOKEN", "")
 
-    correction = json.loads(os.environ["correction"], object_hook=jsonkeys2int)
-    tare = json.loads(os.environ["tare"], object_hook=jsonkeys2int)
-    real_tare = json.loads(os.environ["real_tare"], object_hook=jsonkeys2int)
+    correction = json.loads(os.environ.get("CORRECTION", '"0": 1'), object_hook=jsonkeys2int)
+    tare = json.loads(os.environ.get("TARE", '"0": 0'), object_hook=jsonkeys2int)
+    real_tare = json.loads(os.environ.get("REAL_TARE", '"0": 0'), object_hook=jsonkeys2int)
 
 
     class MySql:
-        host = os.environ["mysql_host"]
-        port = int(os.environ["mysql_port"])
-        user = os.environ["mysql_user"]
-        password = os.environ["mysql_pass"]
-        db = os.environ["mysql_db"]
+        host = os.environ.get("MYSQL_HOST", "")
+        port = int(os.environ.get("MYSQL_PORT", 3306))
+        user = os.environ.get("MYSQL_USER", "beelogger")
+        password = os.environ.get("MYSQL_PASSWORD", "")
+        db = os.environ.get("MYSQL_DB", "beelogger")
 
 
     class MySqlBackup:
-        host = os.environ["mysql_backup_host"]
-        port = int(os.environ["mysql_backup_port"])
-        user = os.environ["mysql_backup_user"]
-        password = os.environ["mysql_backup_pass"]
-        db = os.environ["mysql_backup_db"]
+        host = os.environ.get("MYSQL_BACKUP_HOST", "")
+        port = int(os.environ.get("MYSQL_BACKUP_PORT", 3306))
+        user = os.environ.get("MYSQL_BACKUP_USER", "")
+        password = os.environ.get("MYSQL_BACKUP_PASSWORD", "")
+        db = os.environ.get("MYSQL_BACKUP_DB", "")
 
 
     class FileBackup:
-        host = os.environ["backup_host"]
-        port = int(os.environ["backup_port"])
-        user = os.environ["backup_user"]
-        password = os.environ["backup_pass"]
-        key = os.environ["backup_key"]
-        directory = os.environ["backup_dir"]
+        host = os.environ.get("FILE_BACKUP_HOST", "")
+        port = int(os.environ.get("FILE_BACKUP_PORT", 22))
+        user = os.environ.get("FILE_BACKUP_USER", "")
+        password = os.environ.get("FILE_BACKUP_PASSWORD", "")
+        key = os.environ.get("FILE_BACKUP_KEY", "")
+        directory = os.environ.get("FILE_BACKUP_DIRECTORY", "")
 
 
     class Mail:
-        host = os.environ["mail_host"]
-        port = int(os.environ["mail_port"])
-        user = os.environ["mail_user"]
-        password = os.environ["mail_pass"]
-        reciever = os.environ["mail_rec"]
+        host = os.environ.get("MAIL_HOST", "")
+        port = int(os.environ.get("MAIL_PORT", 465))
+        user = os.environ.get("MAIL_USER", "")
+        password = os.environ.get("MAIL_PASSWORD", "")
+        reciever = os.environ.get("MAIL_RECIEVER", "")
 
     class Weather:
-        location = os.environ["weather_location"]
-        api_key = os.environ["weather_apikey"]
-        lang = os.environ["weather_lang"]
+        location = os.environ.get("WEATHER_LOCATION", "")
+        api_key = os.environ.get("WEATHER_API_KEY", "")
+        lang = os.environ.get("WEATHER_LANG", "de")
 
 
-    embedded_pages = json.loads(os.environ["pages"])
+    embedded_pages = json.loads(os.environ.get("EMBEDDED_PAGES", '{}'))
