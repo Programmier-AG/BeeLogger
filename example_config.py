@@ -68,6 +68,8 @@ else:
     telegram_bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 
     privacy_url = os.environ.get("PRIVACY_URL", "")
+    server_scheme = os.environ.get("SERVER_SCHEME", "http")
+    server_name = os.environ.get("SERVER_NAME", "localhost")
 
     insert_token = os.environ.get("INSERT_TOKEN", "")
     display_token = os.environ.get("DISPLAY_TOKEN", "")
