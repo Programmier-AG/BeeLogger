@@ -49,6 +49,7 @@ except Exception as exception:
 # Initialize Flask app
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SERVER_NAME'] = config.server_name
 app.json_encoder = CustomJSONEncoder
 
 # Initialize all routes that display a rendered template
@@ -98,7 +99,7 @@ def add_header_check_cookies(r):
                                                                                       "css",
                                                                                       "js",
                                                                                       "favicon.ico"]:
-        response = flask.make_response(flask.redirect("/opt-in"))
+        response = flask.make_response(flask.redirect(flask.url_for("opt_in", _external=True, _scheme=config.server_scheme)))
 
         for cookie in request.cookies:
             response.delete_cookie(cookie)
