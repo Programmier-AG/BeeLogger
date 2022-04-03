@@ -72,7 +72,7 @@ def opt_in():
 @app.route("/opt-out")
 def opt_out():
     response = flask.make_response(flask.redirect(flask.url_for("views.dashboard", _external=True, _scheme=config.server_scheme)))
-    response.delete_cookie("opt-in")
+    response.headers.add('Set-Cookie', 'opt-in=false; SameSite=None; Secure; Max-Age=0')  # Delete opt-in cookie
     return response
 
 # Route to check if provider can insert
