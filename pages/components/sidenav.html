@@ -18,13 +18,13 @@
         <li><div class="divider"></div></li>
         <li><a class="subheader">Externe Seiten</a></li>
         {% for link in links.keys() %}
-            <li><a class="waves-effect" href="/{{ link }}"><i class="material-icons-outlined">link</i>{{ link }}</a></li>
+            <li><a class="waves-effect" href="/{{ link }}/"><i class="material-icons-outlined">link</i>{{ link }}</a></li>
         {% endfor %}
     {% endif %}
 
     <li><div class="divider"></div></li>
     <li><a class="subheader">Sonstiges</a></li>
-    <li><a class="waves-effect" href="/rss/feeds"><i class="material-icons-outlined">feed</i>Feeds</a></li>
+    <li><a class="waves-effect" href="/rss/feeds/"><i class="material-icons-outlined">feed</i>Feeds</a></li>
     <li><div class="divider"></div></li>
     <br>
     
@@ -33,6 +33,6 @@
             class="modal-trigger">About</a>
         <a href="#contactModal" class="modal-trigger">Kontakt</a>
         <br>
-        <a href="/opt-out">Cookies ablehnen</a>
+        <a href="/opt-out/">Cookies ablehnen</a>
     </div>
 </ul>
