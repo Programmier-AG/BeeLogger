@@ -228,7 +228,7 @@ function getWeightDelta(data) {
  * the iframe.
  */
  function showFeeds() {
-    window.location.href += '/rss/feeds';
+    window.location.href += '/rss/feeds/';
 }
 
 /**

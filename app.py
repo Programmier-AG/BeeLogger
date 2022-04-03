@@ -52,6 +52,10 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SERVER_NAME'] = config.server_name
 app.json_encoder = CustomJSONEncoder
 
+# Set app redirect scheme
+if config.server_scheme == "https":
+    app.config['PREFERRED_URL_SCHEME'] = "https"
+
 # Initialize all routes that display a rendered template
 app.register_blueprint(views, url_prefix='/')
 
@@ -62,14 +66,14 @@ app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(rss, url_prefix='/rss')
 
 
-@app.route("/opt-in")
+@app.route("/opt-in/")
 def opt_in():
     if "OPT_IN_COMNFIRM" in request.args.keys():
         response = flask.make_response(flask.redirect(flask.url_for("views.dashboard", _external=True, _scheme=config.server_scheme)))
         response.headers.add('Set-Cookie', 'opt-in=true; SameSite=None; Secure; Max-Age=2592000')  # Set opt-in cookie for 30 days
         return response
     return render_template("opt-in.html", privacy_url=config.privacy_url)
-@app.route("/opt-out")
+@app.route("/opt-out/")
 def opt_out():
     response = flask.make_response(flask.redirect(flask.url_for("views.dashboard", _external=True, _scheme=config.server_scheme)))
     response.headers.add('Set-Cookie', 'opt-in=false; SameSite=None; Secure; Max-Age=0')  # Delete opt-in cookie
