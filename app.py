@@ -70,13 +70,13 @@ app.register_blueprint(rss, url_prefix='/rss')
 def opt_in():
     if "OPT_IN_COMNFIRM" in request.args.keys():
         response = flask.make_response(flask.redirect(flask.url_for("views.dashboard", _external=True, _scheme=config.server_scheme)))
-        response.headers.add('Set-Cookie', 'opt-in=true; SameSite=None; Secure; Max-Age=2592000')  # Set opt-in cookie for 30 days
+        response.headers.add('Set-Cookie', 'opt-in=true; Path=/; SameSite=None; Secure; Max-Age=2592000')  # Set opt-in cookie for 30 days
         return response
     return render_template("opt-in.html", privacy_url=config.privacy_url)
 @app.route("/opt-out/")
 def opt_out():
     response = flask.make_response(flask.redirect(flask.url_for("views.dashboard", _external=True, _scheme=config.server_scheme)))
-    response.headers.add('Set-Cookie', 'opt-in=false; SameSite=None; Secure; Max-Age=0')  # Delete opt-in cookie
+    response.headers.add('Set-Cookie', 'opt-in=false; Path=/; SameSite=None; Secure; Max-Age=0')  # Delete opt-in cookie
     return response
 
 # Route to check if provider can insert
