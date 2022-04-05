@@ -20,7 +20,7 @@ def dashboard():
     return render_template("index.html", pages=config.embedded_pages, weather_data=utils.weather_manager.data)
 
 # /display
-@views.route("/display")
+@views.route("/display/")
 def display():
     if "token" not in request.args.keys():
         return redirect("/")
@@ -30,7 +30,7 @@ def display():
     return render_template("display.html", pages=config.embedded_pages)
 
 # /<embedded_page>
-@views.route("/<page>")
+@views.route("/<page>/")
 def embeddedPage(page):
     pages = config.embedded_pages
 
@@ -40,7 +40,7 @@ def embeddedPage(page):
     return render_template("embedded.html", page=pages[page])
 
 # /post_contact
-@views.route("/post_contact", methods=["POST"])
+@views.route("/post_contact/", methods=["POST"])
 def contactPost():
     message = request.form["message"]
     name = request.form["name"]
