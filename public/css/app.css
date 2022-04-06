@@ -88,37 +88,38 @@ h3.chart-title {
 }
 
 #beelogger-current-data-error-box {
-    height: 200px;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     color: #fff;
-    margin: 5px 30px 5px 20px;
-    padding: 0px 30px 0px 30px;
+    margin: 5px 20px 5px 20px;
+    padding: 15px 30px 15px 30px;
 }
 
 #beelogger-charts-error-box {
-    height: 200px;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     color: #fff;
-    margin: 5px 30px 5px 20px;
-    padding: 0px 30px 0px 30px;
+    margin: 5px 20px 5px 20px;
+    padding: 15px 30px 15px 30px;
 }
+
 #beelogger-charts-loader {
-    height: 200px;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     color: #fff;
-    margin: 5px 30px 5px 20px;
+    margin: 5px 20px 5px 20px;
     padding: 0px 30px 0px 30px;
 }
 
