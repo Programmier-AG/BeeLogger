@@ -41,14 +41,15 @@ async function drawCharts(data) {
         infoTextElement.innerHTML = infoText;
     });
 
-    document.getElementById('charts').classList.remove('hide');
+    // document.getElementById('charts').classList.remove('hide');
 
     await drawCompareChart(data, false);
     await drawTempChart(data);
     await drawWeightChart(data);
     await drawHumidityChart(data);
 
-    document.getElementById('beelogger-charts-loader').classList.add('hide');
+    document.getElementById('beelogger-daterange-icon').classList.remove('hide');
+    document.getElementById('beelogger-preloader').classList.remove('active');
 }
 
 /**

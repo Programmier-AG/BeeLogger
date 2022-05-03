@@ -140,3 +140,13 @@ footer {
     text-align: center;
     margin-bottom: 0%;
 }
+
+/* Credit: https://stackoverflow.com/a/55788640/18085012 */
+.loader {
+  position: absolute;
+  margin: auto;
+  top: 50vh;
+  bottom: 50vh;
+  left: 0;
+  right: 0;
+}

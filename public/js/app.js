@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * @returns {Promise} Resolves when done re-drawing the charts and rejects on error
  */
 function applyDateRange() {
+    console.log('Applying date range');
     return new Promise(async (resolve, reject) => {
         document.getElementById('beelogger-charts-error-box').classList.add('hide');
 
@@ -120,12 +121,13 @@ function applyDateRange() {
         diff = Math.abs(diff.toObject().days);
     
         // Append 'compressed' option when difference is > 10 days
-        var compressed = diff > 10 ? true : false;
+        var compressed = diff > 10;
     
         fromDate = fromDate.toISODate();
         toDate = toDate.toISODate();
     
-        document.getElementById('beelogger-charts-loader').classList.remove('hide');
+        document.getElementById('beelogger-daterange-icon').classList.add('hide');
+        document.getElementById('beelogger-preloader').classList.add('active');
     
         // Get data for the specified time span
         var data = await beeLogger.getData(fromDate, toDate, compressed)
@@ -156,11 +158,8 @@ function applyDateRange() {
  */
 async function createChartsForDateRange() {
     var chartsSection = document.getElementById('charts');
-    // Hide charts section for the time being
-    chartsSection.classList.add('hide');
     
     applyDateRange()
-        .then(() => chartsSection.classList.remove('hide'))
         // Error already handled by `applyDateRange()`
         .catch(() => chartsSection.classList.add('hide'));
 }
@@ -301,8 +300,10 @@ function errorHandler(scope, err) {
             let chartsErrorBox = document.getElementById('beelogger-charts-error-box');
             chartsErrorBox.innerHTML = error.title +  error.description;
             chartsErrorBox.classList.remove('hide');
-            document.getElementById('charts').classList.add('hide');
-            document.getElementById('beelogger-charts-loader').classList.add('hide');
+            // document.getElementById('charts').classList.add('hide');
+            document.getElementById('beelogger-preloader').classList.remove('active');
+            document.getElementById('beelogger-daterange-icon').classList.remove('hide');
+
             break;
 
         // Something mandatory is broken, show error message across the entire screen
