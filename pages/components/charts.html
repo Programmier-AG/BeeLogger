@@ -1,27 +1,35 @@
-<h3 id="compare" class="chart-title">Vergleichsansicht</h3>
-<p class="display-info"></p>
-<div id="chartContainer">
-    <div id="chart"></div>
+<div id="compare-chart" class="section scrollspy">
+    <h3 id="compare" class="chart-title">Vergleichsansicht</h3>
+    <p class="display-info"></p>
+    <div id="chartContainer">
+        <div id="chart"></div>
+    </div>
+
+    <div class="container center">
+        <div class="switch">
+            <label>
+                <input id="scale-switch" type="checkbox">
+                <span class="lever"></span>
+                <p style="font-size: 20px;">Separater Maßstab für Gewicht</p>
+            </label>
+        </div>
+    </div>
 </div>
 
-<div class="container center">
-  <div class="switch">
-    <label>
-      <input id="scale-switch" type="checkbox">
-      <span class="lever"></span>
-      <p style="font-size: 20px;">Separater Maßstab für Gewicht</p>
-    </label>
-  </div>
+<div id="weight-chart" class="section scrollspy">
+    <h3 id="weight-chart-title" class="chart-title">Gewicht</h3>
+    <p class="display-info"></p>
+    <div id="weight_chart" class="detail-chart"></div>
 </div>
 
-<h3 id="temperature-chart-title" class="chart-title">Temperatur</h3>
-<p class="display-info"></p>
-<div id="temp_chart" class="detail-chart"></div>
+<div id="temp-chart" class="section scrollspy">
+    <h3 id="temperature-chart-title" class="chart-title">Temperatur</h3>
+    <p class="display-info"></p>
+    <div id="temp_chart" class="detail-chart"></div>
+</div>
 
-<h3 id="weight-chart-title" class="chart-title">Gewicht</h3>
-<p class="display-info"></p>
-<div id="weight_chart" class="detail-chart"></div>
-
-<h3 id="humidity-chart-title" class="chart-title">Luftfeuchtigkeit</h3>
-<p class="display-info"></p>
-<div id="humidity_chart" class="detail-chart"></div>
+<div id="humid-chart" class="section scrollspy">
+    <h3 id="humidity-chart-title" class="chart-title">Luftfeuchtigkeit</h3>
+    <p class="display-info"></p>
+    <div id="humidity_chart" class="detail-chart"></div>
+</div>

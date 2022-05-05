@@ -35,7 +35,7 @@ header a:hover {
     color: #fff;
 }
 
-main, #chart {
+#chart {
     height: 90vh !important;
 }
 
@@ -120,7 +120,7 @@ h3.chart-title {
     text-align: center;
     color: #fff;
     margin: 5px 20px 5px 20px;
-    padding: 0px 30px 0px 30px;
+    padding: 0 30px 0 30px;
 }
 
 footer {
@@ -138,7 +138,7 @@ footer {
 }
 .display-info {
     text-align: center;
-    margin-bottom: 0%;
+    margin-bottom: 0;
 }
 
 /* Credit: https://stackoverflow.com/a/55788640/18085012 */
@@ -149,4 +149,29 @@ footer {
   bottom: 50vh;
   left: 0;
   right: 0;
+}
+
+main {
+    position: fixed;
+    right: 0;
+    width: calc(100vw - 300px);
+    height: calc(100vh - 64px);
+    overflow-y: scroll;
+}
+@media screen and (max-width: 992px) {
+    main {
+        width: 100vw;
+    }
+}
+@media screen and (min-width: 992px) {
+    .modal {
+        width: calc(100vw - 400px) !important;
+        margin-right: 50px !important;
+    }
+}
+#slide-out {
+    position: fixed;
+    height: calc(100vh - 64px);
+    top: 64px;
+    left: 0;
 }

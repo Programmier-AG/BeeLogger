@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     M.Modal.init(document.querySelectorAll('.modal'), {});
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
+    M.ScrollSpy.init(document.querySelectorAll('.scrollspy'), {});
 
     datePickerFrom = M.Datepicker.init(document.getElementById('from-date-input'), {
         minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
