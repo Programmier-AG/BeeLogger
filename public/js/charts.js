@@ -29,6 +29,10 @@ async function drawCharts(data) {
     }
 
     data = data['data'];
+    let timespan = document.getElementById("delta-span-input").value * 60000; // in ms
+    if (timespan === undefined || timespan == null || timespan === 0) {
+        timespan = 86400000; // 24h
+    }
 
     if (data == undefined || data == [] || Object.keys(data) == 0) {
         errorHandler('charts', 204);
@@ -46,6 +50,7 @@ async function drawCharts(data) {
     await drawCompareChart(data, false);
     await drawTempChart(data);
     await drawWeightChart(data);
+    await drawDeltaChart(data, timespan);
     await drawHumidityChart(data);
 
     document.getElementById('beelogger-charts-loader').classList.add('hide');
@@ -139,7 +144,7 @@ async function drawTempChart(data) {
 }
 
 /**
- * Generates and renders the weight chart on the page.
+ * Generates and renders the weight delta chart on the page.
  * 
  * @param {Array} data Array containing the data records that the graph should be generated from
  */
@@ -154,6 +159,50 @@ async function drawWeightChart(data) {
     var weightDataTable = google.visualization.arrayToDataTable(weightData);
     var weightChart = new google.visualization.LineChart(document.getElementById('weight_chart'));
     
+    weightChart.draw(weightDataTable, {
+        height: '100%',
+        lineWidth: 2,
+        colors: ['black'],
+        chartArea: {
+            left: '10%',
+            top: '10%',
+            right: '10%',
+            width: '100%',
+            height: '70%'
+        },
+        legend: {
+            position: 'bottom'
+        },
+    });
+}
+
+/**
+ * Generates and renders the weight chart on the page.
+ *
+ * @param {Array} data Array containing the data records that the graph should be generated from
+ * @param {number} timespan The amount of time between records used for delta calculation (in between will be ignored)
+ */
+async function drawDeltaChart(data, timespan) {
+    let deltaData = [['Gemessen', 'Delta (g)']];
+
+    let i = Object.keys(data).length - 1;
+    while (i !== 0) {
+        let newer_measured = new Date(data[i].measured);
+        let newer_weight = data[i].weight;
+
+        while (newer_measured.getTime() - Date.parse(data[i].measured) < timespan && i > 0) {
+            i--;
+        }
+        let older_weight = data[i].weight;
+
+        let delta = newer_weight - older_weight;
+
+        deltaData.push([newer_measured, delta]);
+    }
+
+    let weightDataTable = google.visualization.arrayToDataTable(deltaData);
+    let weightChart = new google.visualization.LineChart(document.getElementById('delta_chart'));
+
     weightChart.draw(weightDataTable, {
         height: '100%',
         lineWidth: 2,
