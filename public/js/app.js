@@ -181,20 +181,24 @@ async function updateCurrentData(data) {
         return;
     }
 
-    // Get the measured timestamp from latest record
-    var measuredLast = data[Object.keys(data).length - 1].measured;
-    var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
+    // Get the latest record in the dataset.
+    let latestRecord = data[Object.keys(data).length - 1];
+    
+    // Get values for current data displays and round them to 2 decimals
+    let temperature = Number(latestRecord.temperature).toFixed(2);
+    let weight = Number(latestRecord.weight).toFixed(3);
+    let humidity = Number(latestRecord.humidity).toFixed(2);
+    let weightDelta = getWeightDeltaString(data);
+
+    // Get date and time of the last record and convert it to a relative string
+    // Example: 'Measured 2 minutes ago.'
+    let measured = luxon.DateTime.fromISO(latestRecord.measured).toRelative({ locale: 'de' });
 
     document.querySelector('main').classList.remove('hide');
-    document.querySelector('#temperature').innerHTML = data[Object.keys(data).length - 1].temperature + ' °C';
-    
-    var weightCurrent = data[Object.keys(data).length - 1].weight;
-    var weightDelta = getWeightDelta(data);
-    var humidityCurrent = data[Object.keys(data).length - 1].humidity;
-    
-    document.querySelector('#weight').innerHTML = weightCurrent + ' kg';
+    document.querySelector('#temperature').innerHTML = temperature + ' °C';
+    document.querySelector('#weight').innerHTML = weight + ' kg';
     document.querySelector('#weight-delta').innerHTML = weightDelta;
-    document.querySelector('#humidity').innerHTML = humidityCurrent + ' %';
+    document.querySelector('#humidity').innerHTML = humidity + ' %';
     document.querySelector('#updated').innerHTML = measured;
     document.querySelector('#loading').classList.add('hide');
 }
@@ -206,19 +210,19 @@ async function updateCurrentData(data) {
  * @param {Object} data Data object from the data API
  * @returns {string} HTML containing the weight delta (in a fitting color)
  */
-function getWeightDelta(data) {
+function getWeightDeltaString(data) {
     // Get weight from most recent record
-    var weightCurrent = data[Object.keys(data).length - 1].weight;
+    let weightCurrent = data[Object.keys(data).length - 1].weight;
     // Get weight from the record in the middle of the array (measured approximately 24 hours ago)
     // This is done in case there is no record from *exactly* 24 hours ago
-    var weightStartIndex = Math.floor(((Object.keys(data).length - 1) / 2))
-    var weightStart = data[weightStartIndex].weight;
+    let weightStartIndex = Math.floor(((Object.keys(data).length - 1) / 2))
+    let weightStart = data[weightStartIndex].weight;
     // Calculate the delta of the current and start weight
-    var weightDelta = weightCurrent - weightStart;
+    let weightDelta = Number(weightCurrent) - Number(weightStart);
     // Limit float to 2 decimal places
-    weightDelta = Number(weightDelta.toFixed(2));
+    weightDelta = weightDelta.toFixed(3);
     // Format HTML string with green color for weight growth and red color for weight decline
-    var weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta}</p>` : `<p style='color: #fe7373;'>${weightDelta}</p>`;
+    let weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta} kg</p>` : `<p style='color: #fe7373;'>${weightDelta} kg</p>`;
     return weightDeltaString;
 }
 
