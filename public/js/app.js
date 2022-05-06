@@ -20,17 +20,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
 
+    let fromDate = window.localStorage.getItem("daterange-from");
+    let toDate = window.localStorage.getItem("daterange-to");
+
+    if (fromDate === "null" || toDate === "null") {
+        // If no date range is set, use the last 7 days
+        fromDate = luxon.DateTime.now().minus({ days: 7 }).toJSDate();
+        toDate = luxon.DateTime.now().toJSDate();
+    } else {
+        fromDate = luxon.DateTime.fromISO(fromDate).toJSDate();
+        toDate = luxon.DateTime.fromISO(toDate).toJSDate();
+    }
+    document.getElementById("daterange-save-to").checked = window.localStorage.getItem("daterange-save-to") == true;
+    if (window.localStorage.getItem("daterange-save-to") != true) {
+        toDate = luxon.DateTime.now().toJSDate();
+    }
+
     datePickerFrom = M.Datepicker.init(document.getElementById('from-date-input'), {
-        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        //minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
         maxDate: luxon.DateTime.now().toJSDate(),
-        defaultDate: luxon.DateTime.now().minus({ days: 4 }).toJSDate(),
+        defaultDate: fromDate,
         setDefaultDate: true
     });
 
     datePickerTo = M.Datepicker.init(document.getElementById('to-date-input'), {
-        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        //minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
         maxDate: luxon.DateTime.now().toJSDate(),
-        defaultDate: luxon.DateTime.now().toJSDate(),
+        defaultDate: toDate,
         setDefaultDate: true
     });
 
@@ -67,22 +83,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Load charts when the library is ready
             await createChartsForDateRange();
 
-            checkbox = document.getElementById('scale-switch');
+            let checkbox = document.getElementById('scale-switch');
 
             checkbox.addEventListener('change', async (e) => {
-                let fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
-                let toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
-
-                // Calculate difference between dates
-                let diff = fromDate.diff(toDate, 'days');
-                diff = Math.abs(diff.toObject().days);
-
                 // Redraw chart when the state of the switch changed
                 element = document.getElementById('scale-switch');
+                window.localStorage.setItem("separate-weight", element.checked ? '1' : '0');
                 await drawCompareChart(beeLogger.cachedData['data'], element.checked);
             });
 
-            checkbox.checked = false;
+            checkbox.checked = window.localStorage.getItem("separate-weight") == true;
             
             // Timeout function in variable to later be able to stop it again
             // when the window was resized again
@@ -114,7 +124,12 @@ function applyDateRange() {
 
         var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
         var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
-    
+
+        // TODO: Add delta-timespan when ready
+        window.localStorage.setItem('daterange-from', fromDate.toISO());
+        window.localStorage.setItem('daterange-to', toDate.toISO());
+        window.localStorage.setItem('daterange-save-to', document.getElementById("daterange-save-to").checked ? '1' : '0');
+
         // Calculate difference between dates
         var diff = fromDate.diff(toDate, 'days');
         diff = Math.abs(diff.toObject().days);
@@ -144,7 +159,8 @@ function applyDateRange() {
             reject();
             return;
         }
-        
+
+        await updateCurrentData(dataObject);
         await drawCharts(data);
         resolve();
     });

@@ -43,7 +43,7 @@ async function drawCharts(data) {
 
     document.getElementById('charts').classList.remove('hide');
 
-    await drawCompareChart(data, false);
+    await drawCompareChart(data, window.localStorage.getItem("separate-weight") == true);
     await drawTempChart(data);
     await drawWeightChart(data);
     await drawHumidityChart(data);
