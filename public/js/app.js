@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         errorHandler('current-data', 204);
     }
 
-    await updateCurrentData(data);
+    //await updateCurrentData(data); // Handled by applyDateRange()
 
     // Set up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
@@ -223,19 +223,23 @@ async function updateCurrentData(data) {
  * @returns {string} HTML containing the weight delta (in a fitting color)
  */
 function getWeightDelta(data) {
-    // Get weight from most recent record
-    var weightCurrent = data[Object.keys(data).length - 1].weight;
-    // Get weight from the record in the middle of the array (measured approximately 24 hours ago)
-    // This is done in case there is no record from *exactly* 24 hours ago
-    var weightStartIndex = Math.floor(((Object.keys(data).length - 1) / 2))
-    var weightStart = data[weightStartIndex].weight;
-    // Calculate the delta of the current and start weight
-    var weightDelta = weightCurrent - weightStart;
-    // Limit float to 2 decimal places
-    weightDelta = Number(weightDelta.toFixed(2));
-    // Format HTML string with green color for weight growth and red color for weight decline
-    var weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta}</p>` : `<p style='color: #fe7373;'>${weightDelta}</p>`;
-    return weightDeltaString;
+    let timespan = document.getElementById("delta-span-input").value * 60000; // in ms
+    if (timespan === undefined || timespan == null || timespan === 0) {
+        timespan = 86400000; // 24h
+    }
+    let i = Object.keys(data).length - 1;
+    let newer_measured = new Date(data[i].measured);
+    let newer_weight = data[i].weight;
+
+    while (newer_measured.getTime() - Date.parse(data[i].measured) < timespan && i > 0) {
+        i--;
+    }
+    let older_weight = data[i].weight;
+
+    let weightDelta = newer_weight - older_weight;
+    weightDelta = weightDelta.toFixed(2);
+
+    return weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta}</p>` : `<p style='color: #fe7373;'>${weightDelta}</p>`;
 }
 
 /**
