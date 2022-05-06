@@ -29,9 +29,16 @@ async function drawCharts(data) {
     }
 
     data = data['data'];
-    let timespan = document.getElementById("delta-span-input").value * 60000; // in ms
-    if (timespan === undefined || timespan == null || timespan === 0) {
-        timespan = 86400000; // 24h
+
+    // Try to get the time interval between records to use for delta graph.
+    let deltaGraphInterval = document.getElementById("delta-span-input").value;
+
+    // If none or invalid interval is specified, use 24 hours by default (in ms).
+    if (typeof deltaGraphInterval !== 'string' || deltaGraphInterval === '' || deltaGraphInterval === '0' ) {
+        deltaGraphInterval = 86400000;
+    } else {
+        // Turn input string into number and convert to milliseconds.
+        deltaGraphInterval = parseInt(deltaGraphInterval) * 60000;
     }
 
     if (data == undefined || data == [] || Object.keys(data) == 0) {
@@ -50,7 +57,7 @@ async function drawCharts(data) {
     await drawCompareChart(data, false);
     await drawTempChart(data);
     await drawWeightChart(data);
-    await drawDeltaChart(data, timespan);
+    await drawDeltaChart(data, deltaGraphInterval);
     await drawHumidityChart(data);
 
     document.getElementById('beelogger-charts-loader').classList.add('hide');
@@ -177,27 +184,37 @@ async function drawWeightChart(data) {
 }
 
 /**
- * Generates and renders the weight chart on the page.
+ * Generates and renders the weight delta chart on the page.
  *
  * @param {Array} data Array containing the data records that the graph should be generated from
- * @param {number} timespan The amount of time between records used for delta calculation (in between will be ignored)
+ * @param {number} interval The amount of time between records used for delta calculation (in between will be ignored)
  */
-async function drawDeltaChart(data, timespan) {
+async function drawDeltaChart(data, interval) {
+    // Create array to visualize as a chart.
     let deltaData = [['Gemessen', 'Delta (g)']];
 
-    let i = Object.keys(data).length - 1;
-    while (i !== 0) {
-        let newer_measured = new Date(data[i].measured);
-        let newer_weight = data[i].weight;
+    // Start with newest record.
+    let recordIndex = Object.keys(data).length - 1;
 
-        while (newer_measured.getTime() - Date.parse(data[i].measured) < timespan && i > 0) {
-            i--;
+    // Go through each record.
+    while (recordIndex !== 0) {
+        let newerRecord = data[recordIndex];
+        let newerRecordTimestamp = new Date(newerRecord.measured);
+        let newerWeight = newerRecord.weight;
+
+        // Go further in the dataset until the set interval is reached again.
+        while (newerRecordTimestamp.getTime() - Date.parse(data[recordIndex].measured) < interval && recordIndex > 0) {
+            recordIndex--;
         }
-        let older_weight = data[i].weight;
+        
+        // The weight of the record one interval further.
+        let olderWeight = data[recordIndex].weight;
 
-        let delta = newer_weight - older_weight;
+        // Calculate the difference between the two weights.
+        let weightDelta = newerWeight - olderWeight;
 
-        deltaData.push([newer_measured, delta]);
+        // Push timestamp and weight data to visualization data array.
+        deltaData.push([newerRecordTimestamp, weightDelta]);
     }
 
     let weightDataTable = google.visualization.arrayToDataTable(deltaData);
