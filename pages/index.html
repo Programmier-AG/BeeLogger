@@ -32,6 +32,9 @@
             <i class="large material-icons">edit_calendar</i>
         </a>
     </div>
+    <a id="reload-button" class="btn-floating btn-large blue accent-3" onclick="applyDateRange();">
+        <i class="large material-icons">refresh</i>
+    </a>
 
     {% with weather=weather_data %}
         {% include './components/weather.html' %}
