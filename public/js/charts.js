@@ -60,7 +60,7 @@ async function drawCharts(data) {
  */
 async function drawCompareChart(data, separateWeight) {
     var compareData = [
-        ['Tag', 'Temperatur (°C)', 'Gewicht (kg)', 'Luftfeuchtigkeit (%)']
+        ['Tag', 'Temperatur (°C)', 'Gewicht (g)', 'Luftfeuchtigkeit (%)']
     ];
 
     for (row in data) {
@@ -145,7 +145,7 @@ async function drawTempChart(data) {
  * @param {Array} data Array containing the data records that the graph should be generated from
  */
 async function drawWeightChart(data) {
-    var weightData = [['Gemessen', 'Gewicht (kg)']];
+    var weightData = [['Gemessen', 'Gewicht (g)']];
 
     for (row in data) {
         var measured = new Date(data[row].measured);
