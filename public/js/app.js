@@ -22,8 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let fromDate = window.localStorage.getItem("daterange-from");
     let toDate = window.localStorage.getItem("daterange-to");
+    let deltaTimespan = window.localStorage.getItem('delta-timespan');
 
-    if (fromDate === "null" || toDate === "null") {
+    if (fromDate === null || toDate === null || deltaTimespan === null) {
+        console.warn("Cleared localStorage because one or more saved values are not initialized.");
+        window.localStorage.clear();
         // If no date range is set, use the last 7 days
         fromDate = luxon.DateTime.now().minus({ days: 7 }).toJSDate();
         toDate = luxon.DateTime.now().toJSDate();
@@ -31,8 +34,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         fromDate = luxon.DateTime.fromISO(fromDate).toJSDate();
         toDate = luxon.DateTime.fromISO(toDate).toJSDate();
     }
-    document.getElementById("daterange-save-to").checked = window.localStorage.getItem("daterange-save-to") == true;
-    if (window.localStorage.getItem("daterange-save-to") != true) {
+    // Set daterange save checkbox to setting saved in localStorage
+    document.getElementById("daterange-save-to").checked = window.localStorage.getItem("daterange-save-to") === "1";
+    if (window.localStorage.getItem("daterange-save-to") === "0") {
         toDate = luxon.DateTime.now().toJSDate();
     }
 
@@ -49,6 +53,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         defaultDate: toDate,
         setDefaultDate: true
     });
+
+    document.getElementById("delta-span-input").value = window.localStorage.getItem("delta-timespan");
 
     // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData()
@@ -125,10 +131,10 @@ function applyDateRange() {
         var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
         var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
 
-        // TODO: Add delta-timespan when ready
         window.localStorage.setItem('daterange-from', fromDate.toISO());
         window.localStorage.setItem('daterange-to', toDate.toISO());
         window.localStorage.setItem('daterange-save-to', document.getElementById("daterange-save-to").checked ? '1' : '0');
+        window.localStorage.setItem('delta-timespan', document.getElementById("delta-span-input").value)
 
         // Calculate difference between dates
         var diff = fromDate.diff(toDate, 'days');
