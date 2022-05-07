@@ -52,7 +52,7 @@ async function drawCharts(data) {
         infoTextElement.innerHTML = infoText;
     });
 
-    document.getElementById('charts').classList.remove('hide');
+    // document.getElementById('charts').classList.remove('hide');
 
     await drawCompareChart(data, window.localStorage.getItem("separate-weight") == true);
     await drawTempChart(data);
@@ -60,7 +60,8 @@ async function drawCharts(data) {
     await drawDeltaChart(data, deltaGraphInterval);
     await drawHumidityChart(data);
 
-    document.getElementById('beelogger-charts-loader').classList.add('hide');
+    document.getElementById('beelogger-daterange-icon').classList.remove('hide');
+    document.getElementById('beelogger-preloader').classList.remove('active');
 }
 
 /**
@@ -71,7 +72,7 @@ async function drawCharts(data) {
  */
 async function drawCompareChart(data, separateWeight) {
     var compareData = [
-        ['Tag', 'Temperatur (°C)', 'Gewicht (kg)', 'Luftfeuchtigkeit (%)']
+        ['Tag', 'Temperatur (°C)', 'Gewicht (g)', 'Luftfeuchtigkeit (%)']
     ];
 
     for (row in data) {
@@ -156,7 +157,7 @@ async function drawTempChart(data) {
  * @param {Array} data Array containing the data records that the graph should be generated from
  */
 async function drawWeightChart(data) {
-    var weightData = [['Gemessen', 'Gewicht (kg)']];
+    var weightData = [['Gemessen', 'Gewicht (g)']];
 
     for (row in data) {
         var measured = new Date(data[row].measured);
