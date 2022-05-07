@@ -232,7 +232,7 @@ async function updateCurrentData(data) {
  * @param {Object} data Data object from the data API
  * @returns {string} HTML containing the weight delta (in a fitting color)
  */
-function getWeightDelta(data) {
+function getWeightDeltaString(data) {
     let timespan = document.getElementById("delta-span-input").value * 60000; // in ms
     if (timespan === undefined || timespan == null || timespan === 0) {
         timespan = 86400000; // 24h
