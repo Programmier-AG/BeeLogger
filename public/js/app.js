@@ -20,35 +20,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
 
-    // Initialize scale switch for weight graph in compare chart.
-    document.getElementById('scale-switch').checked = false;
-
-    // Try to get previously set date range from localStorage (if set)
     let fromDate = window.localStorage.getItem("daterange-from");
     let toDate = window.localStorage.getItem("daterange-to");
 
-    // If no date range is set, use the last 7 days
-    if (fromDate == null || toDate == null) {
+    if (fromDate === "null" || toDate === "null") {
+        // If no date range is set, use the last 7 days
         fromDate = luxon.DateTime.now().minus({ days: 7 }).toJSDate();
         toDate = luxon.DateTime.now().toJSDate();
     } else {
-        // Otherwise, parse and use date provided in localStorage
         fromDate = luxon.DateTime.fromISO(fromDate).toJSDate();
         toDate = luxon.DateTime.fromISO(toDate).toJSDate();
     }
-
-    // Whether or not to save the settings (eg. date range) in localStorage
-    let saveInLocalStorage = window.localStorage.getItem("daterange-save-to") == '1' ? true : false;
-    // Adjust the checkbox accordingly
-    document.getElementById("daterange-save-to").checked = saveInLocalStorage;
-
-    // Check if localStorage is supposed to be used for saving settings
-    if (saveInLocalStorage !== true) {
-        // Remove values possibly saved previously
-        window.localStorage.removeItem('separate-weight');
-        window.localStorage.removeItem("daterange-from");
-        window.localStorage.removeItem('daterange-to');
-        // Reset date range to default values (last 7 days)
+    document.getElementById("daterange-save-to").checked = window.localStorage.getItem("daterange-save-to") == true;
+    if (window.localStorage.getItem("daterange-save-to") != true) {
         toDate = luxon.DateTime.now().toJSDate();
     }
 
@@ -99,23 +83,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Load charts when the library is ready
             await createChartsForDateRange();
 
-            let scaleSwitch = document.getElementById('scale-switch');
+            let checkbox = document.getElementById('scale-switch');
 
-            scaleSwitch.addEventListener('change', async (event) => {
+            checkbox.addEventListener('change', async (e) => {
                 // Redraw chart when the state of the switch changed
-                let checkbox = event.target;
-
-                if (saveInLocalStorage) {
-                    window.localStorage.setItem("separate-weight", checkbox.checked ? '1' : '0');
-                }
-
-                await drawCompareChart(beeLogger.cachedData['data'], checkbox.checked);
+                element = document.getElementById('scale-switch');
+                window.localStorage.setItem("separate-weight", element.checked ? '1' : '0');
+                await drawCompareChart(beeLogger.cachedData['data'], element.checked);
             });
 
-            // If the scale switch is set to 'separate weight' in localStorage, update in DOM
-            if (saveInLocalStorage) {
-                scaleSwitch.checked = window.localStorage.getItem("separate-weight") == '1' ? true : false;
-            }
+            checkbox.checked = window.localStorage.getItem("separate-weight") == true;
             
             // Timeout function in variable to later be able to stop it again
             // when the window was resized again
@@ -148,19 +125,10 @@ function applyDateRange() {
         var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
         var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
 
-        // Save updated values to localStorage (if enabled).
         // TODO: Add delta-timespan when ready
-        saveInLocalStorage = document.getElementById("daterange-save-to").checked;
-        if (saveInLocalStorage) {
-            window.localStorage.setItem('daterange-from', fromDate.toISO());
-            window.localStorage.setItem('daterange-to', toDate.toISO());
-            window.localStorage.setItem('daterange-save-to', document.getElementById("daterange-save-to").checked ? '1' : '0');
-        }
-
-        // User possibly opted-out of saving settings, make sure 'save-to' is set to false.
-        if (!saveInLocalStorage) {
-            window.localStorage.setItem('daterange-save-to', '0');
-        }
+        window.localStorage.setItem('daterange-from', fromDate.toISO());
+        window.localStorage.setItem('daterange-to', toDate.toISO());
+        window.localStorage.setItem('daterange-save-to', document.getElementById("daterange-save-to").checked ? '1' : '0');
 
         // Calculate difference between dates
         var diff = fromDate.diff(toDate, 'days');
