@@ -186,7 +186,7 @@ async function updateCurrentData(data) {
     
     // Get values for current data displays and round them to 2 decimals
     let temperature = Number(latestRecord.temperature).toFixed(2);
-    let weight = Number(latestRecord.weight).toFixed(3);
+    let weight = Number(latestRecord.weight).toFixed(2);
     let humidity = Number(latestRecord.humidity).toFixed(2);
     let weightDelta = getWeightDeltaString(data);
 
@@ -196,7 +196,7 @@ async function updateCurrentData(data) {
 
     document.querySelector('main').classList.remove('hide');
     document.querySelector('#temperature').innerHTML = temperature + ' °C';
-    document.querySelector('#weight').innerHTML = weight + ' kg';
+    document.querySelector('#weight').innerHTML = weight + ' g';
     document.querySelector('#weight-delta').innerHTML = weightDelta;
     document.querySelector('#humidity').innerHTML = humidity + ' %';
     document.querySelector('#updated').innerHTML = measured;
@@ -222,7 +222,7 @@ function getWeightDeltaString(data) {
     // Limit float to 2 decimal places
     weightDelta = weightDelta.toFixed(3);
     // Format HTML string with green color for weight growth and red color for weight decline
-    let weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta} kg</p>` : `<p style='color: #fe7373;'>${weightDelta} kg</p>`;
+    let weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta} g</p>` : `<p style='color: #fe7373;'>${weightDelta} g</p>`;
     return weightDeltaString;
 }
 
