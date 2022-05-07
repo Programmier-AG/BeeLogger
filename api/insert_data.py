@@ -23,7 +23,7 @@ def insert_data():
             if current["weight"] - float(r_data["w"]) > 0.5:
                 notifications.Feed().push_notification("warning",
                                                        "Gewichtsabfall!",
-                                                       "Das Gewicht ist bei der aktuellen Messung um %skg abgefallen!"
+                                                       "Das Gewicht ist bei der aktuellen Messung um %sg abgefallen!"
                                                        % str(round(float(r_data["w"]) - current["weight"], 2)))
         except Exception as e:
             print("Error while performing data checks!\n"
