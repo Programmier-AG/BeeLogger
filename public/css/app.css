@@ -145,6 +145,12 @@ footer {
     margin-bottom: 0;
 }
 
+#reload-button {
+    position: fixed;
+    bottom: 100px;
+    right: 23px;
+}
+
 /* Credit: https://stackoverflow.com/a/55788640/18085012 */
 .loader {
   position: absolute;

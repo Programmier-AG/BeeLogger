@@ -2,6 +2,11 @@
     {% include './components/about-modal.html' %}
     {% include './components/modals.html' %}
 
+    <div id="reload-button" class="fixed-action-btn">
+        <a class="btn-floating btn-large blue accent-3" onclick="applyDateRange();">
+            <i class="large material-icons">refresh</i>
+        </a>
+    </div>
     <div class="fixed-action-btn">
         <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
             <i id="beelogger-daterange-icon" class="large material-icons hide">edit_calendar</i>
