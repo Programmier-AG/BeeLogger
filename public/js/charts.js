@@ -30,6 +30,17 @@ async function drawCharts(data) {
 
     data = data['data'];
 
+    // Try to get the time interval between records to use for delta graph.
+    let deltaGraphInterval = document.getElementById("delta-span-input").value;
+
+    // If none or invalid interval is specified, use 24 hours by default (in ms).
+    if (typeof deltaGraphInterval !== 'string' || deltaGraphInterval === '' || deltaGraphInterval === '0' ) {
+        deltaGraphInterval = 86400000;
+    } else {
+        // Turn input string into number and convert to milliseconds.
+        deltaGraphInterval = parseInt(deltaGraphInterval) * 60000;
+    }
+
     if (data == undefined || data == [] || Object.keys(data) == 0) {
         errorHandler('charts', 204);
         return;
@@ -43,9 +54,10 @@ async function drawCharts(data) {
 
     // document.getElementById('charts').classList.remove('hide');
 
-    await drawCompareChart(data, false);
+    await drawCompareChart(data, window.localStorage.getItem("separate-weight") == true);
     await drawTempChart(data);
     await drawWeightChart(data);
+    await drawDeltaChart(data, deltaGraphInterval);
     await drawHumidityChart(data);
 
     document.getElementById('beelogger-daterange-icon').classList.remove('hide');
@@ -140,7 +152,7 @@ async function drawTempChart(data) {
 }
 
 /**
- * Generates and renders the weight chart on the page.
+ * Generates and renders the weight delta chart on the page.
  * 
  * @param {Array} data Array containing the data records that the graph should be generated from
  */
@@ -155,6 +167,60 @@ async function drawWeightChart(data) {
     var weightDataTable = google.visualization.arrayToDataTable(weightData);
     var weightChart = new google.visualization.LineChart(document.getElementById('weight_chart'));
     
+    weightChart.draw(weightDataTable, {
+        height: '100%',
+        lineWidth: 2,
+        colors: ['black'],
+        chartArea: {
+            left: '10%',
+            top: '10%',
+            right: '10%',
+            width: '100%',
+            height: '70%'
+        },
+        legend: {
+            position: 'bottom'
+        },
+    });
+}
+
+/**
+ * Generates and renders the weight delta chart on the page.
+ *
+ * @param {Array} data Array containing the data records that the graph should be generated from
+ * @param {number} interval The amount of time between records used for delta calculation (in between will be ignored)
+ */
+async function drawDeltaChart(data, interval) {
+    // Create array to visualize as a chart.
+    let deltaData = [['Gemessen', 'Delta (g)']];
+
+    // Start with newest record.
+    let recordIndex = Object.keys(data).length - 1;
+
+    // Go through each record.
+    while (recordIndex !== 0) {
+        let newerRecord = data[recordIndex];
+        let newerRecordTimestamp = new Date(newerRecord.measured);
+        let newerWeight = newerRecord.weight;
+
+        // Go further in the dataset until the set interval is reached again.
+        while (newerRecordTimestamp.getTime() - Date.parse(data[recordIndex].measured) < interval && recordIndex > 0) {
+            recordIndex--;
+        }
+        
+        // The weight of the record one interval further.
+        let olderWeight = data[recordIndex].weight;
+
+        // Calculate the difference between the two weights.
+        let weightDelta = newerWeight - olderWeight;
+
+        // Push timestamp and weight data to visualization data array.
+        deltaData.push([newerRecordTimestamp, weightDelta]);
+    }
+
+    let weightDataTable = google.visualization.arrayToDataTable(deltaData);
+    let weightChart = new google.visualization.LineChart(document.getElementById('delta_chart'));
+
     weightChart.draw(weightDataTable, {
         height: '100%',
         lineWidth: 2,

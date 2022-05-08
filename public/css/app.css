@@ -142,7 +142,13 @@ footer {
 }
 .display-info {
     text-align: center;
-    margin-bottom: 0;
+    margin-bottom: 0%;
+}
+
+#reload-button {
+    position: fixed;
+    bottom: 100px;
+    right: 23px;
 }
 
 #reload-button {

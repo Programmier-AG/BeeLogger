@@ -21,19 +21,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
     M.ScrollSpy.init(document.querySelectorAll('.scrollspy'), {});
 
+    let fromDate = window.localStorage.getItem("daterange-from");
+    let toDate = window.localStorage.getItem("daterange-to");
+    let deltaTimespan = window.localStorage.getItem('delta-timespan');
+
+    if (fromDate === null || toDate === null || deltaTimespan === null) {
+        console.warn("Cleared localStorage because one or more saved values are not initialized.");
+        window.localStorage.clear();
+        // If no date range is set, use the last 7 days
+        fromDate = luxon.DateTime.now().minus({ days: 7 }).toJSDate();
+        toDate = luxon.DateTime.now().toJSDate();
+    } else {
+        fromDate = luxon.DateTime.fromISO(fromDate).toJSDate();
+        toDate = luxon.DateTime.fromISO(toDate).toJSDate();
+    }
+    // Set daterange save checkbox to setting saved in localStorage
+    document.getElementById("daterange-save-to").checked = window.localStorage.getItem("daterange-save-to") === "1";
+    if (window.localStorage.getItem("daterange-save-to") === "0") {
+        toDate = luxon.DateTime.now().toJSDate();
+    }
+
     datePickerFrom = M.Datepicker.init(document.getElementById('from-date-input'), {
-        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        //minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
         maxDate: luxon.DateTime.now().toJSDate(),
-        defaultDate: luxon.DateTime.now().minus({ days: 4 }).toJSDate(),
+        defaultDate: fromDate,
         setDefaultDate: true
     });
 
     datePickerTo = M.Datepicker.init(document.getElementById('to-date-input'), {
-        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        //minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
         maxDate: luxon.DateTime.now().toJSDate(),
-        defaultDate: luxon.DateTime.now().toJSDate(),
+        defaultDate: toDate,
         setDefaultDate: true
     });
+
+    document.getElementById("delta-span-input").value = window.localStorage.getItem("delta-timespan");
 
     // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData()
@@ -47,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         errorHandler('current-data', 204);
     }
 
-    await updateCurrentData(data);
+    //await updateCurrentData(data); // Handled by applyDateRange()
 
     // Set up background task for keeping the 'measured' date up-to-date
     setInterval(() => {
@@ -68,22 +90,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Load charts when the library is ready
             await createChartsForDateRange();
 
-            checkbox = document.getElementById('scale-switch');
+            let checkbox = document.getElementById('scale-switch');
 
             checkbox.addEventListener('change', async (e) => {
-                let fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
-                let toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
-
-                // Calculate difference between dates
-                let diff = fromDate.diff(toDate, 'days');
-                diff = Math.abs(diff.toObject().days);
-
                 // Redraw chart when the state of the switch changed
                 element = document.getElementById('scale-switch');
+                window.localStorage.setItem("separate-weight", element.checked ? '1' : '0');
                 await drawCompareChart(beeLogger.cachedData['data'], element.checked);
             });
 
-            checkbox.checked = false;
+            checkbox.checked = window.localStorage.getItem("separate-weight") == true;
             
             // Timeout function in variable to later be able to stop it again
             // when the window was resized again
@@ -116,7 +132,12 @@ function applyDateRange() {
 
         var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
         var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
-    
+
+        window.localStorage.setItem('daterange-from', fromDate.toISO());
+        window.localStorage.setItem('daterange-to', toDate.toISO());
+        window.localStorage.setItem('daterange-save-to', document.getElementById("daterange-save-to").checked ? '1' : '0');
+        window.localStorage.setItem('delta-timespan', document.getElementById("delta-span-input").value)
+
         // Calculate difference between dates
         var diff = fromDate.diff(toDate, 'days');
         diff = Math.abs(diff.toObject().days);
@@ -147,7 +168,8 @@ function applyDateRange() {
             reject();
             return;
         }
-        
+
+        await updateCurrentData(dataObject);
         await drawCharts(data);
         resolve();
     });
@@ -211,19 +233,23 @@ async function updateCurrentData(data) {
  * @returns {string} HTML containing the weight delta (in a fitting color)
  */
 function getWeightDeltaString(data) {
-    // Get weight from most recent record
-    let weightCurrent = data[Object.keys(data).length - 1].weight;
-    // Get weight from the record in the middle of the array (measured approximately 24 hours ago)
-    // This is done in case there is no record from *exactly* 24 hours ago
-    let weightStartIndex = Math.floor(((Object.keys(data).length - 1) / 2))
-    let weightStart = data[weightStartIndex].weight;
-    // Calculate the delta of the current and start weight
-    let weightDelta = Number(weightCurrent) - Number(weightStart);
-    // Limit float to 2 decimal places
-    weightDelta = weightDelta.toFixed(3);
-    // Format HTML string with green color for weight growth and red color for weight decline
-    let weightDeltaString = weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta} g</p>` : `<p style='color: #fe7373;'>${weightDelta} g</p>`;
-    return weightDeltaString;
+    let timespan = document.getElementById("delta-span-input").value * 60000; // in ms
+    if (timespan === undefined || timespan == null || timespan === 0) {
+        timespan = 86400000; // 24h
+    }
+    let i = Object.keys(data).length - 1;
+    let newer_measured = new Date(data[i].measured);
+    let newer_weight = data[i].weight;
+
+    while (newer_measured.getTime() - Date.parse(data[i].measured) < timespan && i > 0) {
+        i--;
+    }
+    let older_weight = data[i].weight;
+
+    let weightDelta = newer_weight - older_weight;
+    weightDelta = weightDelta.toFixed(2);
+
+    return weightDelta >= 0 ? `<p style='color: #8aff6b;'>+${weightDelta}</p>` : `<p style='color: #fe7373;'>${weightDelta}</p>`;
 }
 
 /**
