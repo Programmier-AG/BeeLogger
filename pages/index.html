@@ -1,71 +1,21 @@
 {% extends "base.html" %}
 
 {% block custom_header %}
-<link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/app.css">
 {% endblock %}
 
-{% block content %}
-<div class="row center" id="loading">
-    <div class="card col s10 m6 offset-s1 offset-m3 blue-grey darken-1" style="margin-top: 40px;">
-        <div class="card-content white-text">
-            <span id="loading-title" class="card-title">Daten werden geladen...</span>
-            <div id="loading-progress" class="progress">
-                <div class="indeterminate"></div>
-            </div>
-            <p id="loading-text">Die Daten werden aus unserer Datenbank abgerufen. Dies kann einen Moment dauern.</p>
-        </div>
-    </div>
-</div>
+{% include './components/header.html' %}
 
-<main class="hide">
-    {% include './components/header.html' %}
-    
+{% block content %}
     {% with links=pages %}
         {% include './components/sidenav.html' %}
     {% endwith %}
 
-    {% include './components/about-modal.html' %}
-    {% include './components/modals.html' %}
-
-    <div class="fixed-action-btn">
-        <a class="btn-floating btn-large blue accent-3 modal-trigger" href="#dateRangeModal">
-            <i class="large material-icons">edit_calendar</i>
-        </a>
-    </div>
-    <a id="reload-button" class="btn-floating btn-large blue accent-3" onclick="applyDateRange();">
-        <i class="large material-icons">refresh</i>
-    </a>
-
-    {% with weather=weather_data %}
-        {% include './components/weather.html' %}
-    {% endwith %}
-
-    {% include './components/current-data.html' %}
-
-    <div id="beelogger-charts-error-box" class="beelogger-error-box card blue-grey darken-1 hide"></div>
-    
-    <div id="beelogger-charts-loader" class="beelogger-error-box card blue-grey darken-1 hide">
-        <div class="row center" id="loading">
-            <div class="card-content white-text">
-                <span id="loading-title" class="card-title">Daten werden geladen...</span>
-                <div id="loading-progress" class="progress">
-                    <div class="indeterminate"></div>
-                </div>
-                <p id="loading-text">Die Daten werden aus unserer Datenbank abgerufen. Dies kann einen Moment dauern.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="charts">
-        {% include './components/charts.html' %}
-    </div>
-
-    {% include './components/footer.html' %}
-</main>
+    {% include './components/mainpage.html' %}
 {% endblock %}
 
 {% block custom_footer %}
-<script src="/js/beelogger.js"></script>
-<script src="/js/charts.js"></script>
-<script src="/js/app.js"></script>
+    <script src="/js/beelogger.js"></script>
+    <script src="/js/charts.js"></script>
+    <script src="/js/app.js"></script>
 {% endblock %}

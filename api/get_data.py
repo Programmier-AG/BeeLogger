@@ -39,6 +39,9 @@ def get_data():
         else:
             amount = int(request.args["amount"])
 
+        if amount > row_count:
+            amount = row_count
+
         compress_count = round(row_count / amount)
 
         print(">> Compressing from %s to %s values with interval %s" % (row_count, amount, compress_count))

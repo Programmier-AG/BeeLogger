@@ -19,20 +19,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     M.Modal.init(document.querySelectorAll('.modal'), {});
     M.FormSelect.init(document.querySelectorAll('select'), {});
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
+    M.ScrollSpy.init(document.querySelectorAll('.scrollspy'), {});
+
+    let fromDate = window.localStorage.getItem("daterange-from");
+    let toDate = window.localStorage.getItem("daterange-to");
+    let deltaTimespan = window.localStorage.getItem('delta-timespan');
+
+    if (fromDate === null || toDate === null || deltaTimespan === null) {
+        console.warn("Cleared localStorage because one or more saved values are not initialized.");
+        window.localStorage.clear();
+        // If no date range is set, use the last 7 days
+        fromDate = luxon.DateTime.now().minus({ days: 7 }).toJSDate();
+        toDate = luxon.DateTime.now().toJSDate();
+    } else {
+        fromDate = luxon.DateTime.fromISO(fromDate).toJSDate();
+        toDate = luxon.DateTime.fromISO(toDate).toJSDate();
+    }
+    // Set daterange save checkbox to setting saved in localStorage
+    document.getElementById("daterange-save-to").checked = window.localStorage.getItem("daterange-save-to") === "1";
+    if (window.localStorage.getItem("daterange-save-to") === "0") {
+        toDate = luxon.DateTime.now().toJSDate();
+    }
 
     datePickerFrom = M.Datepicker.init(document.getElementById('from-date-input'), {
-        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        //minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
         maxDate: luxon.DateTime.now().toJSDate(),
-        defaultDate: luxon.DateTime.now().minus({ days: 4 }).toJSDate(),
+        defaultDate: fromDate,
         setDefaultDate: true
     });
 
     datePickerTo = M.Datepicker.init(document.getElementById('to-date-input'), {
-        minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
+        //minDate: luxon.DateTime.now().minus({ years: 1 }).toJSDate(),
         maxDate: luxon.DateTime.now().toJSDate(),
-        defaultDate: luxon.DateTime.now().toJSDate(),
+        defaultDate: toDate,
         setDefaultDate: true
     });
+
+    document.getElementById("delta-span-input").value = window.localStorage.getItem("delta-timespan");
 
     // Get data from the last 24 hours and populate beeLogger.currentData
     var data = await beeLogger.getCurrentData()
@@ -67,22 +90,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Load charts when the library is ready
             await createChartsForDateRange();
 
-            checkbox = document.getElementById('scale-switch');
+            let checkbox = document.getElementById('scale-switch');
 
             checkbox.addEventListener('change', async (e) => {
-                let fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
-                let toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
-
-                // Calculate difference between dates
-                let diff = fromDate.diff(toDate, 'days');
-                diff = Math.abs(diff.toObject().days);
-
                 // Redraw chart when the state of the switch changed
                 element = document.getElementById('scale-switch');
+                window.localStorage.setItem("separate-weight", element.checked ? '1' : '0');
                 await drawCompareChart(beeLogger.cachedData['data'], element.checked);
             });
 
-            checkbox.checked = false;
+            checkbox.checked = window.localStorage.getItem("separate-weight") == true;
             
             // Timeout function in variable to later be able to stop it again
             // when the window was resized again
@@ -109,23 +126,30 @@ document.addEventListener('DOMContentLoaded', async () => {
  * @returns {Promise} Resolves when done re-drawing the charts and rejects on error
  */
 function applyDateRange() {
+    console.log('Applying date range');
     return new Promise(async (resolve, reject) => {
         document.getElementById('beelogger-charts-error-box').classList.add('hide');
 
         var fromDate = luxon.DateTime.fromJSDate(datePickerFrom.date);
         var toDate = luxon.DateTime.fromJSDate(datePickerTo.date);
-    
+
+        window.localStorage.setItem('daterange-from', fromDate.toISO());
+        window.localStorage.setItem('daterange-to', toDate.toISO());
+        window.localStorage.setItem('daterange-save-to', document.getElementById("daterange-save-to").checked ? '1' : '0');
+        window.localStorage.setItem('delta-timespan', document.getElementById("delta-span-input").value)
+
         // Calculate difference between dates
         var diff = fromDate.diff(toDate, 'days');
         diff = Math.abs(diff.toObject().days);
     
         // Append 'compressed' option when difference is > 10 days
-        var compressed = diff > 10 ? true : false;
+        var compressed = diff > 10;
     
         fromDate = fromDate.toISODate();
         toDate = toDate.toISODate();
     
-        document.getElementById('beelogger-charts-loader').classList.remove('hide');
+        document.getElementById('beelogger-daterange-icon').classList.add('hide');
+        document.getElementById('beelogger-preloader').classList.add('active');
     
         // Get data for the specified time span
         var data = await beeLogger.getData(fromDate, toDate, compressed)
@@ -157,11 +181,8 @@ function applyDateRange() {
  */
 async function createChartsForDateRange() {
     var chartsSection = document.getElementById('charts');
-    // Hide charts section for the time being
-    chartsSection.classList.add('hide');
     
     applyDateRange()
-        .then(() => chartsSection.classList.remove('hide'))
         // Error already handled by `applyDateRange()`
         .catch(() => chartsSection.classList.add('hide'));
 }
@@ -182,20 +203,24 @@ async function updateCurrentData(data) {
         return;
     }
 
-    // Get the measured timestamp from latest record
-    var measuredLast = data[Object.keys(data).length - 1].measured;
-    var measured = luxon.DateTime.fromISO(measuredLast).toRelative({ locale: 'de' });
+    // Get the latest record in the dataset.
+    let latestRecord = data[Object.keys(data).length - 1];
+    
+    // Get values for current data displays and round them to 2 decimals
+    let temperature = Number(latestRecord.temperature).toFixed(2);
+    let weight = Number(latestRecord.weight).toFixed(2);
+    let humidity = Number(latestRecord.humidity).toFixed(2);
+    let weightDelta = getWeightDeltaString(data);
+
+    // Get date and time of the last record and convert it to a relative string
+    // Example: 'Measured 2 minutes ago.'
+    let measured = luxon.DateTime.fromISO(latestRecord.measured).toRelative({ locale: 'de' });
 
     document.querySelector('main').classList.remove('hide');
-    document.querySelector('#temperature').innerHTML = data[Object.keys(data).length - 1].temperature + ' °C';
-    
-    var weightCurrent = data[Object.keys(data).length - 1].weight;
-    var weightDelta = getWeightDelta(data);
-    var humidityCurrent = data[Object.keys(data).length - 1].humidity;
-    
-    document.querySelector('#weight').innerHTML = weightCurrent + ' kg';
+    document.querySelector('#temperature').innerHTML = temperature + ' °C';
+    document.querySelector('#weight').innerHTML = weight + ' g';
     document.querySelector('#weight-delta').innerHTML = weightDelta;
-    document.querySelector('#humidity').innerHTML = humidityCurrent + ' %';
+    document.querySelector('#humidity').innerHTML = humidity + ' %';
     document.querySelector('#updated').innerHTML = measured;
     document.querySelector('#loading').classList.add('hide');
 }
@@ -207,7 +232,7 @@ async function updateCurrentData(data) {
  * @param {Object} data Data object from the data API
  * @returns {string} HTML containing the weight delta (in a fitting color)
  */
-function getWeightDelta(data) {
+function getWeightDeltaString(data) {
     let timespan = document.getElementById("delta-span-input").value * 60000; // in ms
     if (timespan === undefined || timespan == null || timespan === 0) {
         timespan = 86400000; // 24h
@@ -306,8 +331,10 @@ function errorHandler(scope, err) {
             let chartsErrorBox = document.getElementById('beelogger-charts-error-box');
             chartsErrorBox.innerHTML = error.title +  error.description;
             chartsErrorBox.classList.remove('hide');
-            document.getElementById('charts').classList.add('hide');
-            document.getElementById('beelogger-charts-loader').classList.add('hide');
+            // document.getElementById('charts').classList.add('hide');
+            document.getElementById('beelogger-preloader').classList.remove('active');
+            document.getElementById('beelogger-daterange-icon').classList.remove('hide');
+
             break;
 
         // Something mandatory is broken, show error message across the entire screen
