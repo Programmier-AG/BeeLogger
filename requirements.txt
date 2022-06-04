@@ -1,5 +1,5 @@
-setuptools~=58.3
-pip~=21.3
+setuptools
+pip
 Flask~=2.0.2
 Werkzeug~=2.0.2
 numpy~=1.21.3
