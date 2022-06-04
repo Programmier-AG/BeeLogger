@@ -16,6 +16,9 @@ if not use_env:
     telegram_bot_token = ""
 
     privacy_url = ""
+    server_scheme = "https"
+    auto_server_name = "true"
+    server_name = "<url>:<port>"
 
     insert_token = ""
     display_token = ""

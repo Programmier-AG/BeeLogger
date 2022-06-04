@@ -49,7 +49,8 @@ except Exception as exception:
 # Initialize Flask app
 app = Flask("BeeLogger", static_folder='public', static_url_path='', template_folder='pages')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.config['SERVER_NAME'] = config.server_name
+if config.auto_server_name != "true":
+    app.config['SERVER_NAME'] = config.server_name
 app.json_encoder = CustomJSONEncoder
 
 # Set app redirect scheme
